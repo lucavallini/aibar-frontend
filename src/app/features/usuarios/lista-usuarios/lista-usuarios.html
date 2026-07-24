@@ -1,0 +1,126 @@
+<div class="contenedor">
+  <header>
+    <h1>Usuarios</h1>
+    <button class="btn-primario" (click)="abrirAlta()">+ Nuevo usuario</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !modalAltaAbierto() && !modalEditarAbierto()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!cargando() && !error()) {
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre completo</th>
+          <th>Usuario</th>
+          <th>DNI</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (usuario of usuarios(); track usuario.id) {
+          <tr>
+            <td>{{ usuario.nombre_completo }}</td>
+            <td>{{ usuario.nombre_usuario }}</td>
+            <td>{{ usuario.dni }}</td>
+            <td><span class="badge" [class]="usuario.rol">{{ usuario.rol }}</span></td>
+            <td>{{ usuario.activo ? 'Activo' : 'Inactivo' }}</td>
+            <td>
+              <button class="btn-mini" (click)="abrirEditar(usuario)">Editar</button>
+              @if (!esUsuarioActual(usuario) && usuario.activo) {
+                <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(usuario)">Baja</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6">No hay usuarios cargados todavía.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <app-paginacion
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      [total]="total()"
+      (cambioPagina)="cambiarPagina($event)"
+    ></app-paginacion>
+  }
+</div>
+
+@if (modalAltaAbierto()) {
+  <div class="modal-overlay" (click)="cerrarAlta()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nuevo usuario</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="nombreCompleto">Nombre completo</label>
+      <input id="nombreCompleto" type="text" [(ngModel)]="nuevoUsuario.nombre_completo" />
+
+      <label for="dni">DNI</label>
+      <input id="dni" type="text" [(ngModel)]="nuevoUsuario.dni" />
+
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" [(ngModel)]="nuevoUsuario.password" />
+
+      <label for="rol">Rol</label>
+      <select id="rol" [(ngModel)]="nuevoUsuario.rol">
+        <option value="empleado">Empleado</option>
+        <option value="administrador">Administrador</option>
+      </select>
+
+      <div class="acciones-modal">
+        <button (click)="cerrarAlta()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAlta()">Crear usuario</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalEditarAbierto()) {
+  <div class="modal-overlay" (click)="cerrarEditar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Editar usuario</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="nombreEdit">Nombre completo</label>
+      <input id="nombreEdit" type="text" [(ngModel)]="edicionUsuario.nombre_completo" />
+
+      <label for="dniEdit">DNI</label>
+      <input id="dniEdit" type="text" [(ngModel)]="edicionUsuario.dni" />
+
+      <label for="rolEdit">Rol</label>
+      <select id="rolEdit" [(ngModel)]="edicionUsuario.rol">
+        <option value="empleado">Empleado</option>
+        <option value="administrador">Administrador</option>
+      </select>
+
+      <div class="acciones-modal">
+        <button (click)="cerrarEditar()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalBajaAbierto()) {
+  <app-confirmar
+    titulo="Dar de baja usuario"
+    [mensaje]="'¿Seguro que querés dar de baja a ' + usuarioSeleccionado()?.nombre_completo + '? No va a poder iniciar sesión.'"
+    textoConfirmar="Dar de baja"
+    (confirmar)="confirmarBaja()"
+    (cancelar)="cerrarBaja()"
+  ></app-confirmar>
+}

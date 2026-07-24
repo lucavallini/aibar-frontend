@@ -1,0 +1,122 @@
+<div class="contenedor">
+  <header>
+    <h1>Camiones</h1>
+    <button class="btn-primario" (click)="abrirModal()">+ Nuevo camión</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !modalAbierto()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+@if (!cargando() && !error()) {
+  <table>
+    <thead>
+      <tr>
+        <th>Patente</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Año</th>
+        <th>Tipo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (camion of camiones(); track camion.id) {
+        <tr>
+          <td>{{ camion.patente }}</td>
+          <td>{{ camion.marca || '-' }}</td>
+          <td>{{ camion.modelo || '-' }}</td>
+          <td>{{ camion.anio || '-' }}</td>
+          <td>{{ camion.tipo || '-' }}</td>
+          <td>
+            <button class="btn-mini" (click)="abrirEditar(camion)">Editar</button>
+            <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(camion)">Baja</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6">No hay camiones cargados todavía.</td></tr>
+      }
+    </tbody>
+  </table>
+
+  <app-paginacion
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    (cambioPagina)="cambiarPagina($event)"
+  ></app-paginacion>
+}
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nuevo camión</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="patente">Patente</label>
+      <input id="patente" type="text" [(ngModel)]="nuevoCamion.patente" />
+
+      <label for="marca">Marca</label>
+      <input id="marca" type="text" [(ngModel)]="nuevoCamion.marca" />
+
+      <label for="modelo">Modelo</label>
+      <input id="modelo" type="text" [(ngModel)]="nuevoCamion.modelo" />
+
+      <label for="anio">Año</label>
+      <input id="anio" type="number" [(ngModel)]="nuevoCamion.anio" />
+
+      <label for="tipo">Tipo</label>
+      <input id="tipo" type="text" [(ngModel)]="nuevoCamion.tipo" placeholder="acoplado, chasis, furgón..." />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalEditarAbierto()) {
+  <div class="modal-overlay" (click)="cerrarEditar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Editar camión</h2>
+
+      @if (error()) { <p class="error">{{ error() }}</p> }
+
+      <label for="marcaEdit">Marca</label>
+      <input id="marcaEdit" type="text" [(ngModel)]="edicionCamion.marca" />
+
+      <label for="modeloEdit">Modelo</label>
+      <input id="modeloEdit" type="text" [(ngModel)]="edicionCamion.modelo" />
+
+      <label for="anioEdit">Año</label>
+      <input id="anioEdit" type="number" [(ngModel)]="edicionCamion.anio" />
+
+      <label for="tipoEdit">Tipo</label>
+      <input id="tipoEdit" type="text" [(ngModel)]="edicionCamion.tipo" />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarEditar()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalBajaAbierto()) {
+  <app-confirmar
+    titulo="Dar de baja camión"
+    [mensaje]="'¿Seguro que querés dar de baja el camión ' + camionSeleccionado()?.patente + '?'"
+    textoConfirmar="Dar de baja"
+    (confirmar)="confirmarBaja()"
+    (cancelar)="cerrarBaja()"
+  ></app-confirmar>
+}

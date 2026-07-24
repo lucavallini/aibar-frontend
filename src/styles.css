@@ -1,0 +1,430 @@
+:root {
+  color-scheme: light;
+
+  --altura-header: 64px;
+  --ancho-sidebar: 240px;
+
+  --color-fondo: #f8faf9;
+  --color-fondo-panel: #ffffff;
+  --color-fondo-suave: #f1f5f3;
+  --color-texto: #161d1a;
+  --color-texto-secundario: #63716c;
+  --color-borde: #e2ebe7;
+
+  --color-primario: #106b56;
+  --color-primario-hover: #0b5a47;
+  --color-primario-claro: #e6f3ef;
+
+  --color-sidebar-fondo: #ffffff;
+  --color-sidebar-texto: #4e5f59;
+  --color-sidebar-activo: #0f5f4d;
+  --color-sidebar-hover: #f0f6f3;
+  --color-sidebar-activo-fondo: #e2f0eb;
+
+  --color-acento: #2f8a73;
+  --color-error: #b42318;
+  --color-error-fondo: #fef3f2;
+  --color-exito: #087443;
+  --color-exito-fondo: #ecfdf3;
+  --color-alerta: #8a5a00;
+  --color-alerta-fondo: #fffaeb;
+  --color-info: #175cd3;
+  --color-info-fondo: #eff6ff;
+  --color-neutro: #4b5563;
+  --color-neutro-fondo: #f3f4f6;
+
+  --radio: 8px;
+  --sombra: 0 1px 2px rgb(18 28 24 / 0.06), 0 8px 24px rgb(18 28 24 / 0.04);
+  --sombra-modal: 0 20px 48px rgb(18 28 24 / 0.2);
+}
+
+.tema-oscuro {
+  color-scheme: dark;
+
+  --color-fondo: #111614;
+  --color-fondo-panel: #1a201d;
+  --color-fondo-suave: #202824;
+  --color-texto: #edf3f1;
+  --color-texto-secundario: #a9b9b3;
+  --color-borde: #2b3732;
+
+  --color-primario: #73c7b0;
+  --color-primario-hover: #91d8c5;
+  --color-primario-claro: #203b33;
+
+  --color-sidebar-fondo: #171d1a;
+  --color-sidebar-texto: #b7c9c2;
+  --color-sidebar-activo: #dff7ef;
+  --color-sidebar-hover: #202824;
+  --color-sidebar-activo-fondo: #1f4037;
+
+  --color-acento: #73c7b0;
+  --color-error: #f97066;
+  --color-error-fondo: #3a1716;
+  --color-exito: #6ce9a6;
+  --color-exito-fondo: #102a1d;
+  --color-alerta: #fdb022;
+  --color-alerta-fondo: #2b2111;
+  --color-info: #84caff;
+  --color-info-fondo: #13243b;
+  --color-neutro: #c5ced8;
+  --color-neutro-fondo: #20252c;
+
+  --sombra: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px rgb(0 0 0 / 0.18);
+  --sombra-modal: 0 20px 48px rgb(0 0 0 / 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--color-fondo);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+button {
+  font-family: inherit;
+  font-weight: 600;
+  transition: background-color 0.15s, opacity 0.15s, transform 0.1s;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 0.94rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primario) !important;
+  box-shadow: 0 0 0 3px var(--color-primario-claro);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.contenedor {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+}
+
+.contenedor > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.contenedor table {
+  overflow: hidden;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+th,
+td {
+  padding: 0.72rem 0.85rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+th {
+  color: var(--color-texto-secundario);
+  background: var(--color-fondo-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+tbody tr {
+  transition: background-color 0.15s;
+}
+
+tbody tr:hover {
+  background: var(--color-primario-claro);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.btn-primario,
+.btn-accion,
+.acciones-modal button {
+  min-height: 38px;
+  padding: 0.52rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.btn-primario {
+  background: var(--color-primario);
+  color: #ffffff;
+  box-shadow: var(--sombra);
+}
+
+.btn-primario:hover {
+  background: var(--color-primario-hover);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+p.error {
+  padding: 0.7rem 0.85rem;
+  background: var(--color-error-fondo);
+  border: 1px solid color-mix(in srgb, var(--color-error) 28%, transparent);
+  border-radius: var(--radio);
+  font-size: 0.9rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.16rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+:is(
+  .disponible,
+  .viajando,
+  .inactivo,
+  .pendiente,
+  .en_curso,
+  .finalizado,
+  .cancelado,
+  .alta,
+  .edicion,
+  .cancelacion,
+  .baja,
+  .administrador,
+  .empleado
+) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.16rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge.disponible,
+.badge.finalizado,
+.badge.alta,
+.badge.administrador,
+.disponible,
+.finalizado,
+.alta,
+.administrador {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.badge.viajando,
+.badge.pendiente,
+.viajando,
+.pendiente {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+}
+
+.badge.en_curso,
+.badge.edicion,
+.badge.empleado,
+.en_curso,
+.edicion,
+.empleado {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.badge.inactivo,
+.badge.cancelado,
+.badge.cancelacion,
+.inactivo,
+.cancelado,
+.cancelacion {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.badge.baja,
+.baja {
+  background: var(--color-neutro-fondo);
+  color: var(--color-neutro);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(9 18 16 / 0.56);
+  z-index: 200;
+}
+
+.modal {
+  width: min(100%, 360px);
+  max-height: min(90dvh, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-modal);
+}
+
+.modal-grande {
+  width: min(100%, 460px);
+}
+
+.modal label,
+label {
+  color: var(--color-texto);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.56rem 0.68rem;
+  color: var(--color-texto);
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.acciones-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+
+.acciones-modal button:not(.btn-primario) {
+  color: var(--color-texto);
+  background: var(--color-fondo-suave);
+  border-color: var(--color-borde);
+}
+
+@media (max-width: 1200px) {
+  .contenedor {
+    width: 100%;
+  }
+}
+
+@media (max-width: 992px) {
+  body {
+    font-size: 14px;
+  }
+
+  .contenedor table {
+    display: block;
+    min-width: 680px;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --altura-header: 58px;
+  }
+
+  .contenedor > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .contenedor > header .btn-primario {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.18rem;
+  }
+
+  th,
+  td {
+    padding: 0.62rem 0.7rem;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0.65rem;
+  }
+
+  .modal,
+  .modal-grande {
+    width: 100%;
+    max-height: 92dvh;
+  }
+
+  .acciones-modal {
+    flex-direction: column-reverse;
+  }
+
+  .acciones-modal button {
+    width: 100%;
+  }
+}

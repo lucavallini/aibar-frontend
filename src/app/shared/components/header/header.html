@@ -1,0 +1,14 @@
+<header class="header">
+  <button class="btn-hamburguesa" (click)="onToggleSidebar()" aria-label="Abrir menú">
+    ☰
+  </button>
+
+  <span class="nombre-empresa">AI-BAR SRL</span>
+
+  <div class="acciones">
+    <button class="btn-icono" (click)="onToggleTema()" aria-label="Cambiar tema">
+      {{ themeService.esOscuro() ? '☀️' : '🌙' }}
+    </button>
+    <button class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</header>

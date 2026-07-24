@@ -1,0 +1,55 @@
+<div class="contenedor">
+  <header>
+    <h1>Auditoría</h1>
+  </header>
+
+  <div class="filtro-camion">
+    <label for="filtroEntidad">Filtrar por tipo:</label>
+    <select id="filtroEntidad" [ngModel]="filtroEntidad()" (ngModelChange)="cambiarFiltroEntidad($event)">
+      <option value="">Todos los eventos</option>
+      @for (entidad of entidades; track entidad) {
+        <option [value]="entidad">{{ entidad }}</option>
+      }
+    </select>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!cargando() && !error()) {
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha y hora</th>
+          <th>Acción</th>
+          <th>Entidad</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (evento of eventos(); track evento.id) {
+          <tr>
+            <td>{{ evento.fecha_hora | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td><span class="badge" [class]="evento.tipo_accion">{{ evento.tipo_accion }}</span></td>
+            <td>{{ evento.entidad }}</td>
+            <td>{{ evento.detalle || '-' }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No hay eventos registrados todavía.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <app-paginacion
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      [total]="total()"
+      (cambioPagina)="cambiarPagina($event)"
+    ></app-paginacion>
+  }
+</div>

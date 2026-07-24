@@ -1,0 +1,150 @@
+<div class="contenedor">
+  <header>
+    <h1>Viajes</h1>
+    <button class="btn-primario" (click)="abrirModalNuevoViaje()">+ Nuevo viaje</button>
+  </header>
+
+  <div class="filtros">
+    @for (filtro of filtros; track filtro.valor) {
+      <button
+        class="btn-filtro"
+        [class.activo]="filtroActivo() === filtro.valor"
+        (click)="cambiarFiltro(filtro.valor)"
+      >
+        {{ filtro.label }}
+      </button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !accionModal()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!cargando()) {
+    <div class="lista-viajes">
+      @for (viaje of viajes(); track viaje.id) {
+        <div class="fila-viaje">
+          <div class="info-viaje">
+            <div class="linea-principal">
+              <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
+              <span class="ruta">{{ viaje.origen }} → {{ viaje.destino }}</span>
+              <span class="badge" [class]="viaje.estado">{{ viaje.estado }}</span>
+            </div>
+            <div class="linea-secundaria">
+              @if (viaje.cliente) { <span>Cliente: {{ viaje.cliente }}</span> }
+              @if (viaje.carga) { <span>Carga: {{ viaje.carga }}</span> }
+              @if (viaje.tarifa) { <span>Tarifa: ${{ viaje.tarifa }}</span> }
+              <span>Fecha: {{ viaje.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
+              @if (viaje.kms_recorridos) { <span>{{ viaje.kms_recorridos }} kms</span> }
+            </div>
+            @if (viaje.motivo_cancelacion) {
+              <div class="motivo-cancelacion">Motivo: {{ viaje.motivo_cancelacion }}</div>
+            }
+          </div>
+
+          <div class="acciones-viaje">
+            @if (viaje.estado === 'pendiente') {
+              <button class="btn-accion iniciar" (click)="iniciarViaje(viaje)">Iniciar</button>
+              <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
+            }
+            @if (viaje.estado === 'en_curso') {
+              <button class="btn-accion finalizar" (click)="abrirModalFinalizar(viaje)">Finalizar</button>
+              <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <p>No hay viajes para este filtro.</p>
+      }
+    </div>
+      <app-paginacion
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    (cambioPagina)="cambiarPagina($event)"
+  ></app-paginacion>
+  }
+</div>
+
+@if (accionModal() === 'nuevo') {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal modal-grande" (click)="$event.stopPropagation()">
+      <h2>Nuevo viaje</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="chofer">Chofer disponible</label>
+      <select id="chofer" [(ngModel)]="nuevoViaje.chofer_id">
+        <option value="" disabled selected>Elegí un chofer</option>
+        @for (chofer of choferesDisponibles(); track chofer.id) {
+          <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
+        }
+      </select>
+
+      <label for="camion">Camión (opcional)</label>
+      <select id="camion" [(ngModel)]="nuevoViaje.camion_id">
+        <option [value]="undefined">Sin especificar</option>
+        @for (camion of camiones(); track camion.id) {
+          <option [value]="camion.id">{{ camion.patente }}</option>
+        }
+      </select>
+
+      <label for="cliente">Cliente</label>
+      <input id="cliente" type="text" [(ngModel)]="nuevoViaje.cliente" />
+
+      <label for="origen">Origen</label>
+      <input id="origen" type="text" [(ngModel)]="nuevoViaje.origen" />
+
+      <label for="destino">Destino</label>
+      <input id="destino" type="text" [(ngModel)]="nuevoViaje.destino" />
+
+      <label for="carga">Carga</label>
+      <input id="carga" type="text" [(ngModel)]="nuevoViaje.carga" />
+
+      <label for="tarifa">Tarifa</label>
+      <input id="tarifa" type="number" [(ngModel)]="nuevoViaje.tarifa" />
+
+      <label for="fechaInicio">Fecha y hora de salida</label>
+      <input id="fechaInicio" type="datetime-local" [(ngModel)]="nuevoViaje.fecha_inicio" />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (accionModal() === 'finalizar') {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Finalizar viaje</h2>
+      <label for="kms">Kilómetros recorridos</label>
+      <input id="kms" type="number" [(ngModel)]="kmsRecorridos" min="1" />
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarFinalizar()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (accionModal() === 'cancelar') {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Cancelar viaje</h2>
+      <label for="motivo">Motivo de la cancelación</label>
+      <textarea id="motivo" [(ngModel)]="motivoCancelacion" rows="3"></textarea>
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Volver</button>
+        <button class="btn-primario" (click)="confirmarCancelar()">Confirmar cancelación</button>
+      </div>
+    </div>
+  </div>
+}

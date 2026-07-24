@@ -1,0 +1,107 @@
+<div class="contenedor">
+  <header>
+    <h1>Combustible</h1>
+    <button class="btn-primario" (click)="abrirModal()">+ Nueva carga</button>
+  </header>
+
+  <div class="filtro-camion">
+    <label for="filtroCamion">Filtrar por camión:</label>
+    <select id="filtroCamion" [ngModel]="filtroCamionId()" (ngModelChange)="cambiarFiltroCamion($event)">
+      <option value="">Todos los camiones</option>
+      @for (camion of camiones(); track camion.id) {
+        <option [value]="camion.id">{{ camion.patente }}</option>
+      }
+    </select>
+  <label class="checkbox-label">
+    <input type="checkbox" [ngModel]="verTodoElHistorico()" (ngModelChange)="toggleVerTodo()" />
+    Ver histórico completo
+  </label>
+  </div>
+
+  @if (gastoTotal()) {
+    <div class="resumen">
+      <span><strong>{{ gastoTotal()!.cantidad_cargas }}</strong> cargas</span>
+      <span><strong>{{ gastoTotal()!.total_litros }}</strong> litros totales</span>
+      <span><strong>${{ gastoTotal()!.total_monto }}</strong> gastado</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !modalAbierto()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!cargando() && !error()) {
+    <table>
+      <thead>
+        <tr>
+          <th>Patente</th>
+          <th>Litros</th>
+          <th>Monto</th>
+          <th>Fecha</th>
+          <th>Kms al momento</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (carga of cargas(); track carga.id) {
+          <tr>
+            <td>{{ nombrePatente(carga.camion_id) }}</td>
+            <td>{{ carga.litros }} L</td>
+            <td>${{ carga.monto }}</td>
+            <td>{{ carga.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>{{ carga.kms_al_momento || '-' }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">No hay cargas registradas todavía.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <app-paginacion
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      [total]="total()"
+      (cambioPagina)="cambiarPagina($event)"
+    ></app-paginacion>
+  }
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nueva carga de combustible</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="camion">Camión</label>
+      <select id="camion" [(ngModel)]="nuevaCarga.camion_id">
+        <option value="" disabled selected>Elegí un camión</option>
+        @for (camion of camiones(); track camion.id) {
+          <option [value]="camion.id">{{ camion.patente }}</option>
+        }
+      </select>
+
+      <label for="litros">Litros</label>
+      <input id="litros" type="number" [(ngModel)]="nuevaCarga.litros" />
+
+      <label for="monto">Monto</label>
+      <input id="monto" type="number" [(ngModel)]="nuevaCarga.monto" />
+
+      <label for="fecha">Fecha (si no se completa, usa hoy)</label>
+      <input id="fecha" type="date" [(ngModel)]="nuevaCarga.fecha" />
+
+      <label for="kms">Kms al momento (opcional)</label>
+      <input id="kms" type="number" [(ngModel)]="nuevaCarga.kms_al_momento" />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAlta()">Registrar</button>
+      </div>
+    </div>
+  </div>
+}

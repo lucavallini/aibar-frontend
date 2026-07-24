@@ -1,0 +1,75 @@
+.contenedor {
+  padding-bottom: 1rem;
+}
+
+.filtro-camion {
+  width: min(100%, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.9rem;
+}
+
+.checkbox-label {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primario);
+}
+
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  margin-bottom: 1rem;
+  box-shadow: var(--sombra);
+  font-size: 0.9rem;
+}
+
+.resumen strong {
+  color: var(--color-primario);
+}
+
+.disponible,
+.badge.disponible {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.viajando,
+.badge.viajando {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+}
+
+.inactivo,
+.badge.inactivo {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+@media (max-width: 992px) {
+  .contenedor {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .resumen {
+    flex-direction: column;
+  }
+}

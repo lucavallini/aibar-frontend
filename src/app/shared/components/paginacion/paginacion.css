@@ -1,0 +1,53 @@
+.paginacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-borde);
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+}
+
+.controles {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.controles button {
+  min-height: 36px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.controles button:hover:not(:disabled) {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+}
+
+.controles button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.numero-pagina {
+  color: var(--color-texto);
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .paginacion {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .controles {
+    justify-content: space-between;
+  }
+}

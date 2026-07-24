@@ -1,0 +1,167 @@
+.contenedor {
+  padding-bottom: 1rem;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-filtro {
+  min-height: 36px;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-filtro:hover {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+}
+
+.btn-filtro.activo {
+  background: var(--color-primario);
+  color: white;
+  border-color: var(--color-primario);
+}
+
+.lista-viajes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fila-viaje {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.info-viaje {
+  flex: 1;
+  min-width: 0;
+}
+
+.linea-principal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.chofer {
+  font-weight: 600;
+}
+
+.ruta {
+  color: var(--color-texto-secundario);
+  overflow-wrap: anywhere;
+}
+
+.linea-secundaria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+}
+
+.motivo-cancelacion {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
+
+.pendiente,
+.badge.pendiente {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+}
+
+.en_curso,
+.badge.en_curso {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.finalizado,
+.badge.finalizado {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.cancelado,
+.badge.cancelado {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.acciones-viaje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.btn-accion {
+  min-height: 34px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn-accion.iniciar {
+  background: var(--color-info);
+  color: white;
+}
+
+.btn-accion.finalizar {
+  background: var(--color-exito);
+  color: white;
+}
+
+.btn-accion.cancelar {
+  background: var(--color-error);
+  color: white;
+}
+
+.btn-accion:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .fila-viaje {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acciones-viaje {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 576px) {
+  .filtros,
+  .acciones-viaje {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn-filtro,
+  .btn-accion {
+    width: 100%;
+  }
+}

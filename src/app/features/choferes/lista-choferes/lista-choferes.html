@@ -1,0 +1,111 @@
+<div class="contenedor">
+  <header>
+    <h1>Choferes</h1>
+    <button class="btn-primario" (click)="abrirAlta()">+ Nuevo chofer</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !modalEditarAbierto() && !modalBajaAbierto()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!cargando() && !error()) {
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>DNI</th>
+          <th>Estado</th>
+          <th>Teléfono</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (chofer of choferes(); track chofer.id) {
+          <tr>
+            <td>{{ chofer.nombre_completo }}</td>
+            <td>{{ chofer.dni || '-' }}</td>
+            <td>
+              <span class="badge" [class]="chofer.estado">{{ chofer.estado }}</span>
+            </td>
+            <td>{{ chofer.telefono || '-' }}</td>
+            <td>
+              <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
+              <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(chofer)">Baja</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">No hay choferes cargados todavía.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <app-paginacion
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      [total]="total()"
+      (cambioPagina)="cambiarPagina($event)"
+    ></app-paginacion>
+  }
+</div>
+
+@if (modalEditarAbierto()) {
+  <div class="modal-overlay" (click)="cerrarEditar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Editar chofer</h2>
+
+      @if (error()) { <p class="error">{{ error() }}</p> }
+
+      <label for="nombreEdit">Nombre completo</label>
+      <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" />
+
+      <label for="dniEdit">DNI</label>
+      <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" />
+
+      <label for="telEdit">Teléfono</label>
+      <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarEditar()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalBajaAbierto()) {
+  <app-confirmar
+    titulo="Dar de baja chofer"
+    [mensaje]="'¿Seguro que querés dar de baja a ' + choferSeleccionado()?.nombre_completo + '? Podés reactivarlo después si hace falta.'"
+    textoConfirmar="Dar de baja"
+    (confirmar)="confirmarBaja()"
+    (cancelar)="cerrarBaja()"
+  ></app-confirmar>
+}
+
+@if (modalAltaAbierto()) {
+  <div class="modal-overlay" (click)="cerrarAlta()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nuevo chofer</h2>
+
+      @if (error()) { <p class="error">{{ error() }}</p> }
+
+      <label for="nombreAlta">Nombre completo</label>
+      <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" />
+
+      <label for="dniAlta">DNI</label>
+      <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" />
+
+      <label for="telAlta">Teléfono</label>
+      <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarAlta()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
+      </div>
+    </div>
+  </div>
+}

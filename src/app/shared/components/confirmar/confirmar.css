@@ -1,0 +1,46 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.modal {
+  background: var(--color-fondo-panel);
+  padding: 1.5rem;
+  border-radius: var(--radio);
+  width: 320px;
+  box-shadow: var(--sombra);
+}
+
+.modal h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.modal p {
+  color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+}
+
+.acciones-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.acciones-modal button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-peligro {
+  background: #c0392b;
+  color: white;
+}

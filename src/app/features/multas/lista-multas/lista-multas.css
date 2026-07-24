@@ -1,0 +1,27 @@
+.contenedor {
+  padding-bottom: 1rem;
+}
+
+.disponible,
+.badge.disponible {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.viajando,
+.badge.viajando {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+}
+
+.inactivo,
+.badge.inactivo {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+@media (max-width: 992px) {
+  .contenedor {
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,41 @@
+.contenedor {
+  padding-bottom: 1rem;
+}
+
+.filtro-camion {
+  width: min(100%, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.alta,
+.badge.alta {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.edicion,
+.badge.edicion {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.cancelacion,
+.badge.cancelacion {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.baja,
+.badge.baja {
+  background: var(--color-neutro-fondo);
+  color: var(--color-neutro);
+}
+
+@media (max-width: 992px) {
+  .contenedor {
+    overflow-x: auto;
+  }
+}
