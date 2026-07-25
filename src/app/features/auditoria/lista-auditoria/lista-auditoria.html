@@ -3,14 +3,30 @@
     <h1>Auditoría</h1>
   </header>
 
-  <div class="filtro-camion">
-    <label for="filtroEntidad">Filtrar por tipo:</label>
-    <select id="filtroEntidad" [ngModel]="filtroEntidad()" (ngModelChange)="cambiarFiltroEntidad($event)">
-      <option value="">Todos los eventos</option>
-      @for (entidad of entidades; track entidad) {
-        <option [value]="entidad">{{ entidad }}</option>
-      }
-    </select>
+  <div class="filtros">
+    <div class="filtro-grupo">
+      <label for="filtroEntidad">Tipo</label>
+      <select id="filtroEntidad" [ngModel]="filtroEntidad()" (ngModelChange)="cambiarFiltroEntidad($event)">
+        <option value="">Todos</option>
+        @for (entidad of entidades; track entidad) {
+          <option [value]="entidad">{{ entidad }}</option>
+        }
+      </select>
+    </div>
+    <div class="filtro-grupo">
+      <label>Período</label>
+      <div class="filtro-botones">
+        @for (opcion of opcionesDias; track opcion.label) {
+          <button
+            class="btn-filtro"
+            [class.activo]="filtroDias() === opcion.valor"
+            (click)="cambiarFiltroDias(opcion.valor)"
+          >
+            {{ opcion.label }}
+          </button>
+        }
+      </div>
+    </div>
   </div>
 
   @if (cargando()) {

@@ -8,7 +8,7 @@
 .cuerpo {
   display: flex;
   flex: 1;
-  min-height: 0;
+  height: calc(100dvh - var(--altura-header));
   overflow: hidden;
 }
 

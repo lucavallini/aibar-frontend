@@ -1,6 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ChoferesService } from '../../../core/services/choferes.service';
-import { Chofer, ChoferCreate } from '../../../core/models/chofer.model';
+import { Chofer, ChoferCreate, ChoferDetalle } from '../../../core/models/chofer.model';
+import { ViajesService } from '../../../core/services/viajes.service';
+import { RendimientoCombustible } from '../../../core/models/viaje.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
@@ -31,15 +33,19 @@ export class ListaChoferesComponent implements OnInit {
   modalAltaAbierto = signal(false);
   nuevoChofer: ChoferCreate = this.formularioVacioAlta();
 
+  modalDetalleAbierto = signal(false);
+  choferDetalle = signal<ChoferDetalle | null>(null);
+  rendimiento = signal<RendimientoCombustible | null>(null);
+
   constructor(
     private choferesService: ChoferesService,
+    private viajesService: ViajesService,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.cargarChoferes();
   }
-
 
   formularioVacioAlta(): ChoferCreate {
     return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined };
@@ -71,16 +77,36 @@ export class ListaChoferesComponent implements OnInit {
     });
   }
 
+  abrirDetalle(chofer: Chofer): void {
+    this.rendimiento.set(null);
+    this.choferesService.obtenerDetalle(chofer.id).subscribe({
+      next: (detalle) => {
+        this.choferDetalle.set(detalle);
+        this.modalDetalleAbierto.set(true);
+      },
+      error: () => this.error.set('No se pudo cargar el detalle del chofer')
+    });
+    this.viajesService.rendimientoCombustible(chofer.id).subscribe({
+      next: (r) => this.rendimiento.set(r)
+    });
+  }
+
+  cerrarDetalle(): void {
+    this.modalDetalleAbierto.set(false);
+    this.choferDetalle.set(null);
+    this.rendimiento.set(null);
+  }
+
   abrirEditar(chofer: Chofer): void {
-  this.choferSeleccionado.set(chofer);
-  this.edicionChofer = {
-    nombre_completo: chofer.nombre_completo,
-    dni: chofer.dni ?? undefined,
-    telefono: chofer.telefono ?? undefined,
-  };
-  this.error.set(null);
-  this.modalEditarAbierto.set(true);
-}
+    this.choferSeleccionado.set(chofer);
+    this.edicionChofer = {
+      nombre_completo: chofer.nombre_completo,
+      dni: chofer.dni ?? undefined,
+      telefono: chofer.telefono ?? undefined,
+    };
+    this.error.set(null);
+    this.modalEditarAbierto.set(true);
+  }
 
   cerrarEditar(): void {
     this.modalEditarAbierto.set(false);
@@ -144,6 +170,26 @@ export class ListaChoferesComponent implements OnInit {
   cambiarPagina(nueva: number): void {
     this.pagina.set(nueva);
     this.cargarChoferes();
+  }
+
+  mostrarBotonLicencia(chofer: Chofer): boolean {
+    return chofer.estado === 'disponible' || chofer.estado === 'licencia';
+  }
+
+  textoBotonLicencia(chofer: Chofer): string {
+    return chofer.estado === 'disponible' ? 'Licencia' : 'Disponible';
+  }
+
+  claseBotonLicencia(chofer: Chofer): string {
+    return chofer.estado === 'disponible' ? 'btn-mini-aviso' : 'btn-mini-exito';
+  }
+
+  toggleLicencia(chofer: Chofer): void {
+    const nuevoEstado = chofer.estado === 'disponible' ? 'licencia' : 'disponible';
+    this.choferesService.cambiarEstado(chofer.id, nuevoEstado).subscribe({
+      next: () => this.cargarChoferes(),
+      error: () => this.error.set('No se pudo cambiar el estado')
+    });
   }
 
   cerrarSesion(): void {

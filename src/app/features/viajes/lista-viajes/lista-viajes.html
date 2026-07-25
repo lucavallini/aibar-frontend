@@ -5,15 +5,43 @@
   </header>
 
   <div class="filtros">
-    @for (filtro of filtros; track filtro.valor) {
-      <button
-        class="btn-filtro"
-        [class.activo]="filtroActivo() === filtro.valor"
-        (click)="cambiarFiltro(filtro.valor)"
-      >
-        {{ filtro.label }}
-      </button>
-    }
+    <div class="filtro-grupo">
+      <label for="filtroChofer">Chofer</label>
+      <select id="filtroChofer" [ngModel]="filtroChoferId()" (ngModelChange)="filtroChoferId.set($event); cambiarFiltroChofer()">
+        <option value="">Todos los choferes</option>
+        @for (chofer of choferes(); track chofer.id) {
+          <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
+        }
+      </select>
+    </div>
+    <div class="filtro-grupo">
+      <label>Estado</label>
+      <div class="filtro-botones">
+        @for (filtro of filtrosEstado; track filtro.valor) {
+          <button
+            class="btn-filtro"
+            [class.activo]="filtroEstado() === filtro.valor"
+            (click)="cambiarFiltroEstado(filtro.valor)"
+          >
+            {{ filtro.label }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="filtro-grupo">
+      <label>Período</label>
+      <div class="filtro-botones">
+        @for (opcion of opcionesDias; track opcion.label) {
+          <button
+            class="btn-filtro"
+            [class.activo]="filtroDias() === opcion.valor"
+            (click)="cambiarFiltroDias(opcion.valor)"
+          >
+            {{ opcion.label }}
+          </button>
+        }
+      </div>
+    </div>
   </div>
 
   @if (cargando()) {
@@ -27,23 +55,68 @@
   @if (!cargando()) {
     <div class="lista-viajes">
       @for (viaje of viajes(); track viaje.id) {
-        <div class="fila-viaje">
+        <div class="tarjeta-viaje" [class.tiene-vuelta]="!!viaje.viaje_vuelta">
           <div class="info-viaje">
             <div class="linea-principal">
               <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
-              <span class="ruta">{{ viaje.origen }} → {{ viaje.destino }}</span>
               <span class="badge" [class]="viaje.estado">{{ viaje.estado }}</span>
             </div>
-            <div class="linea-secundaria">
-              @if (viaje.cliente) { <span>Cliente: {{ viaje.cliente }}</span> }
-              @if (viaje.carga) { <span>Carga: {{ viaje.carga }}</span> }
-              @if (viaje.tarifa) { <span>Tarifa: ${{ viaje.tarifa }}</span> }
-              <span>Fecha: {{ viaje.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
-              @if (viaje.kms_recorridos) { <span>{{ viaje.kms_recorridos }} kms</span> }
+
+            <div class="tramo ida">
+              <span class="tramo-label">Ida:</span>
+              <span class="ruta">{{ viaje.origen }} → {{ viaje.destino}}</span>
+              <div class="tramo-datos">
+                <span>Fecha: {{ viaje.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
+                @if (viaje.cliente) { <span>Cliente: {{ viaje.cliente }}</span> }
+                @if (viaje.carga) { <span>Carga: {{ viaje.carga }}</span> }
+                @if (viaje.tarifa) { <span>Tarifa: ${{ viaje.tarifa }}</span> }
+                @if (viaje.kms_recorridos) { <span>{{ viaje.kms_recorridos }} kms</span> }
+                @if (viaje.km_por_litro) { <span>{{ viaje.litros_combustible }} L | {{ viaje.km_por_litro }} km/l</span> }
+                <span class="patentes">
+                  @if (patenteCamion(viaje.camion_id)) { Chasis: {{ patenteCamion(viaje.camion_id) }} }
+                  @if (patenteCamion(viaje.camion_id_2)) { | Acoplado: {{ patenteCamion(viaje.camion_id_2) }} }
+                </span>
+              </div>
             </div>
+
+            @if (viaje.viaje_vuelta) {
+              @let v = viaje.viaje_vuelta;
+              <div class="tramo vuelta">
+                <span class="tramo-label">Vuelta:</span>
+                <span class="badge" [class]="v.estado">{{ v.estado }}</span>
+                <span class="ruta">{{ v.origen }} → {{ v.destino }}</span>
+                <div class="tramo-datos">
+                  <span>Fecha: {{ v.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
+                  @if (v.cliente) { <span>Cliente: {{ v.cliente }}</span> }
+                  @if (v.carga) { <span>Carga: {{ v.carga }}</span> }
+                  @if (v.tarifa) { <span>Tarifa: ${{ v.tarifa }}</span> }
+                  @if (v.kms_recorridos) { <span>{{ v.kms_recorridos }} kms</span> }
+                  @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ v.km_por_litro }} km/l</span> }
+                  <span class="patentes">
+                    @if (patenteCamion(v.camion_id)) { Chasis: {{ patenteCamion(v.camion_id) }} }
+                    @if (patenteCamion(v.camion_id_2)) { | Acoplado: {{ patenteCamion(v.camion_id_2) }} }
+                  </span>
+                </div>
+                <div class="acciones-viaje acciones-vuelta">
+                  @if (v.estado === 'pendiente') {
+                    <button class="btn-accion iniciar" (click)="iniciarViaje(v)">Iniciar</button>
+                    <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
+                  }
+                  @if (v.estado === 'en_curso') {
+                    <button class="btn-accion finalizar" (click)="abrirModalFinalizar(v)">Finalizar</button>
+                    <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
+                  }
+                  @if (v.motivo_cancelacion) {
+                    <div class="motivo-cancelacion">Motivo: {{ v.motivo_cancelacion }}</div>
+                  }
+                </div>
+              </div>
+            }
+
             @if (viaje.motivo_cancelacion) {
               <div class="motivo-cancelacion">Motivo: {{ viaje.motivo_cancelacion }}</div>
             }
+            <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
           </div>
 
           <div class="acciones-viaje">
@@ -55,40 +128,51 @@
               <button class="btn-accion finalizar" (click)="abrirModalFinalizar(viaje)">Finalizar</button>
               <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
             }
+            @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado') {
+              <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">+ Vuelta</button>
+            }
           </div>
         </div>
       } @empty {
         <p>No hay viajes para este filtro.</p>
       }
     </div>
-      <app-paginacion
-    [pagina]="pagina()"
-    [totalPaginas]="totalPaginas()"
-    [total]="total()"
-    (cambioPagina)="cambiarPagina($event)"
-  ></app-paginacion>
+    <app-paginacion
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      [total]="total()"
+      (cambioPagina)="cambiarPagina($event)"
+    ></app-paginacion>
   }
 </div>
 
-@if (accionModal() === 'nuevo') {
+@if (accionModal() === 'nuevo' || accionModal() === 'vuelta') {
   <div class="modal-overlay" (click)="cerrarModal()">
     <div class="modal modal-grande" (click)="$event.stopPropagation()">
-      <h2>Nuevo viaje</h2>
+      <h2>{{ accionModal() === 'vuelta' ? 'Agregar vuelta' : 'Nuevo viaje' }}</h2>
 
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
 
-      <label for="chofer">Chofer disponible</label>
+      <label for="chofer">{{ accionModal() === 'vuelta' ? 'Chofer (vuelta)' : 'Chofer disponible' }}</label>
       <select id="chofer" [(ngModel)]="nuevoViaje.chofer_id">
         <option value="" disabled selected>Elegí un chofer</option>
-        @for (chofer of choferesDisponibles(); track chofer.id) {
+        @for (chofer of choferes(); track chofer.id) {
           <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
         }
       </select>
 
-      <label for="camion">Camión (opcional)</label>
+      <label for="camion">Chasis (opcional)</label>
       <select id="camion" [(ngModel)]="nuevoViaje.camion_id">
+        <option [value]="undefined">Sin especificar</option>
+        @for (camion of camiones(); track camion.id) {
+          <option [value]="camion.id">{{ camion.patente }}</option>
+        }
+      </select>
+
+      <label for="camion2">Acoplado / Batea (opcional)</label>
+      <select id="camion2" [(ngModel)]="nuevoViaje.camion_id_2">
         <option [value]="undefined">Sin especificar</option>
         @for (camion of camiones(); track camion.id) {
           <option [value]="camion.id">{{ camion.patente }}</option>
@@ -115,7 +199,11 @@
 
       <div class="acciones-modal">
         <button (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
+        @if (accionModal() === 'vuelta') {
+          <button class="btn-primario" (click)="confirmarVuelta()">Agregar vuelta</button>
+        } @else {
+          <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
+        }
       </div>
     </div>
   </div>
@@ -127,6 +215,11 @@
       <h2>Finalizar viaje</h2>
       <label for="kms">Kilómetros recorridos</label>
       <input id="kms" type="number" [(ngModel)]="kmsRecorridos" min="1" />
+      <label for="litros">Litros de combustible (opcional)</label>
+      <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
+      @if (kmsRecorridos && litrosCombustible && litrosCombustible > 0) {
+        <p class="rendimiento-preview">{{ (kmsRecorridos / litrosCombustible) | number:'1.2-2' }} km/l</p>
+      }
       <div class="acciones-modal">
         <button (click)="cerrarModal()">Cancelar</button>
         <button class="btn-primario" (click)="confirmarFinalizar()">Confirmar</button>

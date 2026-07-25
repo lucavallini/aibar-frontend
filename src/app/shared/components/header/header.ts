@@ -25,6 +25,10 @@ export class Header {
     this.themeService.alternar();
   }
 
+  recargar(): void {
+    window.location.reload();
+  }
+
   cerrarSesion(): void {
     this.authService.logout();
   }

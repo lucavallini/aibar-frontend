@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Chofer, ChoferCreate } from '../models/chofer.model';
+import { Chofer, ChoferCreate, ChoferDetalle } from '../models/chofer.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +19,10 @@ export class ChoferesService {
 
   obtenerPorId(id: string): Observable<Chofer> {
     return this.http.get<Chofer>(`${this.apiUrl}/${id}`);
+  }
+
+  obtenerDetalle(id: string): Observable<ChoferDetalle> {
+    return this.http.get<ChoferDetalle>(`${this.apiUrl}/${id}/detalle`);
   }
 
   crear(datos: ChoferCreate): Observable<Chofer> {

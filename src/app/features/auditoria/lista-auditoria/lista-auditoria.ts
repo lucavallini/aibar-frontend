@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 export class ListaAuditoria implements OnInit {
   eventos = signal<Auditoria[]>([]);
   filtroEntidad = signal<string>('');
+  filtroDias = signal<number | null>(null);
 
   cargando = signal(true);
   error = signal<string | null>(null);
@@ -22,9 +23,14 @@ export class ListaAuditoria implements OnInit {
   pagina = signal(1);
   totalPaginas = signal(1);
   total = signal(0);
-  tamanoPagina = 50;
+  tamanoPagina = 20;
 
   entidades = ['viaje', 'chofer', 'camion', 'multa', 'combustible', 'usuario'];
+  opcionesDias: { label: string; valor: number | null }[] = [
+    { label: 'Todos', valor: null },
+    { label: '15 días', valor: 15 },
+    { label: '30 días', valor: 30 },
+  ];
 
   constructor(private auditoriaService: AuditoriaService) {}
 
@@ -37,8 +43,9 @@ export class ListaAuditoria implements OnInit {
     this.error.set(null);
 
     const entidad = this.filtroEntidad() || undefined;
+    const dias = this.filtroDias() || undefined;
 
-    this.auditoriaService.listar(entidad, this.pagina(), this.tamanoPagina).subscribe({
+    this.auditoriaService.listar(entidad, dias, this.pagina(), this.tamanoPagina).subscribe({
       next: (respuesta) => {
         this.eventos.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -54,6 +61,12 @@ export class ListaAuditoria implements OnInit {
 
   cambiarFiltroEntidad(valor: string): void {
     this.filtroEntidad.set(valor);
+    this.pagina.set(1);
+    this.cargarEventos();
+  }
+
+  cambiarFiltroDias(valor: number | null): void {
+    this.filtroDias.set(valor);
     this.pagina.set(1);
     this.cargarEventos();
   }

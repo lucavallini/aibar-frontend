@@ -2,6 +2,10 @@
   padding-bottom: 1rem;
 }
 
+.fila-clickeable {
+  cursor: pointer;
+}
+
 .disponible,
 .badge.disponible {
   background: var(--color-exito-fondo);
@@ -18,6 +22,12 @@
 .badge.inactivo {
   background: var(--color-error-fondo);
   color: var(--color-error);
+}
+
+.licencia,
+.badge.licencia {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
 }
 
 .btn-primario {
@@ -48,9 +58,108 @@
   color: #c0392b;
 }
 
+.btn-mini-aviso {
+  border-color: var(--color-alerta);
+  color: var(--color-alerta);
+}
+
+.btn-mini-exito {
+  border-color: var(--color-exito);
+  color: var(--color-exito);
+}
+
+.detalle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.detalle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.detalle-label {
+  color: var(--color-texto-secundario);
+  font-weight: 650;
+  font-size: 0.82rem;
+}
+
+.kms-resumen {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.kms-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.8rem;
+  background: var(--color-primario-claro);
+  border-radius: var(--radio);
+}
+
+.kms-card.rendimiento {
+  background: var(--color-info-fondo);
+}
+
+.kms-card.rendimiento .kms-valor {
+  color: var(--color-info);
+}
+
+.kms-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+.kms-label {
+  font-size: 0.78rem;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+.historico-tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.historico-fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  background: var(--color-fondo-suave);
+  border-radius: var(--radio);
+  font-size: 0.85rem;
+}
+
+.kms-valor-historico {
+  font-weight: 600;
+  color: var(--color-primario);
+}
+
+.sin-datos {
+  text-align: center;
+  color: var(--color-texto-secundario);
+  font-size: 0.85rem;
+}
+
+h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 992px) {
   .contenedor {
     overflow-x: auto;
   }
 }
-

@@ -1,30 +1,35 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { ViajesService } from '../../../core/services/viajes.service';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { CamionesService } from '../../../core/services/camiones.service';
+import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Viaje, ViajeCreate } from '../../../core/models/viaje.model';
 import { Chofer } from '../../../core/models/chofer.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 
 type FiltroEstado = 'todos' | 'pendiente' | 'en_curso' | 'finalizado' | 'cancelado';
-type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | null;
+type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | null;
 
 @Component({
   selector: 'app-lista-viajes',
   standalone: true,
-  imports: [FormsModule, DatePipe, Paginacion],
+  imports: [FormsModule, DatePipe, DecimalPipe, Paginacion],
   templateUrl: './lista-viajes.html',
   styleUrl: './lista-viajes.css'
 })
 export class ListaViajes implements OnInit {
   viajes = signal<Viaje[]>([]);
+  choferes = signal<Chofer[]>([]);
   choferesPorId = signal<Record<string, string>>({});
-  choferesDisponibles = signal<Chofer[]>([]);
   camiones = signal<Camion[]>([]);
-  filtroActivo = signal<FiltroEstado>('todos');
+  camionesPorId = signal<Record<string, Camion>>({});
+  usuariosPorId = signal<Record<string, string>>({});
+  filtroEstado = signal<FiltroEstado>('todos');
+  filtroChoferId = signal<string>('');
+  filtroDias = signal<number | null>(null);
   cargando = signal(true);
   error = signal<string | null>(null);
 
@@ -32,10 +37,23 @@ export class ListaViajes implements OnInit {
   accionModal = signal<AccionModal>(null);
   motivoCancelacion = '';
   kmsRecorridos: number | null = null;
+  litrosCombustible: number | null = null;
 
   nuevoViaje: ViajeCreate = this.formularioVacio();
+  viajeOriginalId = '';
 
-  filtros: { label: string; valor: FiltroEstado }[] = [
+  pagina = signal(1);
+  totalPaginas = signal(1);
+  total = signal(0);
+  tamanoPagina = 20;
+
+  opcionesDias: { label: string; valor: number | null }[] = [
+    { label: 'Todos', valor: null },
+    { label: '15 días', valor: 15 },
+    { label: '30 días', valor: 30 },
+  ];
+
+  filtrosEstado: { label: string; valor: FiltroEstado }[] = [
     { label: 'Todos', valor: 'todos' },
     { label: 'Pendientes', valor: 'pendiente' },
     { label: 'En curso', valor: 'en_curso' },
@@ -43,42 +61,57 @@ export class ListaViajes implements OnInit {
     { label: 'Cancelados', valor: 'cancelado' },
   ];
 
-
   constructor(
     private viajesService: ViajesService,
     private choferesService: ChoferesService,
-    private camionesService: CamionesService
+    private camionesService: CamionesService,
+    private usuariosService: UsuariosService
   ) {}
 
   ngOnInit(): void {
-    this.cargarDatos();
+    this.cargarDatosIniciales();
   }
 
-  cargarDatos(): void {
+  cargarDatosIniciales(): void {
     this.cargando.set(true);
-    this.error.set(null);
 
-this.choferesService.listar(false, 1, 1000).subscribe({
-  next: (respuesta) => {
-    const mapa: Record<string, string> = {};
-    respuesta.items.forEach((c: Chofer) => mapa[c.id] = c.nombre_completo);
+    this.choferesService.listar(false, 1, 1000).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, string> = {};
+        respuesta.items.forEach((c: Chofer) => mapa[c.id] = c.nombre_completo);
         this.choferesPorId.set(mapa);
+        this.choferes.set(respuesta.items);
+      }
+    });
+
+    this.usuariosService.listar(1, 200).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, string> = {};
+        respuesta.items.forEach((u) => mapa[u.id] = u.nombre_completo);
+        this.usuariosPorId.set(mapa);
+      }
+    });
+
+    this.camionesService.listar(false, 1, 1000).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, Camion> = {};
+        respuesta.items.forEach((c) => mapa[c.id] = c);
+        this.camionesPorId.set(mapa);
+        this.camiones.set(respuesta.items);
         this.cargarViajes();
-      },
-      error: () => {
-        this.error.set('No se pudieron cargar los choferes');
-        this.cargando.set(false);
       }
     });
   }
 
-    pagina = signal(1);
-    totalPaginas = signal(1);
-    total = signal(0);
-    tamanoPagina = 20;
-
   cargarViajes(): void {
-    this.viajesService.listar(this.filtroBackend(), this.pagina(), this.tamanoPagina).subscribe({
+    this.cargando.set(true);
+    this.error.set(null);
+
+    const choferId = this.filtroChoferId() || undefined;
+    const estado = this.filtroEstado() === 'todos' ? undefined : this.filtroEstado();
+    const dias = this.filtroDias() || undefined;
+
+    this.viajesService.listar(choferId, estado, dias, this.pagina(), this.tamanoPagina).subscribe({
       next: (respuesta) => {
         this.viajes.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -97,16 +130,32 @@ this.choferesService.listar(false, 1, 1000).subscribe({
     this.cargarViajes();
   }
 
-  filtroBackend(): string | undefined {
-    return this.filtroActivo() === 'todos' ? undefined : this.filtroActivo();
-  }
-
   nombreChofer(choferId: string): string {
     return this.choferesPorId()[choferId] ?? 'Desconocido';
   }
 
-  cambiarFiltro(valor: FiltroEstado): void {
-    this.filtroActivo.set(valor);
+  nombreUsuario(usuarioId: string): string {
+    return this.usuariosPorId()[usuarioId] ?? 'Desconocido';
+  }
+
+  patenteCamion(camionId: string | null): string {
+    if (!camionId) return '';
+    return this.camionesPorId()[camionId]?.patente ?? '';
+  }
+
+  cambiarFiltroEstado(valor: FiltroEstado): void {
+    this.filtroEstado.set(valor);
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
+  cambiarFiltroChofer(): void {
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
+  cambiarFiltroDias(valor: number | null): void {
+    this.filtroDias.set(valor);
     this.pagina.set(1);
     this.cargarViajes();
   }
@@ -124,6 +173,7 @@ this.choferesService.listar(false, 1, 1000).subscribe({
     return {
       chofer_id: '',
       camion_id: undefined,
+      camion_id_2: undefined,
       cliente: '',
       origen: '',
       destino: '',
@@ -139,8 +189,7 @@ this.choferesService.listar(false, 1, 1000).subscribe({
     this.accionModal.set('nuevo');
 
     this.choferesService.listar(true, 1, 1000).subscribe({
-      next: (respuesta) => this.choferesDisponibles.set(respuesta.items.filter(c => c.estado === 'disponible')),
-      error: () => this.error.set('No se pudieron cargar los choferes disponibles')
+      next: (respuesta) => this.choferes.set(respuesta.items.filter(c => c.estado === 'disponible'))
     });
 
     this.camionesService.listar(true, 1, 1000).subscribe({
@@ -162,7 +211,7 @@ this.choferesService.listar(false, 1, 1000).subscribe({
     this.viajesService.crear(datos).subscribe({
       next: () => {
         this.cerrarModal();
-        this.cargarDatos();
+        this.cargarDatosIniciales();
       },
       error: (err) => {
         if (err.status === 409) {
@@ -174,12 +223,55 @@ this.choferesService.listar(false, 1, 1000).subscribe({
     });
   }
 
+  // ---- Modal Vuelta ----
+
+  abrirModalVuelta(viaje: Viaje): void {
+    this.viajeOriginalId = viaje.id;
+    this.nuevoViaje = {
+      ...this.formularioVacio(),
+      origen: viaje.destino,
+      destino: viaje.origen,
+      chofer_id: viaje.chofer_id,
+    };
+    this.error.set(null);
+    this.accionModal.set('vuelta');
+
+    this.choferesService.listar(true, 1, 1000).subscribe({
+      next: (respuesta) => this.choferes.set(respuesta.items)
+    });
+
+    this.camionesService.listar(true, 1, 1000).subscribe({
+      next: (respuesta) => this.camiones.set(respuesta.items)
+    });
+  }
+
+  confirmarVuelta(): void {
+    if (!this.nuevoViaje.chofer_id || !this.nuevoViaje.origen || !this.nuevoViaje.destino || !this.nuevoViaje.fecha_inicio) {
+      this.error.set('Completá chofer, origen, destino y fecha');
+      return;
+    }
+
+    const datos: ViajeCreate = {
+      ...this.nuevoViaje,
+      fecha_inicio: new Date(this.nuevoViaje.fecha_inicio).toISOString()
+    };
+
+    this.viajesService.agregarVuelta(this.viajeOriginalId, datos).subscribe({
+      next: () => {
+        this.cerrarModal();
+        this.cargarDatosIniciales();
+      },
+      error: () => this.error.set('No se pudo agregar la vuelta')
+    });
+  }
+
   // ---- Modales Finalizar / Cancelar ----
 
   abrirModalFinalizar(viaje: Viaje): void {
     this.viajeSeleccionado.set(viaje);
     this.accionModal.set('finalizar');
     this.kmsRecorridos = null;
+    this.litrosCombustible = null;
   }
 
   abrirModalCancelar(viaje: Viaje): void {
@@ -200,7 +292,7 @@ this.choferesService.listar(false, 1, 1000).subscribe({
 
     const fechaFin = new Date().toISOString();
 
-    this.viajesService.finalizar(viaje.id, fechaFin, this.kmsRecorridos).subscribe({
+    this.viajesService.finalizar(viaje.id, fechaFin, this.kmsRecorridos, this.litrosCombustible ?? undefined).subscribe({
       next: () => {
         this.cerrarModal();
         this.cargarViajes();

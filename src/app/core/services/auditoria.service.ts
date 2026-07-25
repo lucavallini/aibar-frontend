@@ -11,10 +11,10 @@ export class AuditoriaService {
 
   constructor(private http: HttpClient) {}
 
-  listar(entidad?: string, pagina: number = 1, tamanoPagina: number = 50): Observable<RespuestaPaginada<Auditoria>> {
-    const filtro = entidad ? `&entidad=${entidad}` : '';
-    return this.http.get<RespuestaPaginada<Auditoria>>(
-      `${this.apiUrl}/?pagina=${pagina}&tamano_pagina=${tamanoPagina}${filtro}`
-    );
+  listar(entidad?: string, dias?: number, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Auditoria>> {
+    let params = `pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
+    if (entidad) params += `&entidad=${entidad}`;
+    if (dias) params += `&dias=${dias}`;
+    return this.http.get<RespuestaPaginada<Auditoria>>(`${this.apiUrl}/?${params}`);
   }
 }

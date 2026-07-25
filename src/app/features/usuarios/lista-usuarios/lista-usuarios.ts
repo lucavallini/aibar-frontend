@@ -1,8 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
-import { UsuariosService, UsuarioCreate, UsuarioUpdate } from '../../../core/services/usuarios.service';
-import { Usuario } from '../../../core/models/usuario.model';
+import { UsuariosService } from '../../../core/services/usuarios.service';
+import { Usuario, UsuarioCreate, UsuarioUpdate } from '../../../core/models/usuario.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { AuthService } from '../../../core/services/auth.service';
@@ -10,7 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-lista-usuarios',
   standalone: true,
-  imports: [FormsModule, DatePipe, Paginacion, Confirmar],
+  imports: [FormsModule, Paginacion, Confirmar],
   templateUrl: './lista-usuarios.html',
   styleUrl: './lista-usuarios.css'
 })

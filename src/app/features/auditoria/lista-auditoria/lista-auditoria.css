@@ -2,12 +2,57 @@
   padding-bottom: 1rem;
 }
 
-.filtro-camion {
-  width: min(100%, 340px);
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: flex-end;
+}
+
+.filtro-grupo {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 1rem;
+  gap: 0.3rem;
+}
+
+.filtro-grupo label {
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--color-texto-secundario);
+}
+
+.filtro-grupo select {
+  min-width: 200px;
+  padding: 0.45rem 0.6rem;
+}
+
+.filtro-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.btn-filtro {
+  min-height: 36px;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-filtro:hover {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+}
+
+.btn-filtro.activo {
+  background: var(--color-primario);
+  color: white;
+  border-color: var(--color-primario);
 }
 
 .alta,

@@ -6,6 +6,9 @@
   <span class="nombre-empresa">AI-BAR SRL</span>
 
   <div class="acciones">
+    <button class="btn-icono" (click)="recargar()" aria-label="Recargar" title="Recargar">
+      ⟳
+    </button>
     <button class="btn-icono" (click)="onToggleTema()" aria-label="Cambiar tema">
       {{ themeService.esOscuro() ? '☀️' : '🌙' }}
     </button>

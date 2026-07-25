@@ -8,7 +8,7 @@
     <p>Cargando...</p>
   }
 
-  @if (error() && !modalEditarAbierto() && !modalBajaAbierto()) {
+  @if (error() && !modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()) {
     <p class="error">{{ error() }}</p>
   }
 
@@ -25,15 +25,20 @@
       </thead>
       <tbody>
         @for (chofer of choferes(); track chofer.id) {
-          <tr>
+          <tr class="fila-clickeable" (click)="abrirDetalle(chofer)">
             <td>{{ chofer.nombre_completo }}</td>
             <td>{{ chofer.dni || '-' }}</td>
             <td>
               <span class="badge" [class]="chofer.estado">{{ chofer.estado }}</span>
             </td>
             <td>{{ chofer.telefono || '-' }}</td>
-            <td>
+            <td (click)="$event.stopPropagation()">
               <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
+              @if (mostrarBotonLicencia(chofer)) {
+                <button class="btn-mini" [class]="claseBotonLicencia(chofer)" (click)="toggleLicencia(chofer)">
+                  {{ textoBotonLicencia(chofer) }}
+                </button>
+              }
               <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(chofer)">Baja</button>
             </td>
           </tr>
@@ -105,6 +110,65 @@
       <div class="acciones-modal">
         <button (click)="cerrarAlta()">Cancelar</button>
         <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalDetalleAbierto()) {
+  <div class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal modal-grande" (click)="$event.stopPropagation()">
+      @let detalle = choferDetalle();
+      @if (detalle) {
+        <h2>{{ detalle.nombre_completo }}</h2>
+
+        <div class="detalle-info">
+          <div class="detalle-item">
+            <span class="detalle-label">DNI</span>
+            <span>{{ detalle.dni || '-' }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Teléfono</span>
+            <span>{{ detalle.telefono || '-' }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Estado</span>
+            <span class="badge" [class]="detalle.estado">{{ detalle.estado }}</span>
+          </div>
+        </div>
+
+        <div class="kms-resumen">
+          <div class="kms-card">
+            <span class="kms-valor">{{ detalle.kms_mes_actual }}</span>
+            <span class="kms-label">KMs este mes</span>
+          </div>
+          @let r = rendimiento();
+          <div class="kms-card rendimiento">
+            @if (r && r.km_por_litro !== null) {
+              <span class="kms-valor">{{ r.km_por_litro }} km/l</span>
+              <span class="kms-label">{{ r.total_litros }} L en {{ r.total_kms }} kms</span>
+            } @else {
+              <span class="kms-valor">—</span>
+              <span class="kms-label">Sin datos de combustible</span>
+            }
+          </div>
+        </div>
+
+        <h3>Histórico de KMs</h3>
+        <div class="historico-tabla">
+          @for (item of detalle.historico; track item.mes) {
+            <div class="historico-fila">
+              <span>{{ item.mes }}</span>
+              <span class="kms-valor-historico">{{ item.kms }} kms</span>
+            </div>
+          } @empty {
+            <p class="sin-datos">Sin viajes finalizados</p>
+          }
+        </div>
+      }
+
+      <div class="acciones-modal">
+        <button class="btn-primario" (click)="cerrarDetalle()">Cerrar</button>
       </div>
     </div>
   </div>

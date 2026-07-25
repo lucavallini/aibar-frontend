@@ -23,7 +23,6 @@ export class Sidebar {
     { label: 'Choferes', ruta: '/choferes', soloAdmin: false },
     { label: 'Camiones', ruta: '/camiones', soloAdmin: false },
     { label: 'Multas', ruta: '/multas', soloAdmin: false },
-    { label: 'Combustible', ruta: '/combustible', soloAdmin: false },
     { label: 'Auditoría', ruta: '/auditoria', soloAdmin: true },
     { label: 'Usuarios', ruta: '/usuarios', soloAdmin: true },
   ];
