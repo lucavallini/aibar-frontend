@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://aibar-api.onrender.com'
+  apiUrl: 'https://aibar-backend.onrender.com'
 };
