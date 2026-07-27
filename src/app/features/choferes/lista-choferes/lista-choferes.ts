@@ -19,6 +19,7 @@ export class ListaChoferesComponent implements OnInit {
   choferes = signal<Chofer[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
+  busqueda = signal('');
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -149,11 +150,17 @@ export class ListaChoferesComponent implements OnInit {
     });
   }
 
+  cambiarBusqueda(valor: string): void {
+    this.busqueda.set(valor);
+    this.pagina.set(1);
+    this.cargarChoferes();
+  }
+
   cargarChoferes(): void {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.choferesService.listar(true, this.pagina(), this.tamanoPagina).subscribe({
+    this.choferesService.listar(true, this.pagina(), this.tamanoPagina, this.busqueda() || undefined).subscribe({
       next: (respuesta) => {
         this.choferes.set(respuesta.items);
         this.total.set(respuesta.total);

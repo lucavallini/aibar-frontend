@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ViajesService } from '../../../core/services/viajes.service';
@@ -29,7 +29,11 @@ export class ListaViajes implements OnInit {
   usuariosPorId = signal<Record<string, string>>({});
   filtroEstado = signal<FiltroEstado>('todos');
   filtroChoferId = signal<string>('');
+  filtroPatente = signal('');
   filtroDias = signal<number | null>(null);
+  filtroDropdownAbierto = signal<'chofer' | 'patente' | null>(null);
+  filtroChoferBusqueda = signal('');
+  filtroPatenteBusqueda = signal('');
   cargando = signal(true);
   error = signal<string | null>(null);
 
@@ -41,6 +45,42 @@ export class ListaViajes implements OnInit {
 
   nuevoViaje: ViajeCreate = this.formularioVacio();
   viajeOriginalId = '';
+
+  dropdownAbierto = signal<'chofer' | 'camion' | 'camion2' | null>(null);
+
+  filtroChoferModal = signal('');
+  filtroCamionModal = signal('');
+  filtroCamion2Modal = signal('');
+
+  choferesFiltradosModal = computed(() => {
+    const filtro = this.filtroChoferModal().toLowerCase();
+    if (!filtro) return this.choferes();
+    return this.choferes().filter(c => c.nombre_completo.toLowerCase().includes(filtro));
+  });
+
+  choferesFiltradosBusqueda = computed(() => {
+    const filtro = this.filtroChoferBusqueda().toLowerCase();
+    if (!filtro) return this.choferes();
+    return this.choferes().filter(c => c.nombre_completo.toLowerCase().includes(filtro));
+  });
+
+  camionesFiltradosModal = computed(() => {
+    const filtro = this.filtroCamionModal().toLowerCase();
+    if (!filtro) return this.camiones();
+    return this.camiones().filter(c => c.patente.toLowerCase().includes(filtro));
+  });
+
+  camionesFiltradosPatente = computed(() => {
+    const filtro = this.filtroPatenteBusqueda().toLowerCase();
+    if (!filtro) return this.camiones();
+    return this.camiones().filter(c => c.patente.toLowerCase().includes(filtro));
+  });
+
+  camiones2FiltradosModal = computed(() => {
+    const filtro = this.filtroCamion2Modal().toLowerCase();
+    if (!filtro) return this.camiones();
+    return this.camiones().filter(c => c.patente.toLowerCase().includes(filtro));
+  });
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -110,8 +150,9 @@ export class ListaViajes implements OnInit {
     const choferId = this.filtroChoferId() || undefined;
     const estado = this.filtroEstado() === 'todos' ? undefined : this.filtroEstado();
     const dias = this.filtroDias() || undefined;
+    const patente = this.filtroPatente() || undefined;
 
-    this.viajesService.listar(choferId, estado, dias, this.pagina(), this.tamanoPagina).subscribe({
+    this.viajesService.listar(choferId, estado, dias, patente, this.pagina(), this.tamanoPagina).subscribe({
       next: (respuesta) => {
         this.viajes.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -160,6 +201,46 @@ export class ListaViajes implements OnInit {
     this.cargarViajes();
   }
 
+  abrirFiltroDropdown(tipo: 'chofer' | 'patente'): void {
+    this.filtroDropdownAbierto.set(tipo);
+    if (tipo === 'chofer') this.filtroChoferBusqueda.set('');
+    else this.filtroPatenteBusqueda.set('');
+  }
+
+  cerrarFiltroDropdown(): void {
+    this.filtroDropdownAbierto.set(null);
+  }
+
+  seleccionarFiltroChofer(chofer: Chofer): void {
+    this.filtroChoferId.set(chofer.id);
+    this.filtroDropdownAbierto.set(null);
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
+  limpiarFiltroChofer(): void {
+    this.filtroChoferId.set('');
+    this.filtroDropdownAbierto.set(null);
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
+  seleccionarFiltroPatente(camion: Camion): void {
+    this.filtroPatente.set(camion.patente || '');
+    this.filtroDropdownAbierto.set(null);
+    this.filtroPatenteBusqueda.set('');
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
+  limpiarFiltroPatente(): void {
+    this.filtroPatente.set('');
+    this.filtroDropdownAbierto.set(null);
+    this.filtroPatenteBusqueda.set('');
+    this.pagina.set(1);
+    this.cargarViajes();
+  }
+
   iniciarViaje(viaje: Viaje): void {
     this.viajesService.iniciar(viaje.id).subscribe({
       next: () => this.cargarViajes(),
@@ -187,6 +268,9 @@ export class ListaViajes implements OnInit {
     this.nuevoViaje = this.formularioVacio();
     this.error.set(null);
     this.accionModal.set('nuevo');
+    this.filtroChoferModal.set('');
+    this.filtroCamionModal.set('');
+    this.filtroCamion2Modal.set('');
 
     this.choferesService.listar(true, 1, 1000).subscribe({
       next: (respuesta) => this.choferes.set(respuesta.items.filter(c => c.estado === 'disponible'))
@@ -235,6 +319,9 @@ export class ListaViajes implements OnInit {
     };
     this.error.set(null);
     this.accionModal.set('vuelta');
+    this.filtroChoferModal.set('');
+    this.filtroCamionModal.set('');
+    this.filtroCamion2Modal.set('');
 
     this.choferesService.listar(true, 1, 1000).subscribe({
       next: (respuesta) => this.choferes.set(respuesta.items)
@@ -278,6 +365,42 @@ export class ListaViajes implements OnInit {
     this.viajeSeleccionado.set(viaje);
     this.accionModal.set('cancelar');
     this.motivoCancelacion = '';
+  }
+
+  cerrarDropdown(): void {
+    this.dropdownAbierto.set(null);
+  }
+
+  abrirDropdown(tipo: 'chofer' | 'camion' | 'camion2'): void {
+    this.dropdownAbierto.set(tipo);
+  }
+
+  seleccionarChofer(chofer: Chofer): void {
+    this.nuevoViaje.chofer_id = chofer.id;
+    this.dropdownAbierto.set(null);
+    this.filtroChoferModal.set('');
+  }
+
+  seleccionarCamion(camion: Camion): void {
+    this.nuevoViaje.camion_id = camion.id || undefined;
+    this.dropdownAbierto.set(null);
+    this.filtroCamionModal.set('');
+  }
+
+  limpiarCamion(): void {
+    this.nuevoViaje.camion_id = undefined;
+    this.dropdownAbierto.set(null);
+  }
+
+  seleccionarCamion2(camion: Camion): void {
+    this.nuevoViaje.camion_id_2 = camion.id || undefined;
+    this.dropdownAbierto.set(null);
+    this.filtroCamion2Modal.set('');
+  }
+
+  limpiarCamion2(): void {
+    this.nuevoViaje.camion_id_2 = undefined;
+    this.dropdownAbierto.set(null);
   }
 
   cerrarModal(): void {

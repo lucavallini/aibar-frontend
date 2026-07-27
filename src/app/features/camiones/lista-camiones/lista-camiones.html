@@ -4,6 +4,10 @@
     <button class="btn-primario" (click)="abrirModal()">+ Nuevo camión</button>
   </header>
 
+  <div class="buscador">
+    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
+  </div>
+
   @if (cargando()) {
     <p>Cargando...</p>
   }

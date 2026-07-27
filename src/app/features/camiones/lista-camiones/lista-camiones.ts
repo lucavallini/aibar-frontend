@@ -17,6 +17,7 @@ export class ListaCamiones implements OnInit {
   camiones = signal<Camion[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
+  busqueda = signal('');
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -91,11 +92,17 @@ export class ListaCamiones implements OnInit {
     });
   }
 
+  cambiarBusqueda(valor: string): void {
+    this.busqueda.set(valor);
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
   cargarCamiones(): void {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.camionesService.listar(true, this.pagina(), this.tamanoPagina).subscribe({
+    this.camionesService.listar(true, this.pagina(), this.tamanoPagina, this.busqueda() || undefined).subscribe({
       next: (respuesta) => {
         this.camiones.set(respuesta.items);
         this.total.set(respuesta.total);

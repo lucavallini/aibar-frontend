@@ -4,15 +4,58 @@
     <button class="btn-primario" (click)="abrirModalNuevoViaje()">+ Nuevo viaje</button>
   </header>
 
-  <div class="filtros">
+  <div class="filtros" (click)="cerrarFiltroDropdown()">
     <div class="filtro-grupo">
-      <label for="filtroChofer">Chofer</label>
-      <select id="filtroChofer" [ngModel]="filtroChoferId()" (ngModelChange)="filtroChoferId.set($event); cambiarFiltroChofer()">
-        <option value="">Todos los choferes</option>
-        @for (chofer of choferes(); track chofer.id) {
-          <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
+      <label>Chofer</label>
+      <div class="buscador-select" (click)="$event.stopPropagation()">
+        <div class="buscador-select-header" (click)="abrirFiltroDropdown('chofer')">
+          <span>{{ filtroChoferId() ? nombreChofer(filtroChoferId()) : 'Todos los choferes' }}</span>
+          <span class="flecha">▼</span>
+        </div>
+        @if (filtroDropdownAbierto() === 'chofer') {
+          <div class="buscador-select-dropdown">
+            <input type="text" [ngModel]="filtroChoferBusqueda()" (ngModelChange)="filtroChoferBusqueda.set($event)" placeholder="Buscar chofer..." autofocus />
+            <div class="opciones">
+              <div class="opcion" (mousedown)="limpiarFiltroChofer()">
+                Todos los choferes
+              </div>
+              @for (chofer of choferesFiltradosBusqueda(); track chofer.id) {
+                <div class="opcion" [class.seleccionada]="filtroChoferId() === chofer.id" (mousedown)="seleccionarFiltroChofer(chofer)">
+                  {{ chofer.nombre_completo }}
+                </div>
+              } @empty {
+                <div class="opcion-vacia">Sin resultados</div>
+              }
+            </div>
+          </div>
         }
-      </select>
+      </div>
+    </div>
+    <div class="filtro-grupo">
+      <label>Patente</label>
+      <div class="buscador-select" (click)="$event.stopPropagation()">
+        <div class="buscador-select-header" (click)="abrirFiltroDropdown('patente')">
+          <span>{{ filtroPatente() || 'Todas las patentes' }}</span>
+          <span class="flecha">▼</span>
+        </div>
+        @if (filtroDropdownAbierto() === 'patente') {
+          <div class="buscador-select-dropdown">
+            <input type="text" [ngModel]="filtroPatenteBusqueda()" (ngModelChange)="filtroPatenteBusqueda.set($event)" placeholder="Buscar patente..." autofocus />
+            <div class="opciones">
+              <div class="opcion" (mousedown)="limpiarFiltroPatente()">
+                Todas las patentes
+              </div>
+              @for (camion of camionesFiltradosPatente(); track camion.id) {
+                <div class="opcion" [class.seleccionada]="filtroPatente() === camion.patente" (mousedown)="seleccionarFiltroPatente(camion)">
+                  {{ camion.patente }}
+                </div>
+              } @empty {
+                <div class="opcion-vacia">Sin resultados</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
     </div>
     <div class="filtro-grupo">
       <label>Estado</label>
@@ -148,36 +191,84 @@
 
 @if (accionModal() === 'nuevo' || accionModal() === 'vuelta') {
   <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal modal-grande" (click)="$event.stopPropagation()">
+    <div class="modal modal-grande" (click)="$event.stopPropagation(); cerrarDropdown()">
       <h2>{{ accionModal() === 'vuelta' ? 'Agregar vuelta' : 'Nuevo viaje' }}</h2>
 
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
 
-      <label for="chofer">{{ accionModal() === 'vuelta' ? 'Chofer (vuelta)' : 'Chofer disponible' }}</label>
-      <select id="chofer" [(ngModel)]="nuevoViaje.chofer_id">
-        <option value="" disabled selected>Elegí un chofer</option>
-        @for (chofer of choferes(); track chofer.id) {
-          <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
+      <label>{{ accionModal() === 'vuelta' ? 'Chofer (vuelta)' : 'Chofer disponible' }}</label>
+      <div class="buscador-select" (click)="$event.stopPropagation()">
+        <div class="buscador-select-header" (click)="abrirDropdown('chofer')">
+          <span>{{ nuevoViaje.chofer_id ? nombreChofer(nuevoViaje.chofer_id) : 'Elegí un chofer' }}</span>
+          <span class="flecha">▼</span>
+        </div>
+        @if (dropdownAbierto() === 'chofer') {
+          <div class="buscador-select-dropdown">
+            <input type="text" [ngModel]="filtroChoferModal()" (ngModelChange)="filtroChoferModal.set($event)" placeholder="Buscar chofer..." autofocus />
+            <div class="opciones">
+              @for (chofer of choferesFiltradosModal(); track chofer.id) {
+                <div class="opcion" [class.seleccionada]="nuevoViaje.chofer_id === chofer.id" (mousedown)="seleccionarChofer(chofer)">
+                  {{ chofer.nombre_completo }}
+                </div>
+              } @empty {
+                <div class="opcion-vacia">Sin resultados</div>
+              }
+            </div>
+          </div>
         }
-      </select>
+      </div>
 
-      <label for="camion">Chasis (opcional)</label>
-      <select id="camion" [(ngModel)]="nuevoViaje.camion_id">
-        <option [value]="undefined">Sin especificar</option>
-        @for (camion of camiones(); track camion.id) {
-          <option [value]="camion.id">{{ camion.patente }}</option>
+      <label>Chasis (opcional)</label>
+      <div class="buscador-select" (click)="$event.stopPropagation()">
+        <div class="buscador-select-header" (click)="abrirDropdown('camion')">
+          <span>{{ nuevoViaje.camion_id ? patenteCamion(nuevoViaje.camion_id) : 'Sin especificar' }}</span>
+          <span class="flecha">▼</span>
+        </div>
+        @if (dropdownAbierto() === 'camion') {
+          <div class="buscador-select-dropdown">
+            <input type="text" [ngModel]="filtroCamionModal()" (ngModelChange)="filtroCamionModal.set($event)" placeholder="Buscar chasis..." autofocus />
+            <div class="opciones">
+              <div class="opcion" (mousedown)="limpiarCamion()">
+                Sin especificar
+              </div>
+              @for (camion of camionesFiltradosModal(); track camion.id) {
+                <div class="opcion" [class.seleccionada]="nuevoViaje.camion_id === camion.id" (mousedown)="seleccionarCamion(camion)">
+                  {{ camion.patente }}
+                </div>
+              } @empty {
+                <div class="opcion-vacia">Sin resultados</div>
+              }
+            </div>
+          </div>
         }
-      </select>
+      </div>
 
-      <label for="camion2">Acoplado / Batea (opcional)</label>
-      <select id="camion2" [(ngModel)]="nuevoViaje.camion_id_2">
-        <option [value]="undefined">Sin especificar</option>
-        @for (camion of camiones(); track camion.id) {
-          <option [value]="camion.id">{{ camion.patente }}</option>
+      <label>Acoplado / Batea (opcional)</label>
+      <div class="buscador-select" (click)="$event.stopPropagation()">
+        <div class="buscador-select-header" (click)="abrirDropdown('camion2')">
+          <span>{{ nuevoViaje.camion_id_2 ? patenteCamion(nuevoViaje.camion_id_2) : 'Sin especificar' }}</span>
+          <span class="flecha">▼</span>
+        </div>
+        @if (dropdownAbierto() === 'camion2') {
+          <div class="buscador-select-dropdown">
+            <input type="text" [ngModel]="filtroCamion2Modal()" (ngModelChange)="filtroCamion2Modal.set($event)" placeholder="Buscar acoplado..." autofocus />
+            <div class="opciones">
+              <div class="opcion" (mousedown)="limpiarCamion2()">
+                Sin especificar
+              </div>
+              @for (camion of camiones2FiltradosModal(); track camion.id) {
+                <div class="opcion" [class.seleccionada]="nuevoViaje.camion_id_2 === camion.id" (mousedown)="seleccionarCamion2(camion)">
+                  {{ camion.patente }}
+                </div>
+              } @empty {
+                <div class="opcion-vacia">Sin resultados</div>
+              }
+            </div>
+          </div>
         }
-      </select>
+      </div>
 
       <label for="cliente">Cliente</label>
       <input id="cliente" type="text" [(ngModel)]="nuevoViaje.cliente" />

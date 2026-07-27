@@ -11,11 +11,12 @@ export class ViajesService {
 
   constructor(private http: HttpClient) {}
 
-  listar(choferId?: string, estado?: string, dias?: number, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Viaje>> {
+  listar(choferId?: string, estado?: string, dias?: number, patente?: string, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Viaje>> {
     let params = `pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
     if (choferId) params += `&chofer_id=${choferId}`;
     if (estado) params += `&estado=${estado}`;
     if (dias) params += `&dias=${dias}`;
+    if (patente) params += `&patente=${encodeURIComponent(patente)}`;
     return this.http.get<RespuestaPaginada<Viaje>>(`${this.apiUrl}/?${params}`);
   }
 

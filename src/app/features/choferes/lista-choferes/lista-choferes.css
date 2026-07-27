@@ -2,6 +2,21 @@
   padding-bottom: 1rem;
 }
 
+.buscador {
+  margin-bottom: 0.8rem;
+}
+
+.buscador input {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+}
+
 .fila-clickeable {
   cursor: pointer;
 }

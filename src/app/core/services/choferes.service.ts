@@ -11,10 +11,10 @@ export class ChoferesService {
 
   constructor(private http: HttpClient) {}
 
-  listar(activosOnly: boolean = true, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Chofer>> {
-    return this.http.get<RespuestaPaginada<Chofer>>(
-      `${this.apiUrl}/?activos_only=${activosOnly}&pagina=${pagina}&tamano_pagina=${tamanoPagina}`
-    );
+  listar(activosOnly: boolean = true, pagina: number = 1, tamanoPagina: number = 20, busqueda?: string): Observable<RespuestaPaginada<Chofer>> {
+    let params = `activos_only=${activosOnly}&pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
+    if (busqueda) params += `&busqueda=${encodeURIComponent(busqueda)}`;
+    return this.http.get<RespuestaPaginada<Chofer>>(`${this.apiUrl}/?${params}`);
   }
 
   obtenerPorId(id: string): Observable<Chofer> {

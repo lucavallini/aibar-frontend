@@ -4,6 +4,10 @@
     <button class="btn-primario" (click)="abrirAlta()">+ Nuevo chofer</button>
   </header>
 
+  <div class="buscador">
+    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
+  </div>
+
   @if (cargando()) {
     <p>Cargando...</p>
   }
