@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CargaCombustible, CargaCombustibleCreate } from '../models/combustible.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
+import { buildListParams } from '../utils/http-params.helper';
 
 @Injectable({ providedIn: 'root' })
 export class CombustibleService {
@@ -11,16 +12,8 @@ export class CombustibleService {
 
   constructor(private http: HttpClient) {}
 
-  listar(
-  camionId?: string,
-  pagina: number = 1,
-  tamanoPagina: number = 20,
-  soloUltimos30Dias: boolean = true
-  ): Observable<RespuestaPaginada<CargaCombustible>> {
-  const filtroCamion = camionId ? `&camion_id=${camionId}` : '';
-  return this.http.get<RespuestaPaginada<CargaCombustible>>(
-      `${this.apiUrl}/?pagina=${pagina}&tamano_pagina=${tamanoPagina}&solo_ultimos_30_dias=${soloUltimos30Dias}${filtroCamion}`
-  );
+  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<CargaCombustible>> {
+    return this.http.get<RespuestaPaginada<CargaCombustible>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) });
   }
 
   crear(datos: CargaCombustibleCreate): Observable<CargaCombustible> {

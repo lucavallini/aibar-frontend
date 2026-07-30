@@ -1,76 +1,5 @@
-.contenedor {
-  padding-bottom: 1rem;
-}
-
-.buscador {
-  margin-bottom: 0.8rem;
-}
-
-.buscador input {
-  width: 100%;
-  max-width: 320px;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio);
-  background: var(--color-fondo-panel);
-  color: var(--color-texto);
-  font-size: 0.9rem;
-}
-
 .fila-clickeable {
   cursor: pointer;
-}
-
-.disponible,
-.badge.disponible {
-  background: var(--color-exito-fondo);
-  color: var(--color-exito);
-}
-
-.viajando,
-.badge.viajando {
-  background: var(--color-alerta-fondo);
-  color: var(--color-alerta);
-}
-
-.inactivo,
-.badge.inactivo {
-  background: var(--color-error-fondo);
-  color: var(--color-error);
-}
-
-.licencia,
-.badge.licencia {
-  background: var(--color-alerta-fondo);
-  color: var(--color-alerta);
-}
-
-.btn-primario {
-  padding: 0.55rem 1.1rem;
-  background: var(--color-primario);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: var(--sombra);
-}
-
-.btn-mini {
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--color-borde);
-  background: var(--color-fondo-panel);
-  color: var(--color-texto);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.78rem;
-  margin-right: 0.3rem;
-}
-
-.btn-mini-peligro {
-  border-color: #c0392b;
-  color: #c0392b;
 }
 
 .btn-mini-aviso {
@@ -168,13 +97,53 @@
   font-size: 0.85rem;
 }
 
+.exito {
+  color: var(--color-exito);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.obs-actual {
+  margin-bottom: 1rem;
+}
+
+.obs-actual textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 0.5rem;
+}
+
+.obs-historico {
+  margin-bottom: 0.5rem;
+}
+
+.obs-item {
+  padding: 0.5rem;
+  background: var(--color-fondo-suave);
+  border-radius: var(--radio);
+  margin-bottom: 0.3rem;
+}
+
+.obs-mes {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--color-texto-secundario);
+  margin-bottom: 0.2rem;
+}
+
+.obs-texto {
+  font-size: 0.88rem;
+  white-space: pre-wrap;
+}
+
 h3 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-}
-
-@media (max-width: 992px) {
-  .contenedor {
-    overflow-x: auto;
-  }
 }

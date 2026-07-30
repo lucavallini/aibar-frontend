@@ -27,7 +27,7 @@
       <p class="error">{{ errorMensaje() }}</p>
     }
 
-    <button type="submit" [disabled]="cargando()">
+    <button type="submit" class="btn-primario" [disabled]="cargando()">
       {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
     </button>
   </form>

@@ -5,6 +5,7 @@ export interface Camion {
   modelo: string | null;
   anio: number | null;
   tipo: string | null;
+  empresa_id: string | null;
   activo: boolean;
   creado_en: string;
 }
@@ -15,4 +16,5 @@ export interface CamionCreate {
   modelo?: string;
   anio?: number;
   tipo?: string;
+  empresa_id?: string;
 }

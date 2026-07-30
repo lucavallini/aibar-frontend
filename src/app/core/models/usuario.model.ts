@@ -3,7 +3,7 @@ export interface Usuario {
   nombre_usuario: string;
   nombre_completo: string;
   dni: string;
-  rol: 'administrador' | 'empleado';
+  rol: 'administrador' | 'empleado' | 'aibar';
   activo: boolean;
   creado_en: string;
 }

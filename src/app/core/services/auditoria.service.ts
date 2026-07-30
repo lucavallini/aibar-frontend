@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Auditoria } from '../models/auditoria.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
+import { buildListParams } from '../utils/http-params.helper';
 
 @Injectable({ providedIn: 'root' })
 export class AuditoriaService {
@@ -11,10 +12,7 @@ export class AuditoriaService {
 
   constructor(private http: HttpClient) {}
 
-  listar(entidad?: string, dias?: number, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Auditoria>> {
-    let params = `pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
-    if (entidad) params += `&entidad=${entidad}`;
-    if (dias) params += `&dias=${dias}`;
-    return this.http.get<RespuestaPaginada<Auditoria>>(`${this.apiUrl}/?${params}`);
+  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Auditoria>> {
+    return this.http.get<RespuestaPaginada<Auditoria>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) });
   }
 }

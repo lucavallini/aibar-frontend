@@ -6,7 +6,7 @@ export const adminGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.getRol() === 'administrador') {
+  if (authService.getRol() === 'administrador' || authService.getRol() === 'aibar') {
     return true;
   }
 

@@ -1,7 +1,9 @@
 <div class="contenedor">
   <header>
     <h1>Choferes</h1>
-    <button class="btn-primario" (click)="abrirAlta()">+ Nuevo chofer</button>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirAlta()">+ Nuevo chofer</button>
+    }
   </header>
 
   <div class="buscador">
@@ -16,49 +18,41 @@
     <p class="error">{{ error() }}</p>
   }
 
-  @if (!cargando() && !error()) {
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>DNI</th>
-          <th>Estado</th>
-          <th>Teléfono</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (chofer of choferes(); track chofer.id) {
-          <tr class="fila-clickeable" (click)="abrirDetalle(chofer)">
-            <td>{{ chofer.nombre_completo }}</td>
-            <td>{{ chofer.dni || '-' }}</td>
-            <td>
-              <span class="badge" [class]="chofer.estado">{{ chofer.estado }}</span>
-            </td>
-            <td>{{ chofer.telefono || '-' }}</td>
-            <td (click)="$event.stopPropagation()">
-              <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
-              @if (mostrarBotonLicencia(chofer)) {
-                <button class="btn-mini" [class]="claseBotonLicencia(chofer)" (click)="toggleLicencia(chofer)">
-                  {{ textoBotonLicencia(chofer) }}
-                </button>
-              }
-              <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(chofer)">Baja</button>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="5">No hay choferes cargados todavía.</td></tr>
-        }
-      </tbody>
-    </table>
-
-    <app-paginacion
-      [pagina]="pagina()"
-      [totalPaginas]="totalPaginas()"
-      [total]="total()"
-      (cambioPagina)="cambiarPagina($event)"
-    ></app-paginacion>
-  }
+  <app-tabla-paginada
+    [headers]="['Nombre', 'DNI', 'Estado', 'Teléfono', 'Empresa', 'Acciones']"
+    [items]="choferes()"
+    [cargando]="cargando()"
+    [error]="error()"
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    emptyMessage="No hay choferes cargados todavía."
+    (cambioPagina)="cambiarPagina($event)"
+  >
+    @for (chofer of choferes(); track chofer.id) {
+      <tr class="fila-clickeable" (click)="abrirDetalle(chofer)">
+        <td>{{ chofer.nombre_completo }}</td>
+        <td>{{ chofer.dni || '-' }}</td>
+        <td>
+          <span class="badge" [class]="chofer.estado">{{ chofer.estado }}</span>
+        </td>
+        <td>{{ chofer.telefono || '-' }}</td>
+        <td>{{ nombreEmpresa(chofer.empresa_id) }}</td>
+        <td (click)="$event.stopPropagation()">
+          @if (!readonly()) {
+            <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
+            @if (mostrarBotonLicencia(chofer)) {
+              <button class="btn-mini" [class]="claseBotonLicencia(chofer)" (click)="toggleLicencia(chofer)">
+                {{ textoBotonLicencia(chofer) }}
+              </button>
+            }
+            <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(chofer)">Baja</button>
+          }
+          <button class="btn-mini" (click)="abrirObservaciones(chofer)">Observaciones</button>
+        </td>
+      </tr>
+    }
+  </app-tabla-paginada>
 </div>
 
 @if (modalEditarAbierto()) {
@@ -69,13 +63,26 @@
       @if (error()) { <p class="error">{{ error() }}</p> }
 
       <label for="nombreEdit">Nombre completo</label>
-      <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" />
+      <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" (input)="edicionChofer.nombre_completo = $event.target.value.toUpperCase()" />
 
       <label for="dniEdit">DNI</label>
-      <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" />
+      <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" (input)="edicionChofer.dni = $event.target.value.toUpperCase()" />
 
       <label for="telEdit">Teléfono</label>
-      <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" />
+      <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" (input)="edicionChofer.telefono = $event.target.value.toUpperCase()" />
+
+      <label>Empresa</label>
+      <div class="select-con-mas">
+        <select [(ngModel)]="edicionChofer.empresa_id">
+          <option [ngValue]="undefined">Sin empresa</option>
+          @for (e of empresas(); track e.id) {
+            <option [ngValue]="e.id">{{ e.nombre }}</option>
+          }
+        </select>
+        @if (!readonly()) {
+          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
+        }
+      </div>
 
       <div class="acciones-modal">
         <button (click)="cerrarEditar()">Cancelar</button>
@@ -103,13 +110,26 @@
       @if (error()) { <p class="error">{{ error() }}</p> }
 
       <label for="nombreAlta">Nombre completo</label>
-      <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" />
+      <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" (input)="nuevoChofer.nombre_completo = $event.target.value.toUpperCase()" />
 
       <label for="dniAlta">DNI</label>
-      <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" />
+      <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" (input)="nuevoChofer.dni = $event.target.value.toUpperCase()" />
 
       <label for="telAlta">Teléfono</label>
-      <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" />
+      <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()" />
+
+      <label>Empresa</label>
+      <div class="select-con-mas">
+        <select [(ngModel)]="nuevoChofer.empresa_id">
+          <option [ngValue]="undefined">Sin empresa</option>
+          @for (e of empresas(); track e.id) {
+            <option [ngValue]="e.id">{{ e.nombre }}</option>
+          }
+        </select>
+        @if (!readonly()) {
+          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
+        }
+      </div>
 
       <div class="acciones-modal">
         <button (click)="cerrarAlta()">Cancelar</button>
@@ -138,6 +158,10 @@
           <div class="detalle-item">
             <span class="detalle-label">Estado</span>
             <span class="badge" [class]="detalle.estado">{{ detalle.estado }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Empresa</span>
+            <span>{{ nombreEmpresa(detalle.empresa_id) }}</span>
           </div>
         </div>
 
@@ -176,4 +200,56 @@
       </div>
     </div>
   </div>
+}
+
+@if (miniModalEmpresaAbierto()) {
+  <app-mini-modal-empresa
+    (empresaCreada)="onEmpresaCreada($event)"
+    (cancelar)="cerrarMiniModalEmpresa()"
+  ></app-mini-modal-empresa>
+}
+
+@if (modalObservacionesAbierto()) {
+  @let chofer = choferObsSeleccionado();
+  @if (chofer) {
+    <div class="modal-overlay" (click)="cerrarObservaciones()">
+      <div class="modal modal-grande" (click)="$event.stopPropagation()">
+        <h2>Observaciones — {{ chofer.nombre_completo }}</h2>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        @if (exitoObs()) {
+          <p class="exito">{{ exitoObs() }}</p>
+        }
+
+        <div class="obs-actual">
+          <h3>Mes actual</h3>
+          <textarea [(ngModel)]="observacionActual" rows="4" placeholder="Escribí una observación para este mes..."></textarea>
+          @if (!readonly()) {
+            <button class="btn-primario" (click)="guardarObservacion()" [disabled]="!observacionActual.trim()">Guardar</button>
+          }
+        </div>
+
+        <div class="obs-historico">
+          <h3>Historial</h3>
+          @if (tieneHistorial()) {
+            @for (obs of historicoObservaciones(); track obs.id) {
+              <div class="obs-item">
+                <div class="obs-mes">{{ getNombreMes(obs.mes) }} {{ obs.anio }}</div>
+                <div class="obs-texto">{{ obs.observacion }}</div>
+              </div>
+            }
+          } @else {
+            <p class="sin-datos">Sin observaciones anteriores</p>
+          }
+        </div>
+
+        <div class="acciones-modal">
+          <button class="btn-primario" (click)="cerrarObservaciones()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
 }

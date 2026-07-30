@@ -1,31 +1,41 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Camion, CamionCreate } from '../models/camion.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
+import { buildListParams } from '../utils/http-params.helper';
+import { ApiCache } from '../utils/api-cache';
+
+const CACHE_KEY = 'camiones';
 
 @Injectable({ providedIn: 'root' })
 export class CamionesService {
   private apiUrl = `${environment.apiUrl}/camiones`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: ApiCache) {}
 
-  listar(activosOnly: boolean = true, pagina: number = 1, tamanoPagina: number = 20, busqueda?: string): Observable<RespuestaPaginada<Camion>> {
-    let params = `activos_only=${activosOnly}&pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
-    if (busqueda) params += `&busqueda=${encodeURIComponent(busqueda)}`;
-    return this.http.get<RespuestaPaginada<Camion>>(`${this.apiUrl}/?${params}`);
+  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Camion>> {
+    const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
+    const cached = this.cache.get<RespuestaPaginada<Camion>>(cacheKey);
+    if (cached) return of(cached);
+    return this.http.get<RespuestaPaginada<Camion>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
+      .pipe(tap(data => this.cache.set(cacheKey, data)));
   }
 
   crear(datos: CamionCreate): Observable<Camion> {
+    this.cache.clear(CACHE_KEY);
     return this.http.post<Camion>(`${this.apiUrl}/`, datos);
   }
 
   actualizar(id: string, datos: Partial<CamionCreate>): Observable<Camion> {
+    this.cache.clear(CACHE_KEY);
     return this.http.patch<Camion>(`${this.apiUrl}/${id}`, datos);
   }
 
   darDeBaja(id: string): Observable<Camion> {
+    this.cache.clear(CACHE_KEY);
     return this.http.delete<Camion>(`${this.apiUrl}/${id}`);
   }
 }

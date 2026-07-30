@@ -1,21 +1,55 @@
 <div class="contenedor">
   <header>
     <h1>Combustible</h1>
-    <button class="btn-primario" (click)="abrirModal()">+ Nueva carga</button>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirModal()">+ Nueva carga</button>
+    }
   </header>
 
-  <div class="filtro-camion">
-    <label for="filtroCamion">Filtrar por camión:</label>
-    <select id="filtroCamion" [ngModel]="filtroCamionId()" (ngModelChange)="cambiarFiltroCamion($event)">
-      <option value="">Todos los camiones</option>
-      @for (camion of camiones(); track camion.id) {
-        <option [value]="camion.id">{{ camion.patente }}</option>
-      }
-    </select>
-  <label class="checkbox-label">
-    <input type="checkbox" [ngModel]="verTodoElHistorico()" (ngModelChange)="toggleVerTodo()" />
-    Ver histórico completo
-  </label>
+  <div class="filtros">
+    <div class="filtro">
+      <label for="filtroCamion">Camión</label>
+      <app-buscador-select
+        [items]="camiones()"
+        [selectedId]="filtroCamionId()"
+        displayKey="patente"
+        idKey="id"
+        placeholder="Todos los camiones"
+        (selectionChange)="cambiarFiltroCamion($event)"
+      />
+    </div>
+
+    <div class="filtro">
+      <label>Chofer</label>
+      <app-buscador-select
+        [items]="choferes()"
+        [selectedId]="filtroChoferId()"
+        displayKey="nombre_completo"
+        idKey="id"
+        placeholder="Todos los choferes"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Todos"
+        (selectionChange)="cambiarFiltroChofer($event)"
+        (cleanSelection)="limpiarFiltroChofer()"
+      />
+    </div>
+
+    <div class="filtro">
+      <label for="fechaDesde">Desde</label>
+      <input id="fechaDesde" type="date" [ngModel]="filtroFechaDesde()" (ngModelChange)="filtroFechaDesde.set($event); pagina.set(1); cargarCargas()" />
+    </div>
+
+    <div class="filtro">
+      <label for="fechaHasta">Hasta</label>
+      <input id="fechaHasta" type="date" [ngModel]="filtroFechaHasta()" (ngModelChange)="filtroFechaHasta.set($event); pagina.set(1); cargarCargas()" />
+    </div>
+
+    <div class="filtro checkbox-filtro">
+      <label class="checkbox-label">
+        <input type="checkbox" [ngModel]="verTodoElHistorico()" (ngModelChange)="toggleVerTodo()" />
+        Ver histórico completo
+      </label>
+    </div>
   </div>
 
   @if (gastoTotal()) {

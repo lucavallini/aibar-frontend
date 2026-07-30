@@ -1,0 +1,78 @@
+.buscador-select {
+  position: relative;
+}
+
+.buscador-select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.buscador-select-header .flecha {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  transition: transform 0.15s;
+}
+
+.buscador-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  margin-top: 2px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  overflow: hidden;
+}
+
+.buscador-select-dropdown input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.opciones {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.opcion {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.opcion:hover {
+  background: var(--color-primario-claro);
+}
+
+.opcion.seleccionada {
+  background: var(--color-primario);
+  color: white;
+}
+
+.opcion-vacia {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}

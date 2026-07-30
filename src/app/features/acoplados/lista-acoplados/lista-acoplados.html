@@ -1,0 +1,133 @@
+<div class="contenedor">
+  <header>
+    <h1>Acoplados</h1>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirModal()">+ Nuevo acoplado</button>
+    }
+  </header>
+
+  <div class="buscador">
+    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (error() && !modalAbierto()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+<app-tabla-paginada
+  [headers]="['Patente', 'Tipo', 'Empresa', 'Acciones']"
+  [items]="acopladosList()"
+  [cargando]="cargando()"
+  [error]="error()"
+  [pagina]="pagina()"
+  [totalPaginas]="totalPaginas()"
+  [total]="total()"
+  emptyMessage="No hay acoplados cargados todavía."
+  (cambioPagina)="cambiarPagina($event)"
+>
+  @for (acoplado of acopladosList(); track acoplado.id) {
+    <tr>
+      <td>{{ acoplado.patente }}</td>
+      <td>{{ acoplado.tipo || '-' }}</td>
+      <td>{{ nombreEmpresa(acoplado.empresa_id) }}</td>
+      <td>
+        @if (!readonly()) {
+          <button class="btn-mini" (click)="abrirEditar(acoplado)">Editar</button>
+          <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(acoplado)">Baja</button>
+        }
+      </td>
+    </tr>
+  }
+</app-tabla-paginada>
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nuevo acoplado</h2>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <label for="patente">Patente</label>
+      <input id="patente" type="text" [(ngModel)]="nuevoAcoplado.patente" (input)="nuevoAcoplado.patente = $event.target.value.toUpperCase()" />
+
+      <label for="tipo">Tipo</label>
+      <input id="tipo" type="text" [(ngModel)]="nuevoAcoplado.tipo" placeholder="acoplado, batea, etc" (input)="nuevoAcoplado.tipo = $event.target.value.toUpperCase()" />
+
+      <label>Empresa</label>
+      <div class="select-con-mas">
+        <select [(ngModel)]="nuevoAcoplado.empresa_id">
+          <option [ngValue]="undefined">Sin empresa</option>
+          @for (e of empresas(); track e.id) {
+            <option [ngValue]="e.id">{{ e.nombre }}</option>
+          }
+        </select>
+        @if (!readonly()) {
+          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
+        }
+      </div>
+
+      <div class="acciones-modal">
+        <button (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalEditarAbierto()) {
+  <div class="modal-overlay" (click)="cerrarEditar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Editar acoplado</h2>
+
+      @if (error()) { <p class="error">{{ error() }}</p> }
+
+      <label for="patenteEdit">Patente</label>
+      <input id="patenteEdit" type="text" [(ngModel)]="edicionAcoplado.patente" (input)="edicionAcoplado.patente = $event.target.value.toUpperCase()" />
+
+      <label for="tipoEdit">Tipo</label>
+      <input id="tipoEdit" type="text" [(ngModel)]="edicionAcoplado.tipo" (input)="edicionAcoplado.tipo = $event.target.value.toUpperCase()" />
+
+      <label>Empresa</label>
+      <div class="select-con-mas">
+        <select [(ngModel)]="edicionAcoplado.empresa_id">
+          <option [ngValue]="undefined">Sin empresa</option>
+          @for (e of empresas(); track e.id) {
+            <option [ngValue]="e.id">{{ e.nombre }}</option>
+          }
+        </select>
+        @if (!readonly()) {
+          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
+        }
+      </div>
+
+      <div class="acciones-modal">
+        <button (click)="cerrarEditar()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalBajaAbierto()) {
+  <app-confirmar
+    titulo="Dar de baja acoplado"
+    [mensaje]="'¿Seguro que querés dar de baja el acoplado ' + acopladoSeleccionado()?.patente + '?'"
+    textoConfirmar="Dar de baja"
+    (confirmar)="confirmarBaja()"
+    (cancelar)="cerrarBaja()"
+  ></app-confirmar>
+}
+
+@if (miniModalEmpresaAbierto()) {
+  <app-mini-modal-empresa
+    (empresaCreada)="onEmpresaCreada($event)"
+    (cancelar)="cerrarMiniModalEmpresa()"
+  ></app-mini-modal-empresa>
+}

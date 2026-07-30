@@ -1,0 +1,30 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>Finalizar viaje</h2>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <label for="fechaFin">Fecha y hora de finalizaci&oacute;n</label>
+    <input id="fechaFin" type="datetime-local" [ngModel]="fechaFinInput()" (ngModelChange)="fechaFinInput.set($event)" />
+
+    <label for="kmsCargado">KM cargado</label>
+    <input id="kmsCargado" type="number" [(ngModel)]="kmsRecorridos" min="0" />
+
+    <label for="kmsDescargado">KM descargado (opcional)</label>
+    <input id="kmsDescargado" type="number" [(ngModel)]="kmsDescargado" min="0" />
+
+    <label for="litros">Litros de combustible (opcional)</label>
+    <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
+
+    @if ((kmsRecorridos || kmsDescargado) && litrosCombustible && litrosCombustible > 0) {
+      <p class="rendimiento-preview">{{ ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0)) / litrosCombustible | number:'1.2-2' }} km/l</p>
+    }
+
+    <div class="acciones-modal">
+      <button (click)="cerrar.emit()">Cancelar</button>
+      <button class="btn-primario" (click)="onConfirmar()">Confirmar</button>
+    </div>
+  </div>
+</div>

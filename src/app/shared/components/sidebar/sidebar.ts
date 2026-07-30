@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -11,6 +11,7 @@ interface ItemMenu {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
@@ -22,7 +23,9 @@ export class Sidebar {
     { label: 'Viajes', ruta: '/viajes', soloAdmin: false },
     { label: 'Choferes', ruta: '/choferes', soloAdmin: false },
     { label: 'Camiones', ruta: '/camiones', soloAdmin: false },
+    { label: 'Acoplados', ruta: '/acoplados', soloAdmin: false },
     { label: 'Multas', ruta: '/multas', soloAdmin: false },
+    { label: 'Combustible', ruta: '/combustible', soloAdmin: false },
     { label: 'Auditoría', ruta: '/auditoria', soloAdmin: true },
     { label: 'Usuarios', ruta: '/usuarios', soloAdmin: true },
   ];
@@ -30,7 +33,7 @@ export class Sidebar {
   constructor(private authService: AuthService) {}
 
   get itemsVisibles(): ItemMenu[] {
-    const esAdmin = this.authService.getRol() === 'administrador';
+    const esAdmin = this.authService.getRol() === 'administrador' || this.authService.getRol() === 'aibar';
     return this.itemsMenu.filter(item => !item.soloAdmin || esAdmin);
   }
 }

@@ -1,16 +1,21 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { AuthService } from '../../../core/services/auth.service';
 import { CombustibleService } from '../../../core/services/combustible.service';
 import { CamionesService } from '../../../core/services/camiones.service';
+import { ChoferesService } from '../../../core/services/choferes.service';
 import { CargaCombustible, CargaCombustibleCreate } from '../../../core/models/combustible.model';
 import { Camion } from '../../../core/models/camion.model';
+import { Chofer } from '../../../core/models/chofer.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 
 @Component({
   selector: 'app-lista-combustible',
   standalone: true,
-  imports: [FormsModule, DatePipe, Paginacion],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect],
   templateUrl: './lista-combustible.html',
   styleUrl: './lista-combustible.css'
 })
@@ -18,8 +23,12 @@ export class ListaCombustible implements OnInit {
   cargas = signal<CargaCombustible[]>([]);
   camionesPorId = signal<Record<string, string>>({});
   camiones = signal<Camion[]>([]);
+  choferes = signal<Chofer[]>([]);
 
   filtroCamionId = signal<string>('');
+  filtroChoferId = signal<string>('');
+  filtroFechaDesde = signal<string>('');
+  filtroFechaHasta = signal<string>('');
   gastoTotal = signal<{ total_litros: number; total_monto: number; cantidad_cargas: number } | null>(null);
 
   cargando = signal(true);
@@ -33,13 +42,17 @@ export class ListaCombustible implements OnInit {
   modalAbierto = signal(false);
   nuevaCarga: CargaCombustibleCreate = this.formularioVacio();
 
+  readonly = computed(() => this.authService.getRol() === 'aibar');
+
   constructor(
     private combustibleService: CombustibleService,
-    private camionesService: CamionesService
+    private camionesService: CamionesService,
+    private choferesService: ChoferesService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.camionesService.listar(false, 1, 1000).subscribe({
+    this.camionesService.listar(1, 1000, { activos_only: false }).subscribe({
       next: (respuesta) => {
         const mapa: Record<string, string> = {};
         respuesta.items.forEach((c: Camion) => mapa[c.id] = c.patente);
@@ -47,6 +60,9 @@ export class ListaCombustible implements OnInit {
         this.camiones.set(respuesta.items);
         this.cargarCargas();
       }
+    });
+    this.choferesService.listar(1, 1000).subscribe({
+      next: (respuesta) => this.choferes.set(respuesta.items)
     });
   }
 
@@ -57,9 +73,18 @@ export class ListaCombustible implements OnInit {
     this.error.set(null);
 
     const camionId = this.filtroCamionId() || undefined;
-    const solo30Dias = !this.verTodoElHistorico();
+    const choferId = this.filtroChoferId() || undefined;
+    const fechaDesde = this.filtroFechaDesde() || undefined;
+    const fechaHasta = this.filtroFechaHasta() || undefined;
+    const solo30Dias = !this.verTodoElHistorico() && !fechaDesde && !fechaHasta;
 
-    this.combustibleService.listar(camionId, this.pagina(), this.tamanoPagina, solo30Dias).subscribe({
+    this.combustibleService.listar(this.pagina(), this.tamanoPagina, {
+      camion_id: camionId,
+      chofer_id: choferId,
+      fecha_desde: fechaDesde,
+      fecha_hasta: fechaHasta,
+      solo_ultimos_30_dias: solo30Dias
+    }).subscribe({
       next: (respuesta) => {
         this.cargas.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -87,8 +112,20 @@ export class ListaCombustible implements OnInit {
     this.cargarCargas();
   }
 
-  cambiarFiltroCamion(camionId: string): void {
-    this.filtroCamionId.set(camionId);
+  cambiarFiltroCamion(camion: any): void {
+    this.filtroCamionId.set(camion ? camion.id : '');
+    this.pagina.set(1);
+    this.cargarCargas();
+  }
+
+  cambiarFiltroChofer(chofer: any): void {
+    this.filtroChoferId.set(chofer ? chofer.id : '');
+    this.pagina.set(1);
+    this.cargarCargas();
+  }
+
+  limpiarFiltroChofer(): void {
+    this.filtroChoferId.set('');
     this.pagina.set(1);
     this.cargarCargas();
   }

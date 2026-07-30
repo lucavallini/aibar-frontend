@@ -1,20 +1,25 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CamionesService } from '../../../core/services/camiones.service';
+import { EmpresasService } from '../../../core/services/empresas.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Camion, CamionCreate } from '../../../core/models/camion.model';
-import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { Empresa } from '../../../core/models/empresa.model';
+import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
-
+import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
 
 @Component({
   selector: 'app-lista-camiones',
   standalone: true,
-  imports: [FormsModule, Paginacion, Confirmar],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa],
   templateUrl: './lista-camiones.html',
   styleUrl: './lista-camiones.css'
 })
 export class ListaCamiones implements OnInit {
   camiones = signal<Camion[]>([]);
+  empresas = signal<Empresa[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
@@ -32,12 +37,25 @@ export class ListaCamiones implements OnInit {
   camionSeleccionado = signal<Camion | null>(null);
   edicionCamion: Partial<CamionCreate> = {};
 
-  constructor(private camionesService: CamionesService) {}
+  miniModalEmpresaAbierto = signal(false);
+
+  readonly = computed(() => this.authService.getRol() === 'aibar');
+
+  constructor(
+    private camionesService: CamionesService,
+    private empresasService: EmpresasService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.cargarCamiones();
   }
 
+  nombreEmpresa(empresaId: string | null): string {
+    if (!empresaId) return '-';
+    const e = this.empresas().find(e => e.id === empresaId);
+    return e ? e.nombre : '-';
+  }
 
   abrirEditar(camion: Camion): void {
     this.camionSeleccionado.set(camion);
@@ -46,6 +64,7 @@ export class ListaCamiones implements OnInit {
       modelo: camion.modelo ?? undefined,
       anio: camion.anio ?? undefined,
       tipo: camion.tipo ?? undefined,
+      empresa_id: camion.empresa_id ?? undefined,
     };
     this.error.set(null);
     this.modalEditarAbierto.set(true);
@@ -102,7 +121,11 @@ export class ListaCamiones implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.camionesService.listar(true, this.pagina(), this.tamanoPagina, this.busqueda() || undefined).subscribe({
+    this.empresasService.listar(1, 1000).subscribe({
+      next: (respuesta) => this.empresas.set(respuesta.items)
+    });
+
+    this.camionesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined }).subscribe({
       next: (respuesta) => {
         this.camiones.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -122,7 +145,7 @@ export class ListaCamiones implements OnInit {
   }
 
   formularioVacio(): CamionCreate {
-    return { patente: '', marca: '', modelo: '', anio: undefined, tipo: '' };
+    return { patente: '', marca: '', modelo: '', anio: undefined, tipo: '', empresa_id: undefined };
   }
 
   abrirModal(): void {
@@ -155,5 +178,25 @@ export class ListaCamiones implements OnInit {
         }
       }
     });
+  }
+
+  abrirMiniModalEmpresa(): void {
+    this.error.set(null);
+    this.miniModalEmpresaAbierto.set(true);
+  }
+
+  onEmpresaCreada(nombre: string): void {
+    this.empresasService.crear({ nombre }).subscribe({
+      next: (empresa) => {
+        this.empresas.update(lista => [...lista, empresa]);
+        this.nuevoCamion.empresa_id = empresa.id;
+        this.miniModalEmpresaAbierto.set(false);
+      },
+      error: () => this.error.set('No se pudo crear la empresa')
+    });
+  }
+
+  cerrarMiniModalEmpresa(): void {
+    this.miniModalEmpresaAbierto.set(false);
   }
 }

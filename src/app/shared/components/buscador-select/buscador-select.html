@@ -1,0 +1,25 @@
+<div class="buscador-select" (click)="$event.stopPropagation()">
+  <div class="buscador-select-header" (click)="abrir($event)">
+    <span>{{ displayText() }}</span>
+    <span class="flecha">▼</span>
+  </div>
+  @if (dropdownAbierta()) {
+    <div class="buscador-select-dropdown">
+      <input type="text" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" (click)="onInputClick($event)" placeholder="Buscar..." autofocus />
+      <div class="opciones">
+        @if (mostrarLimpiar()) {
+          <div class="opcion" (mousedown)="limpiar()">
+            {{ textoLimpiar() }}
+          </div>
+        }
+        @for (item of itemsFiltrados(); track itemId(item)) {
+          <div class="opcion" [class.seleccionada]="selectedId() === itemId(item)" (mousedown)="seleccionar(item)">
+            {{ item[displayKey()] }}
+          </div>
+        } @empty {
+          <div class="opcion-vacia">Sin resultados</div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Viaje, ViajeCreate, RendimientoCombustible } from '../models/viaje.model';
+import { Viaje, ViajeCreate, ViajeReanudar, RendimientoCombustible } from '../models/viaje.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
+import { buildListParams } from '../utils/http-params.helper';
 
 @Injectable({ providedIn: 'root' })
 export class ViajesService {
@@ -11,13 +12,8 @@ export class ViajesService {
 
   constructor(private http: HttpClient) {}
 
-  listar(choferId?: string, estado?: string, dias?: number, patente?: string, pagina: number = 1, tamanoPagina: number = 20): Observable<RespuestaPaginada<Viaje>> {
-    let params = `pagina=${pagina}&tamano_pagina=${tamanoPagina}`;
-    if (choferId) params += `&chofer_id=${choferId}`;
-    if (estado) params += `&estado=${estado}`;
-    if (dias) params += `&dias=${dias}`;
-    if (patente) params += `&patente=${encodeURIComponent(patente)}`;
-    return this.http.get<RespuestaPaginada<Viaje>>(`${this.apiUrl}/?${params}`);
+  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Viaje>> {
+    return this.http.get<RespuestaPaginada<Viaje>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) });
   }
 
   crear(datos: ViajeCreate): Observable<Viaje> {
@@ -28,9 +24,10 @@ export class ViajesService {
     return this.http.post<Viaje>(`${this.apiUrl}/${id}/iniciar`, {});
   }
 
-  finalizar(id: string, fechaFin: string, kmsRecorridos: number, litrosCombustible?: number): Observable<Viaje> {
+  finalizar(id: string, fechaFin: string, kmsRecorridos: number, litrosCombustible?: number, kmsDescargado?: number): Observable<Viaje> {
     const body: any = { fecha_fin: fechaFin, kms_recorridos: kmsRecorridos };
     if (litrosCombustible) body.litros_combustible = litrosCombustible;
+    if (kmsDescargado) body.kms_descargado = kmsDescargado;
     return this.http.post<Viaje>(`${this.apiUrl}/${id}/finalizar`, body);
   }
 
@@ -38,6 +35,10 @@ export class ViajesService {
     return this.http.post<Viaje>(`${this.apiUrl}/${id}/cancelar`, {
       motivo_cancelacion: motivoCancelacion
     });
+  }
+
+  reanudar(id: string, datos: ViajeReanudar): Observable<Viaje> {
+    return this.http.post<Viaje>(`${this.apiUrl}/${id}/reanudar`, datos);
   }
 
   agregarVuelta(viajeId: string, datos: ViajeCreate): Observable<Viaje> {

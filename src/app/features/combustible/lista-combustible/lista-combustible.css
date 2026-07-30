@@ -1,24 +1,15 @@
-.contenedor {
-  padding-bottom: 1rem;
-}
-
-.filtro-camion {
-  width: min(100%, 340px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 0.85rem;
-  font-size: 0.9rem;
+.checkbox-filtro {
+  justify-content: flex-end;
+  padding-bottom: 0.15rem;
 }
 
 .checkbox-label {
-  width: fit-content;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 1rem;
   color: var(--color-texto-secundario);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .checkbox-label input {
@@ -42,30 +33,6 @@
 
 .resumen strong {
   color: var(--color-primario);
-}
-
-.disponible,
-.badge.disponible {
-  background: var(--color-exito-fondo);
-  color: var(--color-exito);
-}
-
-.viajando,
-.badge.viajando {
-  background: var(--color-alerta-fondo);
-  color: var(--color-alerta);
-}
-
-.inactivo,
-.badge.inactivo {
-  background: var(--color-error-fondo);
-  color: var(--color-error);
-}
-
-@media (max-width: 992px) {
-  .contenedor {
-    overflow-x: auto;
-  }
 }
 
 @media (max-width: 576px) {

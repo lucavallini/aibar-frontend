@@ -1,7 +1,9 @@
 <div class="contenedor">
   <header>
     <h1>Multas</h1>
-    <button class="btn-primario" (click)="abrirModal()">+ Nueva multa</button>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirModal()">+ Nueva multa</button>
+    }
   </header>
 
   @if (cargando()) {
@@ -12,39 +14,27 @@
     <p class="error">{{ error() }}</p>
   }
 
-  @if (!cargando() && !error()) {
-    <table>
-      <thead>
-        <tr>
-          <th>Patente</th>
-          <th>Chofer</th>
-          <th>Motivo</th>
-          <th>Monto</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (multa of multas(); track multa.id) {
-          <tr>
-            <td>{{ nombrePatente(multa.camion_id) }}</td>
-            <td>{{ nombreChofer(multa.chofer_id) }}</td>
-            <td>{{ multa.motivo }}</td>
-            <td>{{ multa.monto ? ('$' + multa.monto) : '-' }}</td>
-            <td>{{ multa.fecha | date:'dd/MM/yyyy' }}</td>
-          </tr>
-        } @empty {
-          <tr><td colspan="5">No hay multas registradas todavía.</td></tr>
-        }
-      </tbody>
-    </table>
-
-    <app-paginacion
-      [pagina]="pagina()"
-      [totalPaginas]="totalPaginas()"
-      [total]="total()"
-      (cambioPagina)="cambiarPagina($event)"
-    ></app-paginacion>
-  }
+  <app-tabla-paginada
+    [headers]="['Patente', 'Chofer', 'Motivo', 'Monto', 'Fecha']"
+    [items]="multas()"
+    [cargando]="cargando()"
+    [error]="error()"
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    emptyMessage="No hay multas registradas todavía."
+    (cambioPagina)="cambiarPagina($event)"
+  >
+    @for (multa of multas(); track multa.id) {
+      <tr>
+        <td>{{ nombrePatente(multa.camion_id) }}</td>
+        <td>{{ nombreChofer(multa.chofer_id) }}</td>
+        <td>{{ multa.motivo }}</td>
+        <td>{{ multa.monto ? ('$' + multa.monto) : '-' }}</td>
+        <td>{{ multa.fecha | date:'dd/MM/yyyy' }}</td>
+      </tr>
+    }
+  </app-tabla-paginada>
 </div>
 
 @if (modalAbierto()) {
@@ -73,7 +63,7 @@
       </select>
 
       <label for="motivo">Motivo</label>
-      <input id="motivo" type="text" [(ngModel)]="nuevaMulta.motivo" />
+      <input id="motivo" type="text" [(ngModel)]="nuevaMulta.motivo" (input)="nuevaMulta.motivo = $event.target.value.toUpperCase()" />
 
       <label for="monto">Monto</label>
       <input id="monto" type="number" [(ngModel)]="nuevaMulta.monto" />

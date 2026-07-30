@@ -1,18 +1,20 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { AuthService } from '../../../core/services/auth.service';
 import { MultasService } from '../../../core/services/multas.service';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { Multa, MultaCreate } from '../../../core/models/multa.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Chofer } from '../../../core/models/chofer.model';
-import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 
 @Component({
   selector: 'app-lista-multas',
   standalone: true,
-  imports: [FormsModule, DatePipe, Paginacion],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, DatePipe, TablaPaginada],
   templateUrl: './lista-multas.html',
   styleUrl: './lista-multas.css'
 })
@@ -34,10 +36,13 @@ export class ListaMultas implements OnInit {
   modalAbierto = signal(false);
   nuevaMulta: MultaCreate = this.formularioVacio();
 
+  readonly = computed(() => this.authService.getRol() === 'aibar');
+
   constructor(
     private multasService: MultasService,
     private camionesService: CamionesService,
-    private choferesService: ChoferesService
+    private choferesService: ChoferesService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +50,7 @@ export class ListaMultas implements OnInit {
   }
 
   cargarDatosRelacionados(): void {
-    this.camionesService.listar(false, 1, 1000).subscribe({
+    this.camionesService.listar(1, 1000, { activos_only: false }).subscribe({
       next: (respuesta) => {
         const mapa: Record<string, string> = {};
         respuesta.items.forEach((c: Camion) => mapa[c.id] = c.patente);
@@ -57,7 +62,7 @@ export class ListaMultas implements OnInit {
   }
 
   cargarChoferesYMultas(): void {
-    this.choferesService.listar(false, 1, 1000).subscribe({
+    this.choferesService.listar(1, 1000, { activos_only: false }).subscribe({
       next: (respuesta) => {
         const mapa: Record<string, string> = {};
         respuesta.items.forEach((c: Chofer) => mapa[c.id] = c.nombre_completo);
@@ -72,7 +77,7 @@ export class ListaMultas implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.multasService.listar(this.pagina(), this.tamanoPagina).subscribe({
+    this.multasService.listar(this.pagina(), this.tamanoPagina, undefined).subscribe({
       next: (respuesta) => {
         this.multas.set(respuesta.items);
         this.total.set(respuesta.total);

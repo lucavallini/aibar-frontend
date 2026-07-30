@@ -1,0 +1,13 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal modal-chico" (click)="$event.stopPropagation()">
+    <h2>Nueva empresa</h2>
+
+    <label for="empresaNombre">Nombre</label>
+    <input id="empresaNombre" type="text" [(ngModel)]="nombreInput" placeholder="Nombre de la empresa" (input)="nombreInput = $event.target.value.toUpperCase()" />
+
+    <div class="acciones-modal">
+      <button (click)="cerrar()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmar()" [disabled]="!nombreInput.trim()">Agregar</button>
+    </div>
+  </div>
+</div>

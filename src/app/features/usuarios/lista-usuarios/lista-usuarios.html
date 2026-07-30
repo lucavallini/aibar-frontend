@@ -1,7 +1,9 @@
 <div class="contenedor">
   <header>
     <h1>Usuarios</h1>
-    <button class="btn-primario" (click)="abrirAlta()">+ Nuevo usuario</button>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirAlta()">+ Nuevo usuario</button>
+    }
   </header>
 
   @if (cargando()) {
@@ -12,46 +14,35 @@
     <p class="error">{{ error() }}</p>
   }
 
-  @if (!cargando() && !error()) {
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre completo</th>
-          <th>Usuario</th>
-          <th>DNI</th>
-          <th>Rol</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (usuario of usuarios(); track usuario.id) {
-          <tr>
-            <td>{{ usuario.nombre_completo }}</td>
-            <td>{{ usuario.nombre_usuario }}</td>
-            <td>{{ usuario.dni }}</td>
-            <td><span class="badge" [class]="usuario.rol">{{ usuario.rol }}</span></td>
-            <td>{{ usuario.activo ? 'Activo' : 'Inactivo' }}</td>
-            <td>
-              <button class="btn-mini" (click)="abrirEditar(usuario)">Editar</button>
-              @if (!esUsuarioActual(usuario) && usuario.activo) {
-                <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(usuario)">Baja</button>
-              }
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="6">No hay usuarios cargados todavía.</td></tr>
-        }
-      </tbody>
-    </table>
-
-    <app-paginacion
-      [pagina]="pagina()"
-      [totalPaginas]="totalPaginas()"
-      [total]="total()"
-      (cambioPagina)="cambiarPagina($event)"
-    ></app-paginacion>
-  }
+  <app-tabla-paginada
+    [headers]="['Nombre completo', 'Usuario', 'DNI', 'Rol', 'Estado', 'Acciones']"
+    [items]="usuarios()"
+    [cargando]="cargando()"
+    [error]="error()"
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    emptyMessage="No hay usuarios cargados todavía."
+    (cambioPagina)="cambiarPagina($event)"
+  >
+    @for (usuario of usuarios(); track usuario.id) {
+      <tr>
+        <td>{{ usuario.nombre_completo }}</td>
+        <td>{{ usuario.nombre_usuario }}</td>
+        <td>{{ usuario.dni }}</td>
+        <td><span class="badge" [class]="usuario.rol">{{ usuario.rol }}</span></td>
+        <td>{{ usuario.activo ? 'Activo' : 'Inactivo' }}</td>
+        <td>
+          @if (!readonly()) {
+            <button class="btn-mini" (click)="abrirEditar(usuario)">Editar</button>
+            @if (!esUsuarioActual(usuario) && usuario.activo) {
+              <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(usuario)">Baja</button>
+            }
+          }
+        </td>
+      </tr>
+    }
+  </app-tabla-paginada>
 </div>
 
 @if (modalAltaAbierto()) {
@@ -76,6 +67,7 @@
       <select id="rol" [(ngModel)]="nuevoUsuario.rol">
         <option value="empleado">Empleado</option>
         <option value="administrador">Administrador</option>
+        <option value="aibar">AIBAR</option>
       </select>
 
       <div class="acciones-modal">
@@ -105,6 +97,7 @@
       <select id="rolEdit" [(ngModel)]="edicionUsuario.rol">
         <option value="empleado">Empleado</option>
         <option value="administrador">Administrador</option>
+        <option value="aibar">AIBAR</option>
       </select>
 
       <div class="acciones-modal">

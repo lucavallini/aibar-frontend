@@ -1,22 +1,29 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { ChoferesService } from '../../../core/services/choferes.service';
+import { EmpresasService } from '../../../core/services/empresas.service';
 import { Chofer, ChoferCreate, ChoferDetalle } from '../../../core/models/chofer.model';
+import { Empresa } from '../../../core/models/empresa.model';
 import { ViajesService } from '../../../core/services/viajes.service';
 import { RendimientoCombustible } from '../../../core/models/viaje.model';
 import { AuthService } from '../../../core/services/auth.service';
-import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { FormsModule } from '@angular/forms';
+import { ObservacionesService } from '../../../core/services/observaciones.service';
+import { Observacion, ObservacionCreate } from '../../../core/models/observacion.model';
+import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
 
 @Component({
   selector: 'app-lista-choferes',
   standalone: true,
-  imports: [Paginacion, Confirmar, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa],
   templateUrl: './lista-choferes.html',
   styleUrl: './lista-choferes.css'
 })
 export class ListaChoferesComponent implements OnInit {
   choferes = signal<Chofer[]>([]);
+  empresas = signal<Empresa[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
@@ -38,18 +45,36 @@ export class ListaChoferesComponent implements OnInit {
   choferDetalle = signal<ChoferDetalle | null>(null);
   rendimiento = signal<RendimientoCombustible | null>(null);
 
+  miniModalEmpresaAbierto = signal(false);
+
+  modalObservacionesAbierto = signal(false);
+  choferObservaciones = signal<Observacion[]>([]);
+  observacionActual = '';
+  choferObsSeleccionado = signal<Chofer | null>(null);
+  exitoObs = signal<string | null>(null);
+
+  readonly = computed(() => this.authService.getRol() === 'aibar');
+
   constructor(
     private choferesService: ChoferesService,
+    private empresasService: EmpresasService,
     private viajesService: ViajesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private observacionesService: ObservacionesService
   ) {}
 
   ngOnInit(): void {
     this.cargarChoferes();
   }
 
+  nombreEmpresa(empresaId: string | null): string {
+    if (!empresaId) return '-';
+    const e = this.empresas().find(e => e.id === empresaId);
+    return e ? e.nombre : '-';
+  }
+
   formularioVacioAlta(): ChoferCreate {
-    return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined };
+    return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined, empresa_id: undefined };
   }
 
   abrirAlta(): void {
@@ -104,6 +129,7 @@ export class ListaChoferesComponent implements OnInit {
       nombre_completo: chofer.nombre_completo,
       dni: chofer.dni ?? undefined,
       telefono: chofer.telefono ?? undefined,
+      empresa_id: chofer.empresa_id ?? undefined,
     };
     this.error.set(null);
     this.modalEditarAbierto.set(true);
@@ -160,7 +186,11 @@ export class ListaChoferesComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.choferesService.listar(true, this.pagina(), this.tamanoPagina, this.busqueda() || undefined).subscribe({
+    this.empresasService.listar(1, 1000).subscribe({
+      next: (respuesta) => this.empresas.set(respuesta.items)
+    });
+
+    this.choferesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined }).subscribe({
       next: (respuesta) => {
         this.choferes.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -201,5 +231,93 @@ export class ListaChoferesComponent implements OnInit {
 
   cerrarSesion(): void {
     this.authService.logout();
+  }
+
+  abrirMiniModalEmpresa(): void {
+    this.error.set(null);
+    this.miniModalEmpresaAbierto.set(true);
+  }
+
+  onEmpresaCreada(nombre: string): void {
+    this.empresasService.crear({ nombre }).subscribe({
+      next: (empresa) => {
+        this.empresas.update(lista => [...lista, empresa]);
+        this.nuevoChofer.empresa_id = empresa.id;
+        this.edicionChofer.empresa_id = empresa.id;
+        this.miniModalEmpresaAbierto.set(false);
+      },
+      error: () => this.error.set('No se pudo crear la empresa')
+    });
+  }
+
+  cerrarMiniModalEmpresa(): void {
+    this.miniModalEmpresaAbierto.set(false);
+  }
+
+  // ---- Observaciones ----
+
+  abrirObservaciones(chofer: Chofer): void {
+    this.choferObsSeleccionado.set(chofer);
+    this.observacionActual = '';
+    this.error.set(null);
+    this.exitoObs.set(null);
+    this.modalObservacionesAbierto.set(true);
+
+    this.observacionesService.listar(chofer.id).subscribe({
+      next: (lista) => {
+        this.choferObservaciones.set(lista);
+        const hoy = new Date();
+        const actual = lista.find(o => o.mes === hoy.getMonth() + 1 && o.anio === hoy.getFullYear());
+        if (actual) {
+          this.observacionActual = actual.observacion;
+        }
+      }
+    });
+  }
+
+  cerrarObservaciones(): void {
+    this.modalObservacionesAbierto.set(false);
+    this.choferObsSeleccionado.set(null);
+    this.choferObservaciones.set([]);
+    this.observacionActual = '';
+    this.exitoObs.set(null);
+  }
+
+  getNombreMes(mes: number): string {
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return meses[mes - 1] || '';
+  }
+
+  historicoObservaciones(): Observacion[] {
+    const hoy = new Date();
+    return this.choferObservaciones().filter(
+      o => !(o.mes === hoy.getMonth() + 1 && o.anio === hoy.getFullYear())
+    );
+  }
+
+  tieneHistorial(): boolean {
+    return this.historicoObservaciones().length > 0;
+  }
+
+  guardarObservacion(): void {
+    const chofer = this.choferObsSeleccionado();
+    if (!chofer || !this.observacionActual.trim()) return;
+
+    this.observacionesService.guardar(chofer.id, { observacion: this.observacionActual }).subscribe({
+      next: () => {
+        this.exitoObs.set('Observación guardada');
+        this.error.set(null);
+        setTimeout(() => this.exitoObs.set(null), 2500);
+        this.observacionesService.listar(chofer.id).subscribe({
+          next: (lista) => {
+            this.choferObservaciones.set(lista);
+            const hoy = new Date();
+            const actual = lista.find(o => o.mes === hoy.getMonth() + 1 && o.anio === hoy.getFullYear());
+            this.observacionActual = actual ? actual.observacion : '';
+          }
+        });
+      },
+      error: () => this.error.set('No se pudo guardar la observación')
+    });
   }
 }

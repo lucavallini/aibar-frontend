@@ -1,0 +1,33 @@
+@if (cargando()) {
+  <p>Cargando...</p>
+}
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+
+@if (!cargando() && !error()) {
+  <table>
+    <thead>
+      <tr>
+        @for (h of headers(); track $index) {
+          <th>{{ h }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if (items().length > 0) {
+        <ng-content></ng-content>
+      } @else {
+        <tr><td [attr.colspan]="headers().length">{{ emptyMessage() }}</td></tr>
+      }
+    </tbody>
+  </table>
+
+  <app-paginacion
+    [pagina]="pagina()"
+    [totalPaginas]="totalPaginas()"
+    [total]="total()"
+    (cambioPagina)="cambioPagina.emit($event)"
+  ></app-paginacion>
+}

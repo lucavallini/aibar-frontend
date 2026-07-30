@@ -11,6 +11,7 @@ export interface Viaje {
   carga: string | null;
   tarifa: number | null;
   kms_recorridos: number | null;
+  kms_descargado: number | null;
   fecha_inicio: string;
   fecha_fin: string | null;
   estado: 'pendiente' | 'en_curso' | 'finalizado' | 'cancelado';
@@ -33,6 +34,18 @@ export interface ViajeCreate {
   carga?: string;
   tarifa?: number;
   fecha_inicio: string;
+}
+
+export interface ViajeReanudar {
+  chofer_id?: string;
+  camion_id?: string;
+  camion_id_2?: string;
+  cliente?: string;
+  origen?: string;
+  destino?: string;
+  carga?: string;
+  tarifa?: number;
+  fecha_inicio?: string;
 }
 
 export interface RendimientoCombustible {

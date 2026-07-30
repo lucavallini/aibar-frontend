@@ -1,15 +1,16 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Usuario, UsuarioCreate, UsuarioUpdate } from '../../../core/models/usuario.model';
-import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-lista-usuarios',
   standalone: true,
-  imports: [FormsModule, Paginacion, Confirmar],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, TablaPaginada, Confirmar],
   templateUrl: './lista-usuarios.html',
   styleUrl: './lista-usuarios.css'
 })
@@ -31,6 +32,8 @@ export class ListaUsuarios implements OnInit {
   usuarioSeleccionado = signal<Usuario | null>(null);
   edicionUsuario: UsuarioUpdate = {};
 
+  readonly = computed(() => this.authService.getRol() === 'aibar');
+
   constructor(
     private usuariosService: UsuariosService,
     private authService: AuthService
@@ -44,7 +47,7 @@ export class ListaUsuarios implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.usuariosService.listar(this.pagina(), this.tamanoPagina).subscribe({
+    this.usuariosService.listar(this.pagina(), this.tamanoPagina, undefined).subscribe({
       next: (respuesta) => {
         this.usuarios.set(respuesta.items);
         this.total.set(respuesta.total);

@@ -1,61 +1,59 @@
 <div class="contenedor">
   <header>
     <h1>Viajes</h1>
-    <button class="btn-primario" (click)="abrirModalNuevoViaje()">+ Nuevo viaje</button>
+    @if (!readonly()) {
+      <button class="btn-primario" (click)="abrirModalNuevoViaje()">+ Nuevo viaje</button>
+    }
   </header>
 
-  <div class="filtros" (click)="cerrarFiltroDropdown()">
+  <div class="filtros">
     <div class="filtro-grupo">
       <label>Chofer</label>
-      <div class="buscador-select" (click)="$event.stopPropagation()">
-        <div class="buscador-select-header" (click)="abrirFiltroDropdown('chofer')">
-          <span>{{ filtroChoferId() ? nombreChofer(filtroChoferId()) : 'Todos los choferes' }}</span>
-          <span class="flecha">▼</span>
-        </div>
-        @if (filtroDropdownAbierto() === 'chofer') {
-          <div class="buscador-select-dropdown">
-            <input type="text" [ngModel]="filtroChoferBusqueda()" (ngModelChange)="filtroChoferBusqueda.set($event)" placeholder="Buscar chofer..." autofocus />
-            <div class="opciones">
-              <div class="opcion" (mousedown)="limpiarFiltroChofer()">
-                Todos los choferes
-              </div>
-              @for (chofer of choferesFiltradosBusqueda(); track chofer.id) {
-                <div class="opcion" [class.seleccionada]="filtroChoferId() === chofer.id" (mousedown)="seleccionarFiltroChofer(chofer)">
-                  {{ chofer.nombre_completo }}
-                </div>
-              } @empty {
-                <div class="opcion-vacia">Sin resultados</div>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <app-buscador-select
+        [items]="choferes()"
+        [selectedId]="filtroChoferId()"
+        displayKey="nombre_completo"
+        placeholder="Todos los choferes"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Todos los choferes"
+        (selectionChange)="cambiarFiltroChoferId($event.id)"
+        (cleanSelection)="limpiarFiltroChoferId()"
+      />
     </div>
     <div class="filtro-grupo">
       <label>Patente</label>
-      <div class="buscador-select" (click)="$event.stopPropagation()">
-        <div class="buscador-select-header" (click)="abrirFiltroDropdown('patente')">
-          <span>{{ filtroPatente() || 'Todas las patentes' }}</span>
-          <span class="flecha">▼</span>
-        </div>
-        @if (filtroDropdownAbierto() === 'patente') {
-          <div class="buscador-select-dropdown">
-            <input type="text" [ngModel]="filtroPatenteBusqueda()" (ngModelChange)="filtroPatenteBusqueda.set($event)" placeholder="Buscar patente..." autofocus />
-            <div class="opciones">
-              <div class="opcion" (mousedown)="limpiarFiltroPatente()">
-                Todas las patentes
-              </div>
-              @for (camion of camionesFiltradosPatente(); track camion.id) {
-                <div class="opcion" [class.seleccionada]="filtroPatente() === camion.patente" (mousedown)="seleccionarFiltroPatente(camion)">
-                  {{ camion.patente }}
-                </div>
-              } @empty {
-                <div class="opcion-vacia">Sin resultados</div>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <app-buscador-select
+        [items]="camiones()"
+        [selectedId]="filtroPatente()"
+        displayKey="patente"
+        idKey="patente"
+        placeholder="Todas las patentes"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Todas las patentes"
+        (selectionChange)="cambiarFiltroPatente($event.patente)"
+        (cleanSelection)="limpiarFiltroPatente()"
+      />
+    </div>
+    <div class="filtro-grupo">
+      <label>Empresa</label>
+      <app-buscador-select
+        [items]="empresas()"
+        [selectedId]="filtroEmpresaId()"
+        displayKey="nombre"
+        placeholder="Todas las empresas"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Todas las empresas"
+        (selectionChange)="cambiarFiltroEmpresaId($event.id)"
+        (cleanSelection)="limpiarFiltroEmpresaId()"
+      />
+    </div>
+    <div class="filtro-grupo">
+      <label>Desde</label>
+      <input type="date" [ngModel]="filtroFechaDesde()" (ngModelChange)="cambiarFiltroFechaDesde($event)" class="input-fecha" />
+    </div>
+    <div class="filtro-grupo">
+      <label>Hasta</label>
+      <input type="date" [ngModel]="filtroFechaHasta()" (ngModelChange)="cambiarFiltroFechaHasta($event)" class="input-fecha" />
     </div>
     <div class="filtro-grupo">
       <label>Estado</label>
@@ -99,82 +97,107 @@
     <div class="lista-viajes">
       @for (viaje of viajes(); track viaje.id) {
         <div class="tarjeta-viaje" [class.tiene-vuelta]="!!viaje.viaje_vuelta">
-          <div class="info-viaje">
-            <div class="linea-principal">
-              <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
+          <div class="linea-principal">
+            <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
+            @if (nombreEmpresaChofer(viaje.chofer_id)) {
+              <span class="empresa">{{ nombreEmpresaChofer(viaje.chofer_id) }}</span>
+            }
+          </div>
+
+          <div class="tramo ida">
+            <div class="tramo-header">
+              <span class="tramo-label">Ida:</span>
               <span class="badge" [class]="viaje.estado">{{ viaje.estado }}</span>
             </div>
-
-            <div class="tramo ida">
-              <span class="tramo-label">Ida:</span>
-              <span class="ruta">{{ viaje.origen }} → {{ viaje.destino}}</span>
-              <div class="tramo-datos">
-                <span>Fecha: {{ viaje.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
-                @if (viaje.cliente) { <span>Cliente: {{ viaje.cliente }}</span> }
-                @if (viaje.carga) { <span>Carga: {{ viaje.carga }}</span> }
-                @if (viaje.tarifa) { <span>Tarifa: ${{ viaje.tarifa }}</span> }
-                @if (viaje.kms_recorridos) { <span>{{ viaje.kms_recorridos }} kms</span> }
-                @if (viaje.km_por_litro) { <span>{{ viaje.litros_combustible }} L | {{ viaje.km_por_litro }} km/l</span> }
-                <span class="patentes">
-                  @if (patenteCamion(viaje.camion_id)) { Chasis: {{ patenteCamion(viaje.camion_id) }} }
-                  @if (patenteCamion(viaje.camion_id_2)) { | Acoplado: {{ patenteCamion(viaje.camion_id_2) }} }
+            <span class="ruta">{{ viaje.origen }} → {{ viaje.destino}}</span>
+            <div class="tramo-datos">
+              <span>Fecha: {{ viaje.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
+              @if (viaje.cliente) { <span>Cliente: {{ viaje.cliente }}</span> }
+              @if (viaje.carga) { <span>Carga: {{ viaje.carga }}</span> }
+              @if (viaje.tarifa) { <span>Tarifa: ${{ viaje.tarifa }}</span> }
+              @if (viaje.kms_recorridos) {
+                <span>
+                  {{ viaje.kms_recorridos - (viaje.kms_descargado ?? 0) }} carg
+                  @if (viaje.kms_descargado) { + {{ viaje.kms_descargado }} vac }
+                  = {{ viaje.kms_recorridos }} kms
                 </span>
-              </div>
+              }
+              @if (viaje.km_por_litro) { <span>{{ viaje.litros_combustible }} L | {{ viaje.km_por_litro }} km/l</span> }
+              @if (viaje.fecha_fin) { <span>{{ calcularDias(viaje.fecha_inicio, viaje.fecha_fin) }} días</span> }
+              <span class="patentes">
+                @if (patenteCamion(viaje.camion_id)) { Chasis: {{ patenteCamion(viaje.camion_id) }} }
+                @if (patenteCamion(viaje.camion_id_2)) { | Acoplado: {{ patenteCamion(viaje.camion_id_2) }} }
+              </span>
             </div>
+            <div class="acciones-viaje">
+              @if (viaje.estado === 'pendiente' && !readonly()) {
+                <button class="btn-accion iniciar" (click)="iniciarViaje(viaje)">Iniciar</button>
+                <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
+              }
+              @if (viaje.estado === 'en_curso' && !readonly()) {
+                <button class="btn-accion finalizar" (click)="abrirModalFinalizar(viaje)">Finalizar</button>
+                <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
+              }
+              @if (viaje.estado === 'cancelado' && !readonly()) {
+                <button class="btn-accion reanudar" (click)="abrirModalReanudar(viaje)">Reanudar</button>
+              }
+              @if (viaje.motivo_cancelacion) {
+                <div class="motivo-cancelacion">Motivo: {{ viaje.motivo_cancelacion }}</div>
+              }
+            </div>
+          </div>
 
-            @if (viaje.viaje_vuelta) {
-              @let v = viaje.viaje_vuelta;
-              <div class="tramo vuelta">
+          @if (viaje.viaje_vuelta) {
+            @let v = viaje.viaje_vuelta;
+            <div class="separador-viajes"></div>
+            <div class="tramo vuelta">
+              <div class="tramo-header">
                 <span class="tramo-label">Vuelta:</span>
                 <span class="badge" [class]="v.estado">{{ v.estado }}</span>
-                <span class="ruta">{{ v.origen }} → {{ v.destino }}</span>
-                <div class="tramo-datos">
-                  <span>Fecha: {{ v.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
-                  @if (v.cliente) { <span>Cliente: {{ v.cliente }}</span> }
-                  @if (v.carga) { <span>Carga: {{ v.carga }}</span> }
-                  @if (v.tarifa) { <span>Tarifa: ${{ v.tarifa }}</span> }
-                  @if (v.kms_recorridos) { <span>{{ v.kms_recorridos }} kms</span> }
-                  @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ v.km_por_litro }} km/l</span> }
-                  <span class="patentes">
-                    @if (patenteCamion(v.camion_id)) { Chasis: {{ patenteCamion(v.camion_id) }} }
-                    @if (patenteCamion(v.camion_id_2)) { | Acoplado: {{ patenteCamion(v.camion_id_2) }} }
-                  </span>
-                </div>
-                <div class="acciones-viaje acciones-vuelta">
-                  @if (v.estado === 'pendiente') {
-                    <button class="btn-accion iniciar" (click)="iniciarViaje(v)">Iniciar</button>
-                    <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
-                  }
-                  @if (v.estado === 'en_curso') {
-                    <button class="btn-accion finalizar" (click)="abrirModalFinalizar(v)">Finalizar</button>
-                    <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
-                  }
-                  @if (v.motivo_cancelacion) {
-                    <div class="motivo-cancelacion">Motivo: {{ v.motivo_cancelacion }}</div>
-                  }
-                </div>
               </div>
-            }
+              <span class="ruta">{{ v.origen }} → {{ v.destino }}</span>
+              <div class="tramo-datos">
+                <span>Fecha: {{ v.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
+                @if (v.cliente) { <span>Cliente: {{ v.cliente }}</span> }
+                @if (v.carga) { <span>Carga: {{ v.carga }}</span> }
+                @if (v.tarifa) { <span>Tarifa: ${{ v.tarifa }}</span> }
+                @if (v.kms_recorridos) {
+                  <span>
+                    {{ v.kms_recorridos - (v.kms_descargado ?? 0) }} carg
+                    @if (v.kms_descargado) { + {{ v.kms_descargado }} vac }
+                    = {{ v.kms_recorridos }} kms
+                  </span>
+                }
+                @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ v.km_por_litro }} km/l</span> }
+                @if (v.fecha_fin) { <span>{{ calcularDias(v.fecha_inicio, v.fecha_fin) }} días</span> }
+                <span class="patentes">
+                  @if (patenteCamion(v.camion_id)) { Chasis: {{ patenteCamion(v.camion_id) }} }
+                  @if (patenteCamion(v.camion_id_2)) { | Acoplado: {{ patenteCamion(v.camion_id_2) }} }
+                </span>
+              </div>
+              <div class="acciones-viaje">
+                @if (v.estado === 'pendiente' && !readonly()) {
+                  <button class="btn-accion iniciar" (click)="iniciarViaje(v)">Iniciar</button>
+                  <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
+                }
+                @if (v.estado === 'en_curso' && !readonly()) {
+                  <button class="btn-accion finalizar" (click)="abrirModalFinalizar(v)">Finalizar</button>
+                  <button class="btn-accion cancelar" (click)="abrirModalCancelar(v)">Cancelar</button>
+                }
+                @if (v.estado === 'cancelado' && !readonly()) {
+                  <button class="btn-accion reanudar" (click)="abrirModalReanudar(v)">Reanudar</button>
+                }
+                @if (v.motivo_cancelacion) {
+                  <div class="motivo-cancelacion">Motivo: {{ v.motivo_cancelacion }}</div>
+                }
+              </div>
+            </div>
+          }
 
-            @if (viaje.motivo_cancelacion) {
-              <div class="motivo-cancelacion">Motivo: {{ viaje.motivo_cancelacion }}</div>
-            }
-            <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
-          </div>
-
-          <div class="acciones-viaje">
-            @if (viaje.estado === 'pendiente') {
-              <button class="btn-accion iniciar" (click)="iniciarViaje(viaje)">Iniciar</button>
-              <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
-            }
-            @if (viaje.estado === 'en_curso') {
-              <button class="btn-accion finalizar" (click)="abrirModalFinalizar(viaje)">Finalizar</button>
-              <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
-            }
-            @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado') {
-              <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">+ Vuelta</button>
-            }
-          </div>
+          <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
+          @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado' && !readonly()) {
+            <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">+ Vuelta</button>
+          }
         </div>
       } @empty {
         <p>No hay viajes para este filtro.</p>
@@ -189,98 +212,67 @@
   }
 </div>
 
-@if (accionModal() === 'nuevo' || accionModal() === 'vuelta') {
+@if (accionModal() === 'nuevo' || accionModal() === 'vuelta' || accionModal() === 'reanudar') {
   <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal modal-grande" (click)="$event.stopPropagation(); cerrarDropdown()">
-      <h2>{{ accionModal() === 'vuelta' ? 'Agregar vuelta' : 'Nuevo viaje' }}</h2>
+    <div class="modal modal-grande" (click)="$event.stopPropagation()">
+      <h2>{{
+        accionModal() === 'vuelta' ? 'Agregar vuelta' :
+        accionModal() === 'reanudar' ? 'Reanudar viaje' :
+        'Nuevo viaje'
+      }}</h2>
 
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
 
-      <label>{{ accionModal() === 'vuelta' ? 'Chofer (vuelta)' : 'Chofer disponible' }}</label>
-      <div class="buscador-select" (click)="$event.stopPropagation()">
-        <div class="buscador-select-header" (click)="abrirDropdown('chofer')">
-          <span>{{ nuevoViaje.chofer_id ? nombreChofer(nuevoViaje.chofer_id) : 'Elegí un chofer' }}</span>
-          <span class="flecha">▼</span>
-        </div>
-        @if (dropdownAbierto() === 'chofer') {
-          <div class="buscador-select-dropdown">
-            <input type="text" [ngModel]="filtroChoferModal()" (ngModelChange)="filtroChoferModal.set($event)" placeholder="Buscar chofer..." autofocus />
-            <div class="opciones">
-              @for (chofer of choferesFiltradosModal(); track chofer.id) {
-                <div class="opcion" [class.seleccionada]="nuevoViaje.chofer_id === chofer.id" (mousedown)="seleccionarChofer(chofer)">
-                  {{ chofer.nombre_completo }}
-                </div>
-              } @empty {
-                <div class="opcion-vacia">Sin resultados</div>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <label>{{
+        accionModal() === 'vuelta' ? 'Chofer (vuelta)' :
+        accionModal() === 'reanudar' ? 'Chofer' :
+        'Chofer disponible'
+      }}</label>
+      <app-buscador-select
+        [items]="choferes()"
+        [selectedId]="nuevoViaje.chofer_id"
+        displayKey="nombre_completo"
+        placeholder="Elegí un chofer"
+        (selectionChange)="seleccionarModalChofer($event)"
+      />
 
       <label>Chasis (opcional)</label>
-      <div class="buscador-select" (click)="$event.stopPropagation()">
-        <div class="buscador-select-header" (click)="abrirDropdown('camion')">
-          <span>{{ nuevoViaje.camion_id ? patenteCamion(nuevoViaje.camion_id) : 'Sin especificar' }}</span>
-          <span class="flecha">▼</span>
-        </div>
-        @if (dropdownAbierto() === 'camion') {
-          <div class="buscador-select-dropdown">
-            <input type="text" [ngModel]="filtroCamionModal()" (ngModelChange)="filtroCamionModal.set($event)" placeholder="Buscar chasis..." autofocus />
-            <div class="opciones">
-              <div class="opcion" (mousedown)="limpiarCamion()">
-                Sin especificar
-              </div>
-              @for (camion of camionesFiltradosModal(); track camion.id) {
-                <div class="opcion" [class.seleccionada]="nuevoViaje.camion_id === camion.id" (mousedown)="seleccionarCamion(camion)">
-                  {{ camion.patente }}
-                </div>
-              } @empty {
-                <div class="opcion-vacia">Sin resultados</div>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <app-buscador-select
+        [items]="camiones()"
+        [selectedId]="nuevoViaje.camion_id"
+        displayKey="patente"
+        placeholder="Sin especificar"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Sin especificar"
+        (selectionChange)="seleccionarModalCamion($event)"
+        (cleanSelection)="limpiarModalCamion()"
+      />
 
       <label>Acoplado / Batea (opcional)</label>
-      <div class="buscador-select" (click)="$event.stopPropagation()">
-        <div class="buscador-select-header" (click)="abrirDropdown('camion2')">
-          <span>{{ nuevoViaje.camion_id_2 ? patenteCamion(nuevoViaje.camion_id_2) : 'Sin especificar' }}</span>
-          <span class="flecha">▼</span>
-        </div>
-        @if (dropdownAbierto() === 'camion2') {
-          <div class="buscador-select-dropdown">
-            <input type="text" [ngModel]="filtroCamion2Modal()" (ngModelChange)="filtroCamion2Modal.set($event)" placeholder="Buscar acoplado..." autofocus />
-            <div class="opciones">
-              <div class="opcion" (mousedown)="limpiarCamion2()">
-                Sin especificar
-              </div>
-              @for (camion of camiones2FiltradosModal(); track camion.id) {
-                <div class="opcion" [class.seleccionada]="nuevoViaje.camion_id_2 === camion.id" (mousedown)="seleccionarCamion2(camion)">
-                  {{ camion.patente }}
-                </div>
-              } @empty {
-                <div class="opcion-vacia">Sin resultados</div>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      <app-buscador-select
+        [items]="acopladosList()"
+        [selectedId]="nuevoViaje.camion_id_2"
+        displayKey="patente"
+        placeholder="Sin especificar"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Sin especificar"
+        (selectionChange)="seleccionarModalCamion2($event)"
+        (cleanSelection)="limpiarModalCamion2()"
+      />
 
       <label for="cliente">Cliente</label>
-      <input id="cliente" type="text" [(ngModel)]="nuevoViaje.cliente" />
+      <input id="cliente" type="text" [(ngModel)]="nuevoViaje.cliente" (input)="nuevoViaje.cliente = $event.target.value.toUpperCase()" />
 
       <label for="origen">Origen</label>
-      <input id="origen" type="text" [(ngModel)]="nuevoViaje.origen" />
+      <input id="origen" type="text" [(ngModel)]="nuevoViaje.origen" (input)="nuevoViaje.origen = $event.target.value.toUpperCase()" />
 
       <label for="destino">Destino</label>
-      <input id="destino" type="text" [(ngModel)]="nuevoViaje.destino" />
+      <input id="destino" type="text" [(ngModel)]="nuevoViaje.destino" (input)="nuevoViaje.destino = $event.target.value.toUpperCase()" />
 
       <label for="carga">Carga</label>
-      <input id="carga" type="text" [(ngModel)]="nuevoViaje.carga" />
+      <input id="carga" type="text" [(ngModel)]="nuevoViaje.carga" (input)="nuevoViaje.carga = $event.target.value.toUpperCase()" />
 
       <label for="tarifa">Tarifa</label>
       <input id="tarifa" type="number" [(ngModel)]="nuevoViaje.tarifa" />
@@ -292,6 +284,8 @@
         <button (click)="cerrarModal()">Cancelar</button>
         @if (accionModal() === 'vuelta') {
           <button class="btn-primario" (click)="confirmarVuelta()">Agregar vuelta</button>
+        } @else if (accionModal() === 'reanudar') {
+          <button class="btn-primario" (click)="confirmarReanudar()">Reanudar viaje</button>
         } @else {
           <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
         }
@@ -301,34 +295,17 @@
 }
 
 @if (accionModal() === 'finalizar') {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Finalizar viaje</h2>
-      <label for="kms">Kilómetros recorridos</label>
-      <input id="kms" type="number" [(ngModel)]="kmsRecorridos" min="1" />
-      <label for="litros">Litros de combustible (opcional)</label>
-      <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
-      @if (kmsRecorridos && litrosCombustible && litrosCombustible > 0) {
-        <p class="rendimiento-preview">{{ (kmsRecorridos / litrosCombustible) | number:'1.2-2' }} km/l</p>
-      }
-      <div class="acciones-modal">
-        <button (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarFinalizar()">Confirmar</button>
-      </div>
-    </div>
-  </div>
+  <app-modal-finalizar-viaje
+    [error]="error()"
+    (confirmar)="onFinalizarConfirmado($event)"
+    (cerrar)="cerrarModal()"
+  ></app-modal-finalizar-viaje>
 }
 
 @if (accionModal() === 'cancelar') {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Cancelar viaje</h2>
-      <label for="motivo">Motivo de la cancelación</label>
-      <textarea id="motivo" [(ngModel)]="motivoCancelacion" rows="3"></textarea>
-      <div class="acciones-modal">
-        <button (click)="cerrarModal()">Volver</button>
-        <button class="btn-primario" (click)="confirmarCancelar()">Confirmar cancelación</button>
-      </div>
-    </div>
-  </div>
+  <app-modal-cancelar-viaje
+    [error]="error()"
+    (confirmar)="onCancelarConfirmado($event)"
+    (cerrar)="cerrarModal()"
+  ></app-modal-cancelar-viaje>
 }

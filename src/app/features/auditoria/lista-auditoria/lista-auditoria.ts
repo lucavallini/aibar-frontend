@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AuditoriaService } from '../../../core/services/auditoria.service';
 import { Auditoria } from '../../../core/models/auditoria.model';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-lista-auditoria',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, Paginacion, FormsModule],
   templateUrl: './lista-auditoria.html',
   styleUrl: './lista-auditoria.css'
@@ -45,7 +46,7 @@ export class ListaAuditoria implements OnInit {
     const entidad = this.filtroEntidad() || undefined;
     const dias = this.filtroDias() || undefined;
 
-    this.auditoriaService.listar(entidad, dias, this.pagina(), this.tamanoPagina).subscribe({
+    this.auditoriaService.listar(this.pagina(), this.tamanoPagina, { entidad, dias }).subscribe({
       next: (respuesta) => {
         this.eventos.set(respuesta.items);
         this.total.set(respuesta.total);

@@ -1,0 +1,17 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>Cancelar viaje</h2>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <label for="motivo">Motivo de la cancelaci&oacute;n</label>
+    <textarea id="motivo" [(ngModel)]="motivoCancelacion" rows="3" (input)="motivoCancelacion = $any($event.target).value.toUpperCase()"></textarea>
+
+    <div class="acciones-modal">
+      <button (click)="cerrar.emit()">Volver</button>
+      <button class="btn-primario" (click)="onConfirmar()" [disabled]="motivoCancelacion.trim().length < 5">Confirmar cancelaci&oacute;n</button>
+    </div>
+  </div>
+</div>
