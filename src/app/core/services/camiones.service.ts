@@ -34,6 +34,11 @@ export class CamionesService {
     return this.http.patch<Camion>(`${this.apiUrl}/${id}`, datos);
   }
 
+  cambiarEstado(id: string, estado: string, motivo?: string): Observable<Camion> {
+    this.cache.clear(CACHE_KEY);
+    return this.http.patch<Camion>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
+  }
+
   darDeBaja(id: string): Observable<Camion> {
     this.cache.clear(CACHE_KEY);
     return this.http.delete<Camion>(`${this.apiUrl}/${id}`);

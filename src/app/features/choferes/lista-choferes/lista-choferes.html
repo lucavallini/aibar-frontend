@@ -34,7 +34,10 @@
         <td>{{ chofer.nombre_completo }}</td>
         <td>{{ chofer.dni || '-' }}</td>
         <td>
-          <span class="badge" [class]="chofer.estado">{{ chofer.estado }}</span>
+          <span class="badge" [class]="chofer.estado">{{ labelEstadoChofer(chofer.estado) }}</span>
+          @if (chofer.estado === 'no_disponible' && chofer.motivo_no_disponible) {
+            <span class="motivo-tabla">{{ chofer.motivo_no_disponible }}</span>
+          }
         </td>
         <td>{{ chofer.telefono || '-' }}</td>
         <td>{{ nombreEmpresa(chofer.empresa_id) }}</td>

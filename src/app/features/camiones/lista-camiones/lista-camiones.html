@@ -19,7 +19,7 @@
   }
 
 <app-tabla-paginada
-  [headers]="['Patente', 'Marca', 'Modelo', 'Año', 'Tipo', 'Empresa', 'Acciones']"
+  [headers]="['Patente', 'Marca', 'Modelo', 'Año', 'Tipo', 'Empresa', 'Estado', 'Acciones']"
   [items]="camiones()"
   [cargando]="cargando()"
   [error]="error()"
@@ -37,6 +37,12 @@
       <td>{{ camion.anio || '-' }}</td>
       <td>{{ camion.tipo || '-' }}</td>
       <td>{{ nombreEmpresa(camion.empresa_id) }}</td>
+      <td>
+        <span class="badge" [class]="camion.estado">{{ labelEstadoCamion(camion.estado) }}</span>
+        @if (camion.estado === 'no_disponible' && camion.motivo_no_disponible) {
+          <span class="motivo-tabla">{{ camion.motivo_no_disponible }}</span>
+        }
+      </td>
       <td>
         @if (!readonly()) {
           <button class="btn-mini" (click)="abrirEditar(camion)">Editar</button>

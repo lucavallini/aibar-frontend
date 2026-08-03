@@ -6,6 +6,8 @@
     }
   </header>
 
+  <div class="contenido-viajes">
+    <div class="lista-panel">
   <div class="filtros">
     <div class="filtro-grupo">
       <label>Chofer</label>
@@ -107,7 +109,7 @@
           <div class="tramo ida">
             <div class="tramo-header">
               <span class="tramo-label">Ida:</span>
-              <span class="badge" [class]="viaje.estado">{{ viaje.estado }}</span>
+              <span class="badge" [class]="viaje.estado">{{ labelEstado(viaje.estado) }}</span>
             </div>
             <span class="ruta">{{ viaje.origen }} → {{ viaje.destino}}</span>
             <div class="tramo-datos">
@@ -153,7 +155,7 @@
             <div class="tramo vuelta">
               <div class="tramo-header">
                 <span class="tramo-label">Vuelta:</span>
-                <span class="badge" [class]="v.estado">{{ v.estado }}</span>
+                <span class="badge" [class]="v.estado">{{ labelEstado(v.estado) }}</span>
               </div>
               <span class="ruta">{{ v.origen }} → {{ v.destino }}</span>
               <div class="tramo-datos">
@@ -210,6 +212,17 @@
       (cambioPagina)="cambiarPagina($event)"
     ></app-paginacion>
   }
+  </div>
+
+    <app-estado-flota
+      [choferes]="choferes()"
+      [camiones]="camiones()"
+      [acoplados]="acopladosList()"
+      [empresas]="empresas()"
+      [readonly]="readonly()"
+      (cambioEstado)="recargarFlota()"
+    />
+  </div>
 </div>
 
 @if (accionModal() === 'nuevo' || accionModal() === 'vuelta' || accionModal() === 'reanudar') {

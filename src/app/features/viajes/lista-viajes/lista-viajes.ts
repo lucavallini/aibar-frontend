@@ -17,6 +17,7 @@ import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 import { ModalFinalizarViaje } from '../../../shared/components/modal-finalizar-viaje/modal-finalizar-viaje';
 import { ModalCancelarViaje } from '../../../shared/components/modal-cancelar-viaje/modal-cancelar-viaje';
+import { EstadoFlota } from '../estado-flota/estado-flota';
 import { AuthService } from '../../../core/services/auth.service';
 
 type FiltroEstado = 'todos' | 'pendiente' | 'en_curso' | 'finalizado' | 'cancelado';
@@ -26,7 +27,7 @@ type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | 'reanudar' | 
   selector: 'app-lista-viajes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje],
+  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje, EstadoFlota],
   templateUrl: './lista-viajes.html',
   styleUrl: './lista-viajes.css'
 })
@@ -70,9 +71,19 @@ export class ListaViajes implements OnInit {
 
   readonly = computed(() => this.authService.getRol() === 'aibar');
 
+  labelEstado(estado: string): string {
+    const labels: Record<string, string> = {
+      pendiente: 'Esperando iniciar viaje',
+      en_curso: 'En curso',
+      finalizado: 'Finalizado',
+      cancelado: 'Cancelado',
+    };
+    return labels[estado] ?? estado;
+  }
+
   filtrosEstado: { label: string; valor: FiltroEstado }[] = [
     { label: 'Todos', valor: 'todos' },
-    { label: 'Pendientes', valor: 'pendiente' },
+    { label: 'Esperando iniciar viaje', valor: 'pendiente' },
     { label: 'En curso', valor: 'en_curso' },
     { label: 'Finalizados', valor: 'finalizado' },
     { label: 'Cancelados', valor: 'cancelado' },
@@ -247,6 +258,35 @@ export class ListaViajes implements OnInit {
     return empresa ? empresa.nombre : '';
   }
 
+  recargarFlota(): void {
+    this.choferesService.listar(1, 1000, { activos_only: false }).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, string> = {};
+        respuesta.items.forEach((c: Chofer) => mapa[c.id] = c.nombre_completo);
+        this.choferesPorId.set(mapa);
+        this.choferes.set(respuesta.items);
+      }
+    });
+
+    this.camionesService.listar(1, 1000, { activos_only: false }).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, Camion> = {};
+        respuesta.items.forEach((c) => mapa[c.id] = c);
+        this.camionesPorId.set(mapa);
+        this.camiones.set(respuesta.items);
+      }
+    });
+
+    this.acopladosService.listar(1, 1000, { activos_only: false }).subscribe({
+      next: (respuesta) => {
+        const mapa: Record<string, Acoplado> = {};
+        respuesta.items.forEach((a) => mapa[a.id] = a);
+        this.acopladosPorId.set(mapa);
+        this.acopladosList.set(respuesta.items);
+      }
+    });
+  }
+
   calcularDias(inicio: string, fin: string | null): number | null {
     if (!inicio || !fin) return null;
     const d1 = new Date(inicio);
@@ -288,11 +328,11 @@ export class ListaViajes implements OnInit {
     });
 
     this.acopladosService.listar(1, 1000, undefined).subscribe({
-      next: (respuesta) => this.acopladosList.set(respuesta.items)
+      next: (respuesta) => this.acopladosList.set(respuesta.items.filter(a => a.estado === 'disponible'))
     });
 
     this.camionesService.listar(1, 1000, undefined).subscribe({
-      next: (respuesta) => this.camiones.set(respuesta.items)
+      next: (respuesta) => this.camiones.set(respuesta.items.filter(c => c.estado === 'disponible'))
     });
   }
 
@@ -340,11 +380,11 @@ export class ListaViajes implements OnInit {
     });
 
     this.acopladosService.listar(1, 1000, undefined).subscribe({
-      next: (respuesta) => this.acopladosList.set(respuesta.items)
+      next: (respuesta) => this.acopladosList.set(respuesta.items.filter(a => a.estado === 'disponible'))
     });
 
     this.camionesService.listar(1, 1000, undefined).subscribe({
-      next: (respuesta) => this.camiones.set(respuesta.items)
+      next: (respuesta) => this.camiones.set(respuesta.items.filter(c => c.estado === 'disponible'))
     });
   }
 
@@ -455,11 +495,17 @@ export class ListaViajes implements OnInit {
     });
 
     this.acopladosService.listar(1, 1000, { activos_only: false }).subscribe({
-      next: (respuesta) => this.acopladosList.set(respuesta.items)
+      next: (respuesta) => {
+        const actuales = viaje.camion_id_2 ? [viaje.camion_id_2] : [];
+        this.acopladosList.set(respuesta.items.filter(a => a.estado === 'disponible' || actuales.includes(a.id)))
+      }
     });
 
     this.camionesService.listar(1, 1000, { activos_only: false }).subscribe({
-      next: (respuesta) => this.camiones.set(respuesta.items)
+      next: (respuesta) => {
+        const actuales = viaje.camion_id ? [viaje.camion_id] : [];
+        this.camiones.set(respuesta.items.filter(c => c.estado === 'disponible' || actuales.includes(c.id)))
+      }
     });
   }
 

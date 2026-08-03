@@ -1,0 +1,172 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.estado-flota {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.estado-flota h2 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.tabs-flota {
+  display: flex;
+  gap: 0.4rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.filtro-grupo label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+  margin-bottom: 0.3rem;
+}
+
+.flota-seccion h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-texto-secundario);
+  margin: 0 0 0.5rem;
+}
+
+.contador {
+  min-width: 22px;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  background: var(--color-fondo-suave);
+  color: var(--color-texto-secundario);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.flota-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+}
+
+.flota-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.flota-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.flota-nombre {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.flota-empresa,
+.flota-motivo {
+  width: 100%;
+  font-size: 0.78rem;
+}
+
+.flota-empresa {
+  color: var(--color-texto-secundario);
+}
+
+.flota-motivo {
+  color: var(--color-error);
+}
+
+.flota-acciones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btn-accion {
+  min-height: 30px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.btn-accion.no-disponible {
+  background: var(--color-cancelar);
+  color: white;
+}
+
+.btn-accion.disponible {
+  background: var(--color-iniciar);
+  color: white;
+}
+
+.btn-accion:hover {
+  opacity: 0.9;
+}
+
+.btn-accion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flota-vacio {
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+}
+
+.estado-msg {
+  font-size: 0.8rem;
+  color: var(--color-texto-secundario);
+  font-style: italic;
+}
+
+.modal textarea {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.modal-descripcion {
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
+  margin: 0;
+}

@@ -5,6 +5,7 @@ import { AcopladosService } from '../../../core/services/acoplado.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { Acoplado, AcopladoCreate } from '../../../core/models/acoplado.model';
 import { Empresa } from '../../../core/models/empresa.model';
+import { labelEstadoAcoplado } from '../../../core/utils/estado-labels';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
@@ -55,6 +56,10 @@ export class ListaAcoplados implements OnInit {
     if (!empresaId) return '-';
     const e = this.empresas().find(e => e.id === empresaId);
     return e ? e.nombre : '-';
+  }
+
+  labelEstadoAcoplado(estado: string): string {
+    return labelEstadoAcoplado(estado);
   }
 
   abrirEditar(acoplado: Acoplado): void {

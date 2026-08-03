@@ -19,7 +19,7 @@
   }
 
 <app-tabla-paginada
-  [headers]="['Patente', 'Tipo', 'Empresa', 'Acciones']"
+  [headers]="['Patente', 'Tipo', 'Empresa', 'Estado', 'Acciones']"
   [items]="acopladosList()"
   [cargando]="cargando()"
   [error]="error()"
@@ -34,6 +34,12 @@
       <td>{{ acoplado.patente }}</td>
       <td>{{ acoplado.tipo || '-' }}</td>
       <td>{{ nombreEmpresa(acoplado.empresa_id) }}</td>
+      <td>
+        <span class="badge" [class]="acoplado.estado">{{ labelEstadoAcoplado(acoplado.estado) }}</span>
+        @if (acoplado.estado === 'no_disponible' && acoplado.motivo_no_disponible) {
+          <span class="motivo-tabla">{{ acoplado.motivo_no_disponible }}</span>
+        }
+      </td>
       <td>
         @if (!readonly()) {
           <button class="btn-mini" (click)="abrirEditar(acoplado)">Editar</button>

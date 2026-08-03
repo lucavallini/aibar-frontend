@@ -3,10 +3,11 @@ export interface Chofer {
   nombre_completo: string;
   dni: string | null;
   telefono: string | null;
-  estado: 'disponible' | 'viajando' | 'inactivo' | 'licencia';
+  estado: 'disponible' | 'no_disponible' | 'esperando_iniciar_viaje' | 'viajando' | 'inactivo' | 'licencia';
   camion_id: string | null;
   empresa_id: string | null;
   activo: boolean;
+  motivo_no_disponible: string | null;
   creado_en: string;
   creado_por: string | null;
 }

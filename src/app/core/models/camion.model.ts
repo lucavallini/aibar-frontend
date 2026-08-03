@@ -7,6 +7,8 @@ export interface Camion {
   tipo: string | null;
   empresa_id: string | null;
   activo: boolean;
+  estado: 'disponible' | 'no_disponible' | 'esperando_iniciar_viaje' | 'viajando';
+  motivo_no_disponible: string | null;
   creado_en: string;
 }
 

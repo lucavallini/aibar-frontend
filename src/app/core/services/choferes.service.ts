@@ -37,9 +37,9 @@ export class ChoferesService {
     return this.http.post<Chofer>(`${this.apiUrl}/`, datos);
   }
 
-  cambiarEstado(id: string, estado: string): Observable<Chofer> {
+  cambiarEstado(id: string, estado: string, motivo?: string): Observable<Chofer> {
     this.cache.clear(CACHE_KEY);
-    return this.http.patch<Chofer>(`${this.apiUrl}/${id}/estado`, { estado });
+    return this.http.patch<Chofer>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
   }
 
   actualizar(id: string, datos: Partial<ChoferCreate>): Observable<Chofer> {

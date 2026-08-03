@@ -221,7 +221,7 @@ p.error {
 
 .badge,
 :is(
-  .disponible, .viajando, .inactivo,
+  .disponible, .viajando, .inactivo, .no_disponible, .esperando_iniciar_viaje,
   .pendiente, .en_curso, .finalizado, .cancelado,
   .alta, .edicion, .cancelacion, .baja,
   .administrador, .empleado, .licencia
@@ -244,8 +244,8 @@ p.error {
   color: var(--color-exito);
 }
 
-.badge.viajando, .badge.pendiente,
-.viajando, .pendiente {
+.badge.viajando, .badge.pendiente, .badge.esperando_iniciar_viaje,
+.viajando, .pendiente, .esperando_iniciar_viaje {
   background: var(--color-alerta-fondo);
   color: var(--color-alerta);
 }
@@ -256,8 +256,8 @@ p.error {
   color: var(--color-info);
 }
 
-.badge.inactivo, .badge.cancelado, .badge.cancelacion,
-.inactivo, .cancelado, .cancelacion {
+.badge.inactivo, .badge.cancelado, .badge.cancelacion, .badge.no_disponible,
+.inactivo, .cancelado, .cancelacion, .no_disponible {
   background: var(--color-error-fondo);
   color: var(--color-error);
 }
@@ -272,6 +272,13 @@ p.error {
 .licencia {
   background: var(--color-alerta-fondo);
   color: var(--color-alerta);
+}
+
+.motivo-tabla {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-error);
 }
 
 .modal-overlay {

@@ -9,6 +9,17 @@
   margin-bottom: 0.3rem;
 }
 
+.contenido-viajes {
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 340px);
+  gap: 1rem;
+  align-items: start;
+}
+
+.lista-panel {
+  min-width: 0;
+}
+
 .lista-viajes {
   display: flex;
   flex-direction: column;
@@ -165,6 +176,12 @@
 
 .btn-accion:hover {
   opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .contenido-viajes {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 576px) {

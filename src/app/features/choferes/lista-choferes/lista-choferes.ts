@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { ObservacionesService } from '../../../core/services/observaciones.service';
 import { Observacion, ObservacionCreate } from '../../../core/models/observacion.model';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
+import { labelEstadoChofer } from '../../../core/utils/estado-labels';
 
 @Component({
   selector: 'app-lista-choferes',
@@ -71,6 +72,10 @@ export class ListaChoferesComponent implements OnInit {
     if (!empresaId) return '-';
     const e = this.empresas().find(e => e.id === empresaId);
     return e ? e.nombre : '-';
+  }
+
+  labelEstadoChofer(estado: string): string {
+    return labelEstadoChofer(estado);
   }
 
   formularioVacioAlta(): ChoferCreate {

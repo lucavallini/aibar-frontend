@@ -8,6 +8,7 @@ import { Empresa } from '../../../core/models/empresa.model';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
+import { labelEstadoCamion } from '../../../core/utils/estado-labels';
 
 @Component({
   selector: 'app-lista-camiones',
@@ -55,6 +56,10 @@ export class ListaCamiones implements OnInit {
     if (!empresaId) return '-';
     const e = this.empresas().find(e => e.id === empresaId);
     return e ? e.nombre : '-';
+  }
+
+  labelEstadoCamion(estado: string): string {
+    return labelEstadoCamion(estado);
   }
 
   abrirEditar(camion: Camion): void {

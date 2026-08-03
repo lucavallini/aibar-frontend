@@ -34,6 +34,11 @@ export class AcopladosService {
     return this.http.patch<Acoplado>(`${this.apiUrl}/${id}`, datos);
   }
 
+  cambiarEstado(id: string, estado: string, motivo?: string): Observable<Acoplado> {
+    this.cache.clear(CACHE_KEY);
+    return this.http.patch<Acoplado>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
+  }
+
   darDeBaja(id: string): Observable<Acoplado> {
     this.cache.clear(CACHE_KEY);
     return this.http.delete<Acoplado>(`${this.apiUrl}/${id}`);
