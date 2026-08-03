@@ -24,8 +24,8 @@ export class ViajesService {
     return this.http.post<Viaje>(`${this.apiUrl}/${id}/iniciar`, {});
   }
 
-  finalizar(id: string, fechaFin: string, kmsRecorridos: number, litrosCombustible?: number, kmsDescargado?: number): Observable<Viaje> {
-    const body: any = { fecha_fin: fechaFin, kms_recorridos: kmsRecorridos };
+  finalizar(id: string, fechaFin: string, kmsRecorridos: number, litrosCombustible?: number, kmsDescargado?: number, soloIda = false): Observable<Viaje> {
+    const body: any = { fecha_fin: fechaFin, kms_recorridos: kmsRecorridos, solo_ida: soloIda };
     if (litrosCombustible) body.litros_combustible = litrosCombustible;
     if (kmsDescargado) body.kms_descargado = kmsDescargado;
     return this.http.post<Viaje>(`${this.apiUrl}/${id}/finalizar`, body);

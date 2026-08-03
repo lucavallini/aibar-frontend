@@ -22,6 +22,14 @@
       <p class="rendimiento-preview">{{ ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0)) / litrosCombustible | number:'1.2-2' }} km/l</p>
     }
 
+    <label class="opcion-solo-ida">
+      <input type="checkbox" [ngModel]="soloIda()" (ngModelChange)="soloIda.set($event)" />
+      Es solo de ida (sin vuelta)
+    </label>
+    @if (soloIda()) {
+      <p class="nota-solo-ida">El viaje se finalizará como solo de ida y no se podrá agregar vuelta.</p>
+    }
+
     <div class="acciones-modal">
       <button (click)="cerrar.emit()">Cancelar</button>
       <button class="btn-primario" (click)="onConfirmar()">Confirmar</button>

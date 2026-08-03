@@ -223,7 +223,7 @@ p.error {
 :is(
   .disponible, .viajando, .inactivo, .no_disponible, .esperando_iniciar_viaje,
   .pendiente, .en_curso, .finalizado, .cancelado,
-  .alta, .edicion, .cancelacion, .baja,
+  .alta, .edicion, .cancelacion, .baja, .solo_ida,
   .administrador, .empleado, .licencia
 ) {
   display: inline-flex;
@@ -262,8 +262,8 @@ p.error {
   color: var(--color-error);
 }
 
-.badge.baja,
-.baja {
+.badge.baja, .badge.solo_ida,
+.baja, .solo_ida {
   background: var(--color-neutro-fondo);
   color: var(--color-neutro);
 }

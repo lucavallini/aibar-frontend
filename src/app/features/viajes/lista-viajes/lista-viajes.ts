@@ -17,6 +17,7 @@ import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 import { ModalFinalizarViaje } from '../../../shared/components/modal-finalizar-viaje/modal-finalizar-viaje';
 import { ModalCancelarViaje } from '../../../shared/components/modal-cancelar-viaje/modal-cancelar-viaje';
+import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { EstadoFlota } from '../estado-flota/estado-flota';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -27,7 +28,7 @@ type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | 'reanudar' | 
   selector: 'app-lista-viajes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje, EstadoFlota],
+  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje, Confirmar, EstadoFlota],
   templateUrl: './lista-viajes.html',
   styleUrl: './lista-viajes.css'
 })
@@ -57,6 +58,9 @@ export class ListaViajes implements OnInit {
 
   nuevoViaje: ViajeCreate = this.formularioVacio();
   viajeOriginalId = '';
+  soloIdaForzado = signal(false);
+  modalSinVuelta = signal(false);
+  viajeSinVuelta = signal<Viaje | null>(null);
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -415,6 +419,28 @@ export class ListaViajes implements OnInit {
     this.accionModal.set('finalizar');
   }
 
+  abrirModalFinalizarSinVuelta(viaje: Viaje): void {
+    this.viajeSeleccionado.set(viaje);
+    this.soloIdaForzado.set(true);
+    this.accionModal.set('finalizar');
+  }
+
+  abrirConfirmacionSinVuelta(viaje: Viaje): void {
+    this.viajeSinVuelta.set(viaje);
+    this.modalSinVuelta.set(true);
+  }
+
+  cerrarConfirmacionSinVuelta(): void {
+    this.modalSinVuelta.set(false);
+    this.viajeSinVuelta.set(null);
+  }
+
+  confirmarSinVuelta(): void {
+    const viaje = this.viajeSinVuelta();
+    this.cerrarConfirmacionSinVuelta();
+    if (viaje) this.abrirModalFinalizarSinVuelta(viaje);
+  }
+
   abrirModalCancelar(viaje: Viaje): void {
     this.viajeSeleccionado.set(viaje);
     this.accionModal.set('cancelar');
@@ -446,11 +472,11 @@ export class ListaViajes implements OnInit {
     this.error.set(null);
   }
 
-  onFinalizarConfirmado(datos: { fecha_fin: string; kms_recorridos: number; kms_descargado?: number; litros_combustible?: number }): void {
+  onFinalizarConfirmado(datos: { fecha_fin: string; kms_recorridos: number; kms_descargado?: number; litros_combustible?: number; solo_ida?: boolean }): void {
     const viaje = this.viajeSeleccionado();
     if (!viaje) return;
 
-    this.viajesService.finalizar(viaje.id, datos.fecha_fin, datos.kms_recorridos, datos.litros_combustible, datos.kms_descargado).subscribe({
+    this.viajesService.finalizar(viaje.id, datos.fecha_fin, datos.kms_recorridos, datos.litros_combustible, datos.kms_descargado, datos.solo_ida ?? false).subscribe({
       next: () => {
         this.cerrarModal();
         this.cargarViajes();

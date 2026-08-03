@@ -16,6 +16,7 @@ export interface Viaje {
   fecha_fin: string | null;
   estado: 'pendiente' | 'en_curso' | 'finalizado' | 'cancelado';
   motivo_cancelacion: string | null;
+  solo_ida?: boolean;
   asignado_por: string;
   autorizado_por: string | null;
   creado_en: string;

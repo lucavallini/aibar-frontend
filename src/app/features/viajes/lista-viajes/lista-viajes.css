@@ -159,6 +159,11 @@
   color: white;
 }
 
+.btn-accion.finalizar-sin-vuelta {
+  background: var(--color-cancelar);
+  color: white;
+}
+
 .btn-accion.cancelar {
   background: var(--color-cancelar);
   color: white;

@@ -110,6 +110,9 @@
             <div class="tramo-header">
               <span class="tramo-label">Ida:</span>
               <span class="badge" [class]="viaje.estado">{{ labelEstado(viaje.estado) }}</span>
+              @if (viaje.solo_ida) {
+                <span class="badge solo-ida">Solo ida</span>
+              }
             </div>
             <span class="ruta">{{ viaje.origen }} → {{ viaje.destino}}</span>
             <div class="tramo-datos">
@@ -138,6 +141,7 @@
               }
               @if (viaje.estado === 'en_curso' && !readonly()) {
                 <button class="btn-accion finalizar" (click)="abrirModalFinalizar(viaje)">Finalizar</button>
+                <button class="btn-accion finalizar-sin-vuelta" (click)="abrirConfirmacionSinVuelta(viaje)">Finalizar sin vuelta</button>
                 <button class="btn-accion cancelar" (click)="abrirModalCancelar(viaje)">Cancelar</button>
               }
               @if (viaje.estado === 'cancelado' && !readonly()) {
@@ -197,7 +201,7 @@
           }
 
           <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
-          @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado' && !readonly()) {
+          @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado' && !viaje.solo_ida && !readonly()) {
             <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">+ Vuelta</button>
           }
         </div>
@@ -310,9 +314,20 @@
 @if (accionModal() === 'finalizar') {
   <app-modal-finalizar-viaje
     [error]="error()"
+    [soloIdaInicial]="soloIdaForzado()"
     (confirmar)="onFinalizarConfirmado($event)"
     (cerrar)="cerrarModal()"
   ></app-modal-finalizar-viaje>
+}
+
+@if (modalSinVuelta() && viajeSinVuelta()) {
+  <app-confirmar
+    titulo="Finalizar sin vuelta"
+    [mensaje]="'¿Seguro que querés finalizar el viaje de ' + nombreChofer(viajeSinVuelta()!.chofer_id) + ' sin vuelta? El viaje quedará como solo de ida.'"
+    textoConfirmar="Finalizar"
+    (confirmar)="confirmarSinVuelta()"
+    (cancelar)="cerrarConfirmacionSinVuelta()"
+  ></app-confirmar>
 }
 
 @if (accionModal() === 'cancelar') {
