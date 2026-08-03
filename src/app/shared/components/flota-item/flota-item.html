@@ -1,0 +1,23 @@
+<li class="flota-item">
+  <div class="flota-principal">
+    <div class="flota-info">
+      <span class="flota-nombre">{{ nombre() }}</span>
+      @if (empresa()) {
+        <span class="flota-empresa">{{ empresa() }}</span>
+      }
+      @if (estado() === 'no_disponible' && motivo()) {
+        <span class="flota-motivo">{{ motivo() }}</span>
+      }
+    </div>
+    <span class="badge" [class]="estado()">{{ labelEstado()(estado()) }}</span>
+  </div>
+  @if (!readonly()) {
+    <div class="flota-acciones">
+      @if (estado() === 'no_disponible') {
+        <button class="btn-accion disponible" (click)="disponible.emit(item())">Disponible</button>
+      } @else {
+        <button class="btn-accion no-disponible" (click)="noDisponible.emit(item())">No disponible</button>
+      }
+    </div>
+  }
+</li>

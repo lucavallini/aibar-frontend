@@ -1,0 +1,10 @@
+@if (cargando()) {
+  <div class="cargando" role="status">
+    <span class="spinner" aria-hidden="true"></span>
+    <span>Cargando...</span>
+  </div>
+}
+
+@if (error() && mostrarError()) {
+  <p class="error">{{ error() }}</p>
+}

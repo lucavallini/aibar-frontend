@@ -1,13 +1,13 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Modal } from '../modal/modal';
 
 @Component({
   selector: 'app-modal-cancelar-viaje',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, Modal],
   templateUrl: './modal-cancelar-viaje.html',
-  styleUrl: './modal-cancelar-viaje.css'
 })
 export class ModalCancelarViaje {
   error = input<string | null>(null);

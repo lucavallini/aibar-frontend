@@ -22,13 +22,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.5rem;
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1rem;
   background: var(--color-fondo-panel);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
   margin-bottom: 1rem;
   box-shadow: var(--sombra);
   font-size: 0.9rem;
+}
+
+.resumen span {
+  color: var(--color-texto-secundario);
 }
 
 .resumen strong {

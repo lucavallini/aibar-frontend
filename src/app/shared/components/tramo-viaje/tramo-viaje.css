@@ -1,0 +1,72 @@
+.tramo {
+  padding: 0.5rem 0;
+}
+
+.tramo + .tramo {
+  margin-top: 0.2rem;
+}
+
+.tramo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.tramo-label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tramo.ida .tramo-label {
+  color: var(--color-primario);
+}
+
+.tramo.vuelta .tramo-label {
+  color: var(--color-info);
+}
+
+.ruta {
+  color: var(--color-texto-secundario);
+  overflow-wrap: anywhere;
+}
+
+.tramo-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: 0.84rem;
+  color: var(--color-texto-secundario);
+  margin-top: 0.2rem;
+}
+
+.patentes {
+  font-size: 0.82rem;
+  color: var(--color-texto-secundario);
+}
+
+.motivo-cancelacion {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-error);
+}
+
+.acciones-viaje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 576px) {
+  .acciones-viaje {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .btn-accion {
+    width: 100%;
+  }
+}

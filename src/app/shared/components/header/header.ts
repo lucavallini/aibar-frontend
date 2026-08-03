@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
@@ -11,7 +11,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   styleUrl: './header.css'
 })
 export class Header {
-  @Output() toggleSidebar = new EventEmitter<void>();
+  toggleSidebar = output<void>();
 
   constructor(
     private authService: AuthService,

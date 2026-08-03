@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
+import { Modal } from '../modal/modal';
 
 @Component({
   selector: 'app-modal-finalizar-viaje',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, Modal],
   templateUrl: './modal-finalizar-viaje.html',
   styleUrl: './modal-finalizar-viaje.css'
 })

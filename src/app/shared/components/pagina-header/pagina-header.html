@@ -1,0 +1,6 @@
+<header>
+  <h1>{{ titulo() }}</h1>
+  @if (mostrarAccion() && accionLabel()) {
+    <button class="btn-primario" (click)="nuevo.emit()">{{ accionLabel() }}</button>
+  }
+</header>

@@ -1,1 +1,9 @@
+th {
+  white-space: nowrap;
+}
 
+tbody td[colspan] {
+  padding: 2rem 1rem;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}

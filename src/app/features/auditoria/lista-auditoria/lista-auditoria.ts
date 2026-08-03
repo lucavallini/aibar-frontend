@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, Paginacion, FormsModule],
   templateUrl: './lista-auditoria.html',
-  styleUrl: './lista-auditoria.css'
 })
 export class ListaAuditoria implements OnInit {
   eventos = signal<Auditoria[]>([]);

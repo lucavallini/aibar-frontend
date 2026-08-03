@@ -1,22 +1,11 @@
 <div class="contenedor">
-  <header>
-    <h1>Choferes</h1>
-    @if (!readonly()) {
-      <button class="btn-primario" (click)="abrirAlta()">+ Nuevo chofer</button>
-    }
-  </header>
+  <app-pagina-header titulo="Choferes" accionLabel="+ Nuevo chofer" [mostrarAccion]="!readonly()" (nuevo)="abrirAlta()" />
 
   <div class="buscador">
     <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
   </div>
 
-  @if (cargando()) {
-    <p>Cargando...</p>
-  }
-
-  @if (error() && !modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()) {
-    <p class="error">{{ error() }}</p>
-  }
+  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()" />
 
   <app-tabla-paginada
     [headers]="['Nombre', 'DNI', 'Estado', 'Teléfono', 'Empresa', 'Acciones']"
@@ -59,40 +48,32 @@
 </div>
 
 @if (modalEditarAbierto()) {
-  <div class="modal-overlay" (click)="cerrarEditar()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Editar chofer</h2>
+  <app-modal titulo="Editar chofer" (cerrado)="cerrarEditar()">
+    @if (error()) { <p class="error">{{ error() }}</p> }
 
-      @if (error()) { <p class="error">{{ error() }}</p> }
+    <label for="nombreEdit">Nombre completo</label>
+    <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" (input)="edicionChofer.nombre_completo = $event.target.value.toUpperCase()" />
 
-      <label for="nombreEdit">Nombre completo</label>
-      <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" (input)="edicionChofer.nombre_completo = $event.target.value.toUpperCase()" />
+    <label for="dniEdit">DNI</label>
+    <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" (input)="edicionChofer.dni = $event.target.value.toUpperCase()" />
 
-      <label for="dniEdit">DNI</label>
-      <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" (input)="edicionChofer.dni = $event.target.value.toUpperCase()" />
+    <label for="telEdit">Teléfono</label>
+    <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" (input)="edicionChofer.telefono = $event.target.value.toUpperCase()" />
 
-      <label for="telEdit">Teléfono</label>
-      <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" (input)="edicionChofer.telefono = $event.target.value.toUpperCase()" />
+    <label>Empresa</label>
+    <app-select-empresa
+      [empresas]="empresas()"
+      [value]="edicionChofer.empresa_id"
+      [readonly]="readonly()"
+      (valueChange)="edicionChofer.empresa_id = $event ?? undefined"
+      (crear)="abrirMiniModalEmpresa()"
+    />
 
-      <label>Empresa</label>
-      <div class="select-con-mas">
-        <select [(ngModel)]="edicionChofer.empresa_id">
-          <option [ngValue]="undefined">Sin empresa</option>
-          @for (e of empresas(); track e.id) {
-            <option [ngValue]="e.id">{{ e.nombre }}</option>
-          }
-        </select>
-        @if (!readonly()) {
-          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
-        }
-      </div>
-
-      <div class="acciones-modal">
-        <button (click)="cerrarEditar()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
-      </div>
+    <div class="acciones-modal">
+      <button (click)="cerrarEditar()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalBajaAbierto()) {
@@ -106,103 +87,91 @@
 }
 
 @if (modalAltaAbierto()) {
-  <div class="modal-overlay" (click)="cerrarAlta()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Nuevo chofer</h2>
+  <app-modal titulo="Nuevo chofer" (cerrado)="cerrarAlta()">
+    @if (error()) { <p class="error">{{ error() }}</p> }
 
-      @if (error()) { <p class="error">{{ error() }}</p> }
+    <label for="nombreAlta">Nombre completo</label>
+    <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" (input)="nuevoChofer.nombre_completo = $event.target.value.toUpperCase()" />
 
-      <label for="nombreAlta">Nombre completo</label>
-      <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" (input)="nuevoChofer.nombre_completo = $event.target.value.toUpperCase()" />
+    <label for="dniAlta">DNI</label>
+    <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" (input)="nuevoChofer.dni = $event.target.value.toUpperCase()" />
 
-      <label for="dniAlta">DNI</label>
-      <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" (input)="nuevoChofer.dni = $event.target.value.toUpperCase()" />
+    <label for="telAlta">Teléfono</label>
+    <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()" />
 
-      <label for="telAlta">Teléfono</label>
-      <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()" />
+    <label>Empresa</label>
+    <app-select-empresa
+      [empresas]="empresas()"
+      [value]="nuevoChofer.empresa_id"
+      [readonly]="readonly()"
+      (valueChange)="nuevoChofer.empresa_id = $event ?? undefined"
+      (crear)="abrirMiniModalEmpresa()"
+    />
 
-      <label>Empresa</label>
-      <div class="select-con-mas">
-        <select [(ngModel)]="nuevoChofer.empresa_id">
-          <option [ngValue]="undefined">Sin empresa</option>
-          @for (e of empresas(); track e.id) {
-            <option [ngValue]="e.id">{{ e.nombre }}</option>
-          }
-        </select>
-        @if (!readonly()) {
-          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
-        }
-      </div>
-
-      <div class="acciones-modal">
-        <button (click)="cerrarAlta()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
-      </div>
+    <div class="acciones-modal">
+      <button (click)="cerrarAlta()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalDetalleAbierto()) {
-  <div class="modal-overlay" (click)="cerrarDetalle()">
-    <div class="modal modal-grande" (click)="$event.stopPropagation()">
-      @let detalle = choferDetalle();
-      @if (detalle) {
-        <h2>{{ detalle.nombre_completo }}</h2>
-
-        <div class="detalle-info">
-          <div class="detalle-item">
-            <span class="detalle-label">DNI</span>
-            <span>{{ detalle.dni || '-' }}</span>
-          </div>
-          <div class="detalle-item">
-            <span class="detalle-label">Teléfono</span>
-            <span>{{ detalle.telefono || '-' }}</span>
-          </div>
-          <div class="detalle-item">
-            <span class="detalle-label">Estado</span>
-            <span class="badge" [class]="detalle.estado">{{ detalle.estado }}</span>
-          </div>
-          <div class="detalle-item">
-            <span class="detalle-label">Empresa</span>
-            <span>{{ nombreEmpresa(detalle.empresa_id) }}</span>
-          </div>
+  <app-modal tamano="grande" [titulo]="choferDetalle()?.nombre_completo" (cerrado)="cerrarDetalle()">
+    @let detalle = choferDetalle();
+    @if (detalle) {
+      <div class="detalle-info">
+        <div class="detalle-item">
+          <span class="detalle-label">DNI</span>
+          <span>{{ detalle.dni || '-' }}</span>
         </div>
-
-        <div class="kms-resumen">
-          <div class="kms-card">
-            <span class="kms-valor">{{ detalle.kms_mes_actual }}</span>
-            <span class="kms-label">KMs este mes</span>
-          </div>
-          @let r = rendimiento();
-          <div class="kms-card rendimiento">
-            @if (r && r.km_por_litro !== null) {
-              <span class="kms-valor">{{ r.km_por_litro }} km/l</span>
-              <span class="kms-label">{{ r.total_litros }} L en {{ r.total_kms }} kms</span>
-            } @else {
-              <span class="kms-valor">—</span>
-              <span class="kms-label">Sin datos de combustible</span>
-            }
-          </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Teléfono</span>
+          <span>{{ detalle.telefono || '-' }}</span>
         </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Estado</span>
+          <span class="badge" [class]="detalle.estado">{{ detalle.estado }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Empresa</span>
+          <span>{{ nombreEmpresa(detalle.empresa_id) }}</span>
+        </div>
+      </div>
 
-        <h3>Histórico de KMs</h3>
-        <div class="historico-tabla">
-          @for (item of detalle.historico; track item.mes) {
-            <div class="historico-fila">
-              <span>{{ item.mes }}</span>
-              <span class="kms-valor-historico">{{ item.kms }} kms</span>
-            </div>
-          } @empty {
-            <p class="sin-datos">Sin viajes finalizados</p>
+      <div class="kms-resumen">
+        <div class="kms-card">
+          <span class="kms-valor">{{ detalle.kms_mes_actual }}</span>
+          <span class="kms-label">KMs este mes</span>
+        </div>
+        @let r = rendimiento();
+        <div class="kms-card rendimiento">
+          @if (r && r.km_por_litro !== null) {
+            <span class="kms-valor">{{ r.km_por_litro }} km/l</span>
+            <span class="kms-label">{{ r.total_litros }} L en {{ r.total_kms }} kms</span>
+          } @else {
+            <span class="kms-valor">—</span>
+            <span class="kms-label">Sin datos de combustible</span>
           }
         </div>
-      }
-
-      <div class="acciones-modal">
-        <button class="btn-primario" (click)="cerrarDetalle()">Cerrar</button>
       </div>
+
+      <h3>Histórico de KMs</h3>
+      <div class="historico-tabla">
+        @for (item of detalle.historico; track item.mes) {
+          <div class="historico-fila">
+            <span>{{ item.mes }}</span>
+            <span class="kms-valor-historico">{{ item.kms }} kms</span>
+          </div>
+        } @empty {
+          <p class="sin-datos">Sin viajes finalizados</p>
+        }
+      </div>
+    }
+
+    <div class="acciones-modal">
+      <button class="btn-primario" (click)="cerrarDetalle()">Cerrar</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 @if (miniModalEmpresaAbierto()) {
@@ -215,44 +184,40 @@
 @if (modalObservacionesAbierto()) {
   @let chofer = choferObsSeleccionado();
   @if (chofer) {
-    <div class="modal-overlay" (click)="cerrarObservaciones()">
-      <div class="modal modal-grande" (click)="$event.stopPropagation()">
-        <h2>Observaciones — {{ chofer.nombre_completo }}</h2>
+    <app-modal tamano="grande" titulo="Observaciones — {{ chofer.nombre_completo }}" (cerrado)="cerrarObservaciones()">
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
 
-        @if (error()) {
-          <p class="error">{{ error() }}</p>
+      @if (exitoObs()) {
+        <p class="exito">{{ exitoObs() }}</p>
+      }
+
+      <div class="obs-actual">
+        <h3>Mes actual</h3>
+        <textarea [(ngModel)]="observacionActual" rows="4" placeholder="Escribí una observación para este mes..."></textarea>
+        @if (!readonly()) {
+          <button class="btn-primario" (click)="guardarObservacion()" [disabled]="!observacionActual.trim()">Guardar</button>
         }
-
-        @if (exitoObs()) {
-          <p class="exito">{{ exitoObs() }}</p>
-        }
-
-        <div class="obs-actual">
-          <h3>Mes actual</h3>
-          <textarea [(ngModel)]="observacionActual" rows="4" placeholder="Escribí una observación para este mes..."></textarea>
-          @if (!readonly()) {
-            <button class="btn-primario" (click)="guardarObservacion()" [disabled]="!observacionActual.trim()">Guardar</button>
-          }
-        </div>
-
-        <div class="obs-historico">
-          <h3>Historial</h3>
-          @if (tieneHistorial()) {
-            @for (obs of historicoObservaciones(); track obs.id) {
-              <div class="obs-item">
-                <div class="obs-mes">{{ getNombreMes(obs.mes) }} {{ obs.anio }}</div>
-                <div class="obs-texto">{{ obs.observacion }}</div>
-              </div>
-            }
-          } @else {
-            <p class="sin-datos">Sin observaciones anteriores</p>
-          }
-        </div>
-
-        <div class="acciones-modal">
-          <button class="btn-primario" (click)="cerrarObservaciones()">Cerrar</button>
-        </div>
       </div>
-    </div>
+
+      <div class="obs-historico">
+        <h3>Historial</h3>
+        @if (tieneHistorial()) {
+          @for (obs of historicoObservaciones(); track obs.id) {
+            <div class="obs-item">
+              <div class="obs-mes">{{ getNombreMes(obs.mes) }} {{ obs.anio }}</div>
+              <div class="obs-texto">{{ obs.observacion }}</div>
+            </div>
+          }
+        } @else {
+          <p class="sin-datos">Sin observaciones anteriores</p>
+        }
+      </div>
+
+      <div class="acciones-modal">
+        <button class="btn-primario" (click)="cerrarObservaciones()">Cerrar</button>
+      </div>
+    </app-modal>
   }
 }

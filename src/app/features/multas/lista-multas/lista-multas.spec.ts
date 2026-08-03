@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ListaMultas } from './lista-multas';
 
@@ -9,6 +10,7 @@ describe('ListaMultas', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ListaMultas],
+      providers: [provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListaMultas);

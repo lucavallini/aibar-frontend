@@ -1,0 +1,11 @@
+<div class="select-con-mas">
+  <select [ngModel]="value()" (ngModelChange)="valueChange.emit($event)">
+    <option [ngValue]="undefined">Sin empresa</option>
+    @for (e of empresas(); track e.id) {
+      <option [ngValue]="e.id">{{ e.nombre }}</option>
+    }
+  </select>
+  @if (!readonly()) {
+    <button type="button" class="btn-mas" (click)="crear.emit()">+</button>
+  }
+</div>

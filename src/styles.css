@@ -4,24 +4,27 @@
   --altura-header: 64px;
   --ancho-sidebar: 240px;
 
-  --color-fondo: #f5f8f7;
+  --color-fondo: #f7f9f8;
   --color-fondo-panel: #ffffff;
-  --color-fondo-suave: #eef3f0;
-  --color-texto: #141a17;
-  --color-texto-secundario: #5b6b65;
-  --color-borde: #dee8e3;
+  --color-fondo-suave: #f1f5f3;
+  --color-texto: #17201c;
+  --color-texto-secundario: #64736d;
+  --color-borde: #dce7e2;
 
-  --color-primario: #007A65;
-  --color-primario-hover: #006653;
-  --color-primario-claro: #e0f2ee;
+  --color-primario: #106b56;
+  --color-primario-hover: #0b5a47;
+  --color-primario-claro: #e5f2ee;
 
-  --color-sidebar-fondo: #ffffff;
-  --color-sidebar-texto: #4c5d57;
-  --color-sidebar-activo: #0d5d4a;
-  --color-sidebar-hover: #eef4f1;
-  --color-sidebar-activo-fondo: #deede8;
+  --color-sidebar-fondo: #fbfdfc;
+  --color-sidebar-texto: #50615a;
+  --color-sidebar-activo: #106b56;
+  --color-sidebar-hover: #eef5f2;
+  --color-sidebar-activo-fondo: #e4f1ed;
 
-  --color-acento: #26947a;
+  --color-acento: #2f8a73;
+  --color-input: #ffffff;
+  --color-table-head: #f3f6f5;
+  --color-table-hover: #f4faf8;
   --color-error: #b42318;
   --color-error-fondo: #fef3f2;
   --color-exito: #087443;
@@ -37,22 +40,23 @@
   --color-finalizar: #087443;
   --color-cancelar: #b42318;
   --color-reanudar: #175cd3;
-  --color-vuelta: #007A65;
+  --color-vuelta: #106b56;
 
   --radio: 8px;
-  --sombra: 0 1px 2px rgb(18 28 24 / 0.06), 0 8px 24px rgb(18 28 24 / 0.04);
-  --sombra-modal: 0 20px 48px rgb(18 28 24 / 0.2);
+  --sombra: 0 1px 2px rgb(17 24 20 / 0.06);
+  --sombra-elevada: 0 12px 28px rgb(17 24 20 / 0.1);
+  --sombra-modal: 0 20px 48px rgb(17 24 20 / 0.2);
 }
 
 .tema-oscuro {
   color-scheme: dark;
 
-  --color-fondo: #111614;
+  --color-fondo: #111513;
   --color-fondo-panel: #1a201d;
-  --color-fondo-suave: #202824;
+  --color-fondo-suave: #202723;
   --color-texto: #edf3f1;
-  --color-texto-secundario: #a9b9b3;
-  --color-borde: #2b3732;
+  --color-texto-secundario: #aab8b3;
+  --color-borde: #2c3833;
 
   --color-primario: #5cbda5;
   --color-primario-hover: #7acfba;
@@ -65,6 +69,9 @@
   --color-sidebar-activo-fondo: #1c4036;
 
   --color-acento: #5cbda5;
+  --color-input: #151a18;
+  --color-table-head: #202723;
+  --color-table-hover: #1d2b26;
   --color-error: #f97066;
   --color-error-fondo: #3a1716;
   --color-exito: #6ce9a6;
@@ -76,13 +83,14 @@
   --color-neutro: #c5ced8;
   --color-neutro-fondo: #20252c;
 
-  --color-iniciar: #84caff;
-  --color-finalizar: #6ce9a6;
-  --color-cancelar: #f97066;
-  --color-reanudar: #84caff;
-  --color-vuelta: #5cbda5;
+  --color-iniciar: #2563eb;
+  --color-finalizar: #168255;
+  --color-cancelar: #c5362d;
+  --color-reanudar: #2563eb;
+  --color-vuelta: #167762;
 
-  --sombra: 0 1px 2px rgb(0 0 0 / 0.24), 0 8px 24px rgb(0 0 0 / 0.18);
+  --sombra: 0 1px 2px rgb(0 0 0 / 0.24);
+  --sombra-elevada: 0 12px 28px rgb(0 0 0 / 0.34);
   --sombra-modal: 0 20px 48px rgb(0 0 0 / 0.5);
 }
 
@@ -101,7 +109,7 @@ body {
   min-height: 100dvh;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 15px;
-  line-height: 1.45;
+  line-height: 1.5;
   background-color: var(--color-fondo);
   color: var(--color-texto);
   transition: background-color 0.2s, color 0.2s;
@@ -110,11 +118,17 @@ body {
 button {
   font-family: inherit;
   font-weight: 600;
+  line-height: 1.2;
   transition: background-color 0.15s, opacity 0.15s, transform 0.1s;
 }
 
 button:active {
   transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 input, select, textarea {
@@ -126,6 +140,12 @@ input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--color-primario) !important;
   box-shadow: 0 0 0 3px var(--color-primario-claro);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--color-primario-claro);
+  outline-offset: 2px;
 }
 
 table {
@@ -151,7 +171,8 @@ table {
 h1 {
   margin: 0;
   color: var(--color-texto);
-  font-size: 1.35rem;
+  font-size: 1.42rem;
+  font-weight: 760;
   line-height: 1.2;
 }
 
@@ -173,7 +194,7 @@ td {
 
 th {
   color: var(--color-texto-secundario);
-  background: var(--color-fondo-suave);
+  background: var(--color-table-head);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -185,7 +206,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: var(--color-primario-claro);
+  background: var(--color-table-hover);
 }
 
 tbody tr:last-child td {
@@ -205,6 +226,11 @@ tbody tr:last-child td {
 
 .btn-primario:hover {
   background: var(--color-primario-hover);
+}
+
+.btn-primario:disabled {
+  background: color-mix(in srgb, var(--color-primario) 55%, var(--color-fondo-suave));
+  border-color: transparent;
 }
 
 .error {
@@ -244,8 +270,14 @@ p.error {
   color: var(--color-exito);
 }
 
-.badge.viajando, .badge.pendiente, .badge.esperando_iniciar_viaje,
-.viajando, .pendiente, .esperando_iniciar_viaje {
+.badge.viajando,
+.viajando {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.badge.pendiente, .badge.esperando_iniciar_viaje,
+.pendiente, .esperando_iniciar_viaje {
   background: var(--color-alerta-fondo);
   color: var(--color-alerta);
 }
@@ -262,8 +294,8 @@ p.error {
   color: var(--color-error);
 }
 
-.badge.baja, .badge.solo_ida,
-.baja, .solo_ida {
+.badge.baja, .badge.solo_ida, .badge.solo-ida,
+.baja, .solo_ida, .solo-ida {
   background: var(--color-neutro-fondo);
   color: var(--color-neutro);
 }
@@ -314,6 +346,13 @@ p.error {
   width: min(100%, 320px);
 }
 
+.modal h2 {
+  margin: 0 0 0.25rem;
+  color: var(--color-texto);
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
 .select-con-mas {
   display: flex;
   gap: 0.4rem;
@@ -359,11 +398,16 @@ input,
 select,
 textarea {
   width: 100%;
+  min-height: 38px;
   padding: 0.56rem 0.68rem;
   color: var(--color-texto);
-  background: var(--color-fondo-panel);
+  background: var(--color-input);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
+}
+
+select {
+  cursor: pointer;
 }
 
 textarea {
@@ -385,14 +429,24 @@ textarea {
 }
 
 .btn-mini {
+  min-height: 32px;
   padding: 0.3rem 0.6rem;
   border: 1px solid var(--color-borde);
   background: var(--color-fondo-panel);
   color: var(--color-texto);
-  border-radius: 6px;
+  border-radius: var(--radio);
   cursor: pointer;
   font-size: 0.78rem;
   margin-right: 0.3rem;
+}
+
+.btn-mini:last-child {
+  margin-right: 0;
+}
+
+.btn-mini:hover {
+  background: var(--color-fondo-suave);
+  border-color: color-mix(in srgb, var(--color-primario) 28%, var(--color-borde));
 }
 
 .btn-mini-peligro {
@@ -400,7 +454,47 @@ textarea {
   color: var(--color-error);
 }
 
-.filtro-grupo select,
+.btn-accion {
+  min-height: 34px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  cursor: pointer;
+  color: #fff;
+}
+
+.btn-accion:hover {
+  opacity: 0.9;
+}
+
+.btn-accion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-accion.iniciar,
+.btn-accion.disponible,
+.btn-accion.reanudar {
+  background: var(--color-iniciar);
+}
+
+.btn-accion.finalizar {
+  background: var(--color-finalizar);
+}
+
+.btn-accion.cancelar,
+.btn-accion.finalizar-sin-vuelta,
+.btn-accion.no-disponible {
+  background: var(--color-cancelar);
+}
+
+.btn-accion.vuelta {
+  background: var(--color-vuelta);
+}
+
+.filtro select,
 .input-fecha {
   min-width: 220px;
   padding: 0.45rem 0.6rem;
@@ -443,6 +537,7 @@ textarea {
   border-radius: 999px;
   cursor: pointer;
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .btn-filtro:hover {
@@ -482,14 +577,21 @@ textarea {
     font-size: 14px;
   }
 
-  .contenedor {
-    overflow-x: auto;
-  }
-
   .contenedor table {
     display: block;
-    min-width: 680px;
+    max-width: 100%;
     overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .filtros {
+    gap: 0.65rem;
+  }
+
+  .filtro,
+  .filtro select,
+  .input-fecha {
+    min-width: min(100%, 220px);
   }
 }
 
@@ -506,6 +608,17 @@ textarea {
   .contenedor > header .btn-primario {
     width: 100%;
   }
+
+  .filtros {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filtro,
+  .buscador input {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 @media (max-width: 576px) {
@@ -520,6 +633,15 @@ textarea {
   th,
   td {
     padding: 0.62rem 0.7rem;
+  }
+
+  .filtro-botones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .btn-filtro {
+    width: 100%;
   }
 
   .modal-overlay {

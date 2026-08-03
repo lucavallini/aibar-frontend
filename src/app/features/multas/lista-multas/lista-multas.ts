@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { MultasService } from '../../../core/services/multas.service';
 import { CamionesService } from '../../../core/services/camiones.service';
@@ -9,14 +9,17 @@ import { Multa, MultaCreate } from '../../../core/models/multa.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Chofer } from '../../../core/models/chofer.model';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { obtenerNombrePorId } from '../../../core/utils/entidades';
+import { Modal } from '../../../shared/components/modal/modal';
 
 @Component({
   selector: 'app-lista-multas',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, TablaPaginada],
+  imports: [FormsModule, DatePipe, DecimalPipe, TablaPaginada, PaginaHeader, EstadoCarga, Modal],
   templateUrl: './lista-multas.html',
-  styleUrl: './lista-multas.css'
 })
 export class ListaMultas implements OnInit {
   multas = signal<Multa[]>([]);
@@ -97,12 +100,11 @@ export class ListaMultas implements OnInit {
   }
 
   nombrePatente(camionId: string): string {
-    return this.camionesPorId()[camionId] ?? 'Desconocido';
+    return obtenerNombrePorId(this.camionesPorId(), camionId);
   }
 
   nombreChofer(choferId: string | null): string {
-    if (!choferId) return '-';
-    return this.choferesPorId()[choferId] ?? 'Desconocido';
+    return obtenerNombrePorId(this.choferesPorId(), choferId, '-');
   }
 
   formularioVacio(): MultaCreate {

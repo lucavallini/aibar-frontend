@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ListaCombustible } from './lista-combustible';
 
@@ -9,6 +10,7 @@ describe('ListaCombustible', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ListaCombustible],
+      providers: [provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListaCombustible);

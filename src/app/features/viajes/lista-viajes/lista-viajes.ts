@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { ViajesService } from '../../../core/services/viajes.service';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { CamionesService } from '../../../core/services/camiones.service';
@@ -19,7 +18,12 @@ import { ModalFinalizarViaje } from '../../../shared/components/modal-finalizar-
 import { ModalCancelarViaje } from '../../../shared/components/modal-cancelar-viaje/modal-cancelar-viaje';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { EstadoFlota } from '../estado-flota/estado-flota';
+import { TramoViaje } from '../../../shared/components/tramo-viaje/tramo-viaje';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { Modal } from '../../../shared/components/modal/modal';
 import { AuthService } from '../../../core/services/auth.service';
+import { obtenerNombrePorId } from '../../../core/utils/entidades';
 
 type FiltroEstado = 'todos' | 'pendiente' | 'en_curso' | 'finalizado' | 'cancelado';
 type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | 'reanudar' | null;
@@ -28,7 +32,7 @@ type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | 'reanudar' | 
   selector: 'app-lista-viajes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje, Confirmar, EstadoFlota],
+  imports: [FormsModule, Paginacion, BuscadorSelect, ModalFinalizarViaje, ModalCancelarViaje, Confirmar, EstadoFlota, TramoViaje, PaginaHeader, EstadoCarga, Modal],
   templateUrl: './lista-viajes.html',
   styleUrl: './lista-viajes.css'
 })
@@ -74,16 +78,6 @@ export class ListaViajes implements OnInit {
   ];
 
   readonly = computed(() => this.authService.getRol() === 'aibar');
-
-  labelEstado(estado: string): string {
-    const labels: Record<string, string> = {
-      pendiente: 'Esperando iniciar viaje',
-      en_curso: 'En curso',
-      finalizado: 'Finalizado',
-      cancelado: 'Cancelado',
-    };
-    return labels[estado] ?? estado;
-  }
 
   filtrosEstado: { label: string; valor: FiltroEstado }[] = [
     { label: 'Todos', valor: 'todos' },
@@ -183,16 +177,11 @@ export class ListaViajes implements OnInit {
   }
 
   nombreChofer(choferId: string): string {
-    return this.choferesPorId()[choferId] ?? 'Desconocido';
+    return obtenerNombrePorId(this.choferesPorId(), choferId);
   }
 
   nombreUsuario(usuarioId: string): string {
-    return this.usuariosPorId()[usuarioId] ?? 'Desconocido';
-  }
-
-  patenteCamion(camionId: string | null): string {
-    if (!camionId) return '';
-    return this.camionesPorId()[camionId]?.patente ?? this.acopladosPorId()[camionId]?.patente ?? '';
+    return obtenerNombrePorId(this.usuariosPorId(), usuarioId);
   }
 
   cambiarFiltroEstado(valor: FiltroEstado): void {
@@ -297,6 +286,12 @@ export class ListaViajes implements OnInit {
     const d2 = new Date(fin);
     const diff = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     return diff >= 0 ? diff : null;
+  }
+
+  viajeTerminado(viaje: Viaje): boolean {
+    if (viaje.estado !== 'finalizado') return false;
+    if (viaje.solo_ida) return true;
+    return !!viaje.viaje_vuelta && viaje.viaje_vuelta.estado === 'finalizado';
   }
 
   iniciarViaje(viaje: Viaje): void {

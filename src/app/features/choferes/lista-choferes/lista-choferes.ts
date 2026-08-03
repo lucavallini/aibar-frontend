@@ -12,13 +12,18 @@ import { FormsModule } from '@angular/forms';
 import { ObservacionesService } from '../../../core/services/observaciones.service';
 import { Observacion, ObservacionCreate } from '../../../core/models/observacion.model';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { Modal } from '../../../shared/components/modal/modal';
 import { labelEstadoChofer } from '../../../core/utils/estado-labels';
+import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
 
 @Component({
   selector: 'app-lista-choferes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa],
+  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
   templateUrl: './lista-choferes.html',
   styleUrl: './lista-choferes.css'
 })
@@ -69,14 +74,10 @@ export class ListaChoferesComponent implements OnInit {
   }
 
   nombreEmpresa(empresaId: string | null): string {
-    if (!empresaId) return '-';
-    const e = this.empresas().find(e => e.id === empresaId);
-    return e ? e.nombre : '-';
+    return obtenerNombreEmpresa(this.empresas(), empresaId);
   }
 
-  labelEstadoChofer(estado: string): string {
-    return labelEstadoChofer(estado);
-  }
+  labelEstadoChofer = labelEstadoChofer;
 
   formularioVacioAlta(): ChoferCreate {
     return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined, empresa_id: undefined };

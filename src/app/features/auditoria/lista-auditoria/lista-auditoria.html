@@ -4,7 +4,7 @@
   </header>
 
   <div class="filtros">
-    <div class="filtro-grupo">
+    <div class="filtro">
       <label for="filtroEntidad">Tipo</label>
       <select id="filtroEntidad" [ngModel]="filtroEntidad()" (ngModelChange)="cambiarFiltroEntidad($event)">
         <option value="">Todos</option>
@@ -13,7 +13,7 @@
         }
       </select>
     </div>
-    <div class="filtro-grupo">
+    <div class="filtro">
       <label>Período</label>
       <div class="filtro-botones">
         @for (opcion of opcionesDias; track opcion.label) {

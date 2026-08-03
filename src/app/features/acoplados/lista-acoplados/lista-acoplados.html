@@ -1,22 +1,11 @@
 <div class="contenedor">
-  <header>
-    <h1>Acoplados</h1>
-    @if (!readonly()) {
-      <button class="btn-primario" (click)="abrirModal()">+ Nuevo acoplado</button>
-    }
-  </header>
+  <app-pagina-header titulo="Acoplados" accionLabel="+ Nuevo acoplado" [mostrarAccion]="!readonly()" (nuevo)="abrirModal()" />
 
   <div class="buscador">
     <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
   </div>
 
-  @if (cargando()) {
-    <p>Cargando...</p>
-  }
-
-  @if (error() && !modalAbierto()) {
-    <p class="error">{{ error() }}</p>
-  }
+  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalAbierto()" />
 
 <app-tabla-paginada
   [headers]="['Patente', 'Tipo', 'Empresa', 'Estado', 'Acciones']"
@@ -52,13 +41,10 @@
 </div>
 
 @if (modalAbierto()) {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Nuevo acoplado</h2>
-
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
-      }
+  <app-modal titulo="Nuevo acoplado" (cerrado)="cerrarModal()">
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
       <label for="patente">Patente</label>
       <input id="patente" type="text" [(ngModel)]="nuevoAcoplado.patente" (input)="nuevoAcoplado.patente = $event.target.value.toUpperCase()" />
@@ -67,32 +53,24 @@
       <input id="tipo" type="text" [(ngModel)]="nuevoAcoplado.tipo" placeholder="acoplado, batea, etc" (input)="nuevoAcoplado.tipo = $event.target.value.toUpperCase()" />
 
       <label>Empresa</label>
-      <div class="select-con-mas">
-        <select [(ngModel)]="nuevoAcoplado.empresa_id">
-          <option [ngValue]="undefined">Sin empresa</option>
-          @for (e of empresas(); track e.id) {
-            <option [ngValue]="e.id">{{ e.nombre }}</option>
-          }
-        </select>
-        @if (!readonly()) {
-          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
-        }
-      </div>
+      <app-select-empresa
+        [empresas]="empresas()"
+        [value]="nuevoAcoplado.empresa_id"
+        [readonly]="readonly()"
+        (valueChange)="nuevoAcoplado.empresa_id = $event ?? undefined"
+        (crear)="abrirMiniModalEmpresa()"
+      />
 
       <div class="acciones-modal">
         <button (click)="cerrarModal()">Cancelar</button>
         <button class="btn-primario" (click)="confirmarAlta()">Crear</button>
       </div>
-    </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalEditarAbierto()) {
-  <div class="modal-overlay" (click)="cerrarEditar()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Editar acoplado</h2>
-
-      @if (error()) { <p class="error">{{ error() }}</p> }
+  <app-modal titulo="Editar acoplado" (cerrado)="cerrarEditar()">
+    @if (error()) { <p class="error">{{ error() }}</p> }
 
       <label for="patenteEdit">Patente</label>
       <input id="patenteEdit" type="text" [(ngModel)]="edicionAcoplado.patente" (input)="edicionAcoplado.patente = $event.target.value.toUpperCase()" />
@@ -101,24 +79,19 @@
       <input id="tipoEdit" type="text" [(ngModel)]="edicionAcoplado.tipo" (input)="edicionAcoplado.tipo = $event.target.value.toUpperCase()" />
 
       <label>Empresa</label>
-      <div class="select-con-mas">
-        <select [(ngModel)]="edicionAcoplado.empresa_id">
-          <option [ngValue]="undefined">Sin empresa</option>
-          @for (e of empresas(); track e.id) {
-            <option [ngValue]="e.id">{{ e.nombre }}</option>
-          }
-        </select>
-        @if (!readonly()) {
-          <button type="button" class="btn-mas" (click)="abrirMiniModalEmpresa()">+</button>
-        }
-      </div>
+      <app-select-empresa
+        [empresas]="empresas()"
+        [value]="edicionAcoplado.empresa_id"
+        [readonly]="readonly()"
+        (valueChange)="edicionAcoplado.empresa_id = $event ?? undefined"
+        (crear)="abrirMiniModalEmpresa()"
+      />
 
       <div class="acciones-modal">
         <button (click)="cerrarEditar()">Cancelar</button>
         <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
       </div>
-    </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalBajaAbierto()) {

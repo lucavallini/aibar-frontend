@@ -6,17 +6,21 @@ import { EmpresasService } from '../../../core/services/empresas.service';
 import { Acoplado, AcopladoCreate } from '../../../core/models/acoplado.model';
 import { Empresa } from '../../../core/models/empresa.model';
 import { labelEstadoAcoplado } from '../../../core/utils/estado-labels';
+import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { Modal } from '../../../shared/components/modal/modal';
 
 @Component({
   selector: 'app-lista-acoplados',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa],
+  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
   templateUrl: './lista-acoplados.html',
-  styleUrl: './lista-acoplados.css'
 })
 export class ListaAcoplados implements OnInit {
   acopladosList = signal<Acoplado[]>([]);
@@ -53,14 +57,10 @@ export class ListaAcoplados implements OnInit {
   }
 
   nombreEmpresa(empresaId: string | null): string {
-    if (!empresaId) return '-';
-    const e = this.empresas().find(e => e.id === empresaId);
-    return e ? e.nombre : '-';
+    return obtenerNombreEmpresa(this.empresas(), empresaId);
   }
 
-  labelEstadoAcoplado(estado: string): string {
-    return labelEstadoAcoplado(estado);
-  }
+  labelEstadoAcoplado = labelEstadoAcoplado;
 
   abrirEditar(acoplado: Acoplado): void {
     this.acopladoSeleccionado.set(acoplado);

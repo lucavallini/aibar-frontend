@@ -12,7 +12,7 @@
   </div>
 
   <div class="filtros">
-    <div class="filtro-grupo">
+    <div class="filtro">
       <label>Estado</label>
       <div class="filtro-botones">
         @for (opcion of opcionesEstado; track opcion.valor) {
@@ -26,7 +26,7 @@
         }
       </div>
     </div>
-    <div class="filtro-grupo">
+    <div class="filtro">
       <label>Empresa</label>
       <app-buscador-select
         [items]="empresas()"
@@ -40,7 +40,7 @@
       />
     </div>
     @if (vista() === 'choferes') {
-      <div class="filtro-grupo">
+      <div class="filtro">
         <label>Buscar chofer</label>
         <app-buscador-select
           [items]="choferes()"
@@ -55,7 +55,7 @@
       </div>
     }
     @if (vista() === 'chasis') {
-      <div class="filtro-grupo">
+      <div class="filtro">
         <label>Buscar chasis</label>
         <app-buscador-select
           [items]="camiones()"
@@ -70,7 +70,7 @@
       </div>
     }
     @if (vista() === 'acoplados') {
-      <div class="filtro-grupo">
+      <div class="filtro">
         <label>Buscar acoplado</label>
         <app-buscador-select
           [items]="acoplados()"
@@ -95,27 +95,17 @@
       @if (mostrarListaChoferes()) {
         <ul class="flota-lista">
           @for (c of choferesFiltrados(); track c.id) {
-            <li class="flota-item">
-              <div class="flota-info">
-                <span class="flota-nombre">{{ c.nombre_completo }}</span>
-                <span class="badge" [class]="c.estado">{{ labelEstadoChofer(c.estado) }}</span>
-                @if (nombreEmpresa(c.empresa_id)) {
-                  <span class="flota-empresa">{{ nombreEmpresa(c.empresa_id) }}</span>
-                }
-                @if (c.estado === 'no_disponible' && c.motivo_no_disponible) {
-                  <span class="flota-motivo">{{ c.motivo_no_disponible }}</span>
-                }
-              </div>
-              @if (!readonly()) {
-                <div class="flota-acciones">
-                  @if (c.estado === 'no_disponible') {
-                    <button class="btn-accion disponible" (click)="marcarDisponible('chofer', c)">Disponible</button>
-                  } @else {
-                    <button class="btn-accion no-disponible" (click)="abrirMotivo('chofer', c)">No disponible</button>
-                  }
-                </div>
-              }
-            </li>
+            <app-flota-item
+              [item]="c"
+              [nombre]="c.nombre_completo"
+              [estado]="c.estado"
+              [labelEstado]="labelEstadoChofer"
+              [empresa]="nombreEmpresa(c.empresa_id)"
+              [motivo]="c.estado === 'no_disponible' ? c.motivo_no_disponible : null"
+              [readonly]="readonly()"
+              (disponible)="marcarDisponible('chofer', $event)"
+              (noDisponible)="abrirMotivo('chofer', $event)"
+            />
           } @empty {
             <li class="flota-vacio">Sin resultados</li>
           }
@@ -135,27 +125,17 @@
       @if (mostrarListaCamiones()) {
         <ul class="flota-lista">
           @for (c of camionesFiltrados(); track c.id) {
-            <li class="flota-item">
-              <div class="flota-info">
-                <span class="flota-nombre">{{ c.patente }}</span>
-                <span class="badge" [class]="c.estado">{{ labelEstadoCamion(c.estado) }}</span>
-                @if (nombreEmpresa(c.empresa_id)) {
-                  <span class="flota-empresa">{{ nombreEmpresa(c.empresa_id) }}</span>
-                }
-                @if (c.estado === 'no_disponible' && c.motivo_no_disponible) {
-                  <span class="flota-motivo">{{ c.motivo_no_disponible }}</span>
-                }
-              </div>
-              @if (!readonly()) {
-                <div class="flota-acciones">
-                  @if (c.estado === 'no_disponible') {
-                    <button class="btn-accion disponible" (click)="marcarDisponible('camion', c)">Disponible</button>
-                  } @else {
-                    <button class="btn-accion no-disponible" (click)="abrirMotivo('camion', c)">No disponible</button>
-                  }
-                </div>
-              }
-            </li>
+            <app-flota-item
+              [item]="c"
+              [nombre]="c.patente"
+              [estado]="c.estado"
+              [labelEstado]="labelEstadoCamion"
+              [empresa]="nombreEmpresa(c.empresa_id)"
+              [motivo]="c.estado === 'no_disponible' ? c.motivo_no_disponible : null"
+              [readonly]="readonly()"
+              (disponible)="marcarDisponible('camion', $event)"
+              (noDisponible)="abrirMotivo('camion', $event)"
+            />
           } @empty {
             <li class="flota-vacio">Sin resultados</li>
           }
@@ -175,27 +155,17 @@
       @if (mostrarListaAcoplados()) {
         <ul class="flota-lista">
           @for (a of acopladosFiltrados(); track a.id) {
-            <li class="flota-item">
-              <div class="flota-info">
-                <span class="flota-nombre">{{ a.patente }}</span>
-                <span class="badge" [class]="a.estado">{{ labelEstadoAcoplado(a.estado) }}</span>
-                @if (nombreEmpresa(a.empresa_id)) {
-                  <span class="flota-empresa">{{ nombreEmpresa(a.empresa_id) }}</span>
-                }
-                @if (a.estado === 'no_disponible' && a.motivo_no_disponible) {
-                  <span class="flota-motivo">{{ a.motivo_no_disponible }}</span>
-                }
-              </div>
-              @if (!readonly()) {
-                <div class="flota-acciones">
-                  @if (a.estado === 'no_disponible') {
-                    <button class="btn-accion disponible" (click)="marcarDisponible('acoplado', a)">Disponible</button>
-                  } @else {
-                    <button class="btn-accion no-disponible" (click)="abrirMotivo('acoplado', a)">No disponible</button>
-                  }
-                </div>
-              }
-            </li>
+            <app-flota-item
+              [item]="a"
+              [nombre]="a.patente"
+              [estado]="a.estado"
+              [labelEstado]="labelEstadoAcoplado"
+              [empresa]="nombreEmpresa(a.empresa_id)"
+              [motivo]="a.estado === 'no_disponible' ? a.motivo_no_disponible : null"
+              [readonly]="readonly()"
+              (disponible)="marcarDisponible('acoplado', $event)"
+              (noDisponible)="abrirMotivo('acoplado', $event)"
+            />
           } @empty {
             <li class="flota-vacio">Sin resultados</li>
           }
@@ -208,25 +178,22 @@
 </aside>
 
 @if (modalMotivo()) {
-  <div class="modal-overlay" (click)="cerrarMotivo()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Marcar no disponible</h2>
-      <p class="modal-descripcion">{{ modalMotivo()!.nombre }}</p>
-      <label for="motivo">Motivo</label>
-      <textarea
-        id="motivo"
-        rows="3"
-        [ngModel]="motivo()"
-        (ngModelChange)="motivo.set($event)"
-        placeholder="Ej: mantenimiento, problema mecánico..."
-      ></textarea>
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
-      }
-      <div class="acciones-modal">
-        <button (click)="cerrarMotivo()">Cancelar</button>
-        <button class="btn-primario" [disabled]="!motivo().trim()" (click)="confirmarNoDisponible()">Guardar</button>
-      </div>
+  <app-modal titulo="Marcar no disponible" (cerrado)="cerrarMotivo()">
+    <p class="modal-descripcion">{{ modalMotivo()!.nombre }}</p>
+    <label for="motivo">Motivo</label>
+    <textarea
+      id="motivo"
+      rows="3"
+      [ngModel]="motivo()"
+      (ngModelChange)="motivo.set($event)"
+      placeholder="Ej: mantenimiento, problema mecánico..."
+    ></textarea>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    <div class="acciones-modal">
+      <button (click)="cerrarMotivo()">Cancelar</button>
+      <button class="btn-primario" [disabled]="!motivo().trim()" (click)="confirmarNoDisponible()">Guardar</button>
     </div>
-  </div>
+  </app-modal>
 }

@@ -1,18 +1,7 @@
 <div class="contenedor">
-  <header>
-    <h1>Multas</h1>
-    @if (!readonly()) {
-      <button class="btn-primario" (click)="abrirModal()">+ Nueva multa</button>
-    }
-  </header>
+  <app-pagina-header titulo="Multas" accionLabel="+ Nueva multa" [mostrarAccion]="!readonly()" (nuevo)="abrirModal()" />
 
-  @if (cargando()) {
-    <p>Cargando...</p>
-  }
-
-  @if (error() && !modalAbierto()) {
-    <p class="error">{{ error() }}</p>
-  }
+  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalAbierto()" />
 
   <app-tabla-paginada
     [headers]="['Patente', 'Chofer', 'Motivo', 'Monto', 'Fecha']"
@@ -30,7 +19,7 @@
         <td>{{ nombrePatente(multa.camion_id) }}</td>
         <td>{{ nombreChofer(multa.chofer_id) }}</td>
         <td>{{ multa.motivo }}</td>
-        <td>{{ multa.monto ? ('$' + multa.monto) : '-' }}</td>
+        <td>{{ multa.monto ? ('$' + (multa.monto | number)) : '-' }}</td>
         <td>{{ multa.fecha | date:'dd/MM/yyyy' }}</td>
       </tr>
     }
@@ -38,43 +27,39 @@
 </div>
 
 @if (modalAbierto()) {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Nueva multa</h2>
+  <app-modal titulo="Nueva multa" (cerrado)="cerrarModal()">
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
+    <label for="camion">Camión</label>
+    <select id="camion" [(ngModel)]="nuevaMulta.camion_id">
+      <option value="" disabled selected>Elegí un camión</option>
+      @for (camion of camiones(); track camion.id) {
+        <option [value]="camion.id">{{ camion.patente }}</option>
       }
+    </select>
 
-      <label for="camion">Camión</label>
-      <select id="camion" [(ngModel)]="nuevaMulta.camion_id">
-        <option value="" disabled selected>Elegí un camión</option>
-        @for (camion of camiones(); track camion.id) {
-          <option [value]="camion.id">{{ camion.patente }}</option>
-        }
-      </select>
+    <label for="chofer">Chofer (opcional)</label>
+    <select id="chofer" [(ngModel)]="nuevaMulta.chofer_id">
+      <option [value]="undefined">Sin especificar</option>
+      @for (chofer of choferes(); track chofer.id) {
+        <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
+      }
+    </select>
 
-      <label for="chofer">Chofer (opcional)</label>
-      <select id="chofer" [(ngModel)]="nuevaMulta.chofer_id">
-        <option [value]="undefined">Sin especificar</option>
-        @for (chofer of choferes(); track chofer.id) {
-          <option [value]="chofer.id">{{ chofer.nombre_completo }}</option>
-        }
-      </select>
+    <label for="motivo">Motivo</label>
+    <input id="motivo" type="text" [(ngModel)]="nuevaMulta.motivo" (input)="nuevaMulta.motivo = $event.target.value.toUpperCase()" />
 
-      <label for="motivo">Motivo</label>
-      <input id="motivo" type="text" [(ngModel)]="nuevaMulta.motivo" (input)="nuevaMulta.motivo = $event.target.value.toUpperCase()" />
+    <label for="monto">Monto</label>
+    <input id="monto" type="number" [(ngModel)]="nuevaMulta.monto" />
 
-      <label for="monto">Monto</label>
-      <input id="monto" type="number" [(ngModel)]="nuevaMulta.monto" />
+    <label for="fecha">Fecha (si no se completa, usa hoy)</label>
+    <input id="fecha" type="date" [(ngModel)]="nuevaMulta.fecha" />
 
-      <label for="fecha">Fecha (si no se completa, usa hoy)</label>
-      <input id="fecha" type="date" [(ngModel)]="nuevaMulta.fecha" />
-
-      <div class="acciones-modal">
-        <button (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarAlta()">Registrar</button>
-      </div>
+    <div class="acciones-modal">
+      <button (click)="cerrarModal()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarAlta()">Registrar</button>
     </div>
-  </div>
+  </app-modal>
 }

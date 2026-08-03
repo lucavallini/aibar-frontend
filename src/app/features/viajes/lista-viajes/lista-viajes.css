@@ -1,14 +1,3 @@
-.modal input[type="text"] {
-  width: 100%;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio);
-  background: var(--color-fondo-panel);
-  color: var(--color-texto);
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
-}
-
 .contenido-viajes {
   display: grid;
   grid-template-columns: 1fr minmax(280px, 340px);
@@ -32,10 +21,72 @@
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background-color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .tarjeta-viaje:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--color-primario) 30%, var(--color-borde));
+    box-shadow: 0 6px 18px rgb(16 107 86 / 0.13);
+    background: color-mix(in srgb, var(--color-fondo-panel) 94%, var(--color-primario-claro) 6%);
+  }
+
+  .tarjeta-viaje:hover .tarjeta-flecha {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-viaje {
+    transition: none;
+  }
+
+  .tarjeta-viaje:hover {
+    transform: none;
+  }
 }
 
 .tarjeta-viaje.tiene-vuelta {
   border-left: 4px solid var(--color-primario);
+}
+
+@media (hover: hover) {
+  .tarjeta-viaje.tiene-vuelta:hover {
+    border-left-color: var(--color-primario-hover);
+  }
+}
+
+.tarjeta-flecha {
+  color: var(--color-primario);
+  font-weight: 700;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.linea-derecha {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.tarjeta-viaje.terminado {
+  background: color-mix(in srgb, var(--color-exito-fondo) 45%, var(--color-fondo-panel));
+  border-color: color-mix(in srgb, var(--color-exito) 35%, var(--color-borde));
+}
+
+@media (hover: hover) {
+  .tarjeta-viaje.terminado:hover {
+    background: color-mix(in srgb, var(--color-exito-fondo) 62%, var(--color-fondo-panel));
+  }
+}
+
+.tarjeta-viaje.terminado .badge.terminado {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
 }
 
 .linea-principal {
@@ -55,74 +106,10 @@
   color: var(--color-texto-secundario);
 }
 
-.ruta {
-  color: var(--color-texto-secundario);
-  overflow-wrap: anywhere;
-}
-
-.vuelta {
-  color: var(--color-primario);
-  font-weight: 600;
-}
-
-.tarjeta-viaje .btn-accion.vuelta {
-  margin-top: 0.4rem;
-}
-
-.tramo {
-  padding: 0.5rem 0;
-}
-
-.tramo + .tramo {
-  margin-top: 0.2rem;
-}
-
-.tramo-header {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.2rem;
-}
-
-.tramo-label {
-  font-weight: 700;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.tramo.ida .tramo-label {
-  color: var(--color-primario);
-}
-
-.tramo.vuelta .tramo-label {
-  color: var(--color-info);
-}
-
 .separador-viajes {
   height: 1px;
   background: var(--color-borde);
   margin: 0.5rem 0;
-}
-
-.tramo-datos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  font-size: 0.84rem;
-  color: var(--color-texto-secundario);
-  margin-top: 0.2rem;
-}
-
-.patentes {
-  font-size: 0.82rem;
-  color: var(--color-texto-secundario);
-}
-
-.motivo-cancelacion {
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: var(--color-error);
 }
 
 .creado-por {
@@ -132,78 +119,12 @@
   font-style: italic;
 }
 
-.acciones-viaje {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+.tarjeta-viaje .btn-accion.vuelta {
   margin-top: 0.4rem;
-}
-
-.btn-accion {
-  min-height: 34px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.85rem;
-  border: 1px solid transparent;
-  border-radius: var(--radio);
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-accion.iniciar {
-  background: var(--color-iniciar);
-  color: white;
-}
-
-.btn-accion.finalizar {
-  background: var(--color-finalizar);
-  color: white;
-}
-
-.btn-accion.finalizar-sin-vuelta {
-  background: var(--color-cancelar);
-  color: white;
-}
-
-.btn-accion.cancelar {
-  background: var(--color-cancelar);
-  color: white;
-}
-
-.btn-accion.vuelta {
-  background: var(--color-vuelta);
-  color: white;
-}
-
-.btn-accion.reanudar {
-  background: var(--color-reanudar);
-  color: white;
-}
-
-.btn-accion:hover {
-  opacity: 0.9;
 }
 
 @media (max-width: 900px) {
   .contenido-viajes {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 576px) {
-  .filtro-botones {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .btn-filtro {
-    width: 100%;
-  }
-
-  .acciones-viaje {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .btn-accion {
-    width: 100%;
   }
 }

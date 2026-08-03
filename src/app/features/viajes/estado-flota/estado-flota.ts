@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
+import { FlotaItem } from '../../../shared/components/flota-item/flota-item';
+import { Modal } from '../../../shared/components/modal/modal';
 import { Chofer } from '../../../core/models/chofer.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Acoplado } from '../../../core/models/acoplado.model';
@@ -10,6 +12,7 @@ import { ChoferesService } from '../../../core/services/choferes.service';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { AcopladosService } from '../../../core/services/acoplado.service';
 import { labelEstadoChofer, labelEstadoCamion, labelEstadoAcoplado } from '../../../core/utils/estado-labels';
+import { obtenerNombrePorId } from '../../../core/utils/entidades';
 
 type FiltroDisponibilidad = 'todos' | 'disponibles' | 'no_disponibles';
 type TipoFlota = 'chofer' | 'camion' | 'acoplado';
@@ -19,7 +22,7 @@ type VistaFlota = 'choferes' | 'chasis' | 'acoplados';
   selector: 'app-estado-flota',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, BuscadorSelect],
+  imports: [FormsModule, BuscadorSelect, FlotaItem, Modal],
   templateUrl: './estado-flota.html',
   styleUrl: './estado-flota.css'
 })
@@ -107,25 +110,16 @@ export class EstadoFlota {
   }
 
   nombreEmpresa(empresaId: string | null): string {
-    if (!empresaId) return '';
-    return this.empresasPorId()[empresaId] ?? '';
+    return obtenerNombrePorId(this.empresasPorId(), empresaId, '');
   }
 
   cambiarVista(vista: VistaFlota): void {
     this.vista.set(vista);
   }
 
-  labelEstadoChofer(estado: string): string {
-    return labelEstadoChofer(estado);
-  }
-
-  labelEstadoCamion(estado: string): string {
-    return labelEstadoCamion(estado);
-  }
-
-  labelEstadoAcoplado(estado: string): string {
-    return labelEstadoAcoplado(estado);
-  }
+  labelEstadoChofer = labelEstadoChofer;
+  labelEstadoCamion = labelEstadoCamion;
+  labelEstadoAcoplado = labelEstadoAcoplado;
 
   cambiarFiltroEstado(valor: FiltroDisponibilidad): void {
     this.filtroEstado.set(valor);

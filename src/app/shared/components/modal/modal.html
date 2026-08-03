@@ -1,0 +1,15 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div
+    #panel
+    class="modal"
+    [class.modal-chico]="tamano() === 'chico'"
+    [class.modal-grande]="tamano() === 'grande'"
+    tabindex="-1"
+    (click)="$event.stopPropagation()"
+  >
+    @if (titulo()) {
+      <h2>{{ titulo() }}</h2>
+    }
+    <ng-content></ng-content>
+  </div>
+</div>

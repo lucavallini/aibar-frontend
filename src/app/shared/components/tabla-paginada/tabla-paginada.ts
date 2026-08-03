@@ -17,9 +17,7 @@ export class TablaPaginada {
   pagina = input(1);
   totalPaginas = input(1);
   total = input(0);
-  tamanoPagina = input(20);
   emptyMessage = input('No hay registros todavía.');
-  errorMessage = input('No se pudieron cargar los datos');
 
   cambioPagina = output<number>();
 }

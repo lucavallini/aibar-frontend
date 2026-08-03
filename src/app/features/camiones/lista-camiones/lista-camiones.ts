@@ -8,15 +8,19 @@ import { Empresa } from '../../../core/models/empresa.model';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { Modal } from '../../../shared/components/modal/modal';
 import { labelEstadoCamion } from '../../../core/utils/estado-labels';
+import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
 
 @Component({
   selector: 'app-lista-camiones',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa],
+  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
   templateUrl: './lista-camiones.html',
-  styleUrl: './lista-camiones.css'
 })
 export class ListaCamiones implements OnInit {
   camiones = signal<Camion[]>([]);
@@ -53,14 +57,10 @@ export class ListaCamiones implements OnInit {
   }
 
   nombreEmpresa(empresaId: string | null): string {
-    if (!empresaId) return '-';
-    const e = this.empresas().find(e => e.id === empresaId);
-    return e ? e.nombre : '-';
+    return obtenerNombreEmpresa(this.empresas(), empresaId);
   }
 
-  labelEstadoCamion(estado: string): string {
-    return labelEstadoCamion(estado);
-  }
+  labelEstadoCamion = labelEstadoCamion;
 
   abrirEditar(camion: Camion): void {
     this.camionSeleccionado.set(camion);

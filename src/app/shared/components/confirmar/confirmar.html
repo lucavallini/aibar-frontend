@@ -1,10 +1,7 @@
-<div class="modal-overlay" (click)="cancelar.emit()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <h2>{{ titulo }}</h2>
-    <p>{{ mensaje }}</p>
-    <div class="acciones-modal">
-      <button (click)="cancelar.emit()">Cancelar</button>
-      <button class="btn-peligro" (click)="confirmar.emit()">{{ textoConfirmar }}</button>
-    </div>
+<app-modal [titulo]="titulo()" (cerrado)="cancelar.emit()">
+  <p>{{ mensaje() }}</p>
+  <div class="acciones-modal">
+    <button (click)="cancelar.emit()">Cancelar</button>
+    <button class="btn-peligro" (click)="confirmar.emit()">{{ textoConfirmar() }}</button>
   </div>
-</div>
+</app-modal>

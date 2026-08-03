@@ -1,18 +1,7 @@
 <div class="contenedor">
-  <header>
-    <h1>Usuarios</h1>
-    @if (!readonly()) {
-      <button class="btn-primario" (click)="abrirAlta()">+ Nuevo usuario</button>
-    }
-  </header>
+  <app-pagina-header titulo="Usuarios" accionLabel="+ Nuevo usuario" [mostrarAccion]="!readonly()" (nuevo)="abrirAlta()" />
 
-  @if (cargando()) {
-    <p>Cargando...</p>
-  }
-
-  @if (error() && !modalAltaAbierto() && !modalEditarAbierto()) {
-    <p class="error">{{ error() }}</p>
-  }
+  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalAltaAbierto() && !modalEditarAbierto()" />
 
   <app-tabla-paginada
     [headers]="['Nombre completo', 'Usuario', 'DNI', 'Rol', 'Estado', 'Acciones']"
@@ -46,66 +35,58 @@
 </div>
 
 @if (modalAltaAbierto()) {
-  <div class="modal-overlay" (click)="cerrarAlta()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Nuevo usuario</h2>
+  <app-modal titulo="Nuevo usuario" (cerrado)="cerrarAlta()">
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
-      }
+    <label for="nombreCompleto">Nombre completo</label>
+    <input id="nombreCompleto" type="text" [(ngModel)]="nuevoUsuario.nombre_completo" />
 
-      <label for="nombreCompleto">Nombre completo</label>
-      <input id="nombreCompleto" type="text" [(ngModel)]="nuevoUsuario.nombre_completo" />
+    <label for="dni">DNI</label>
+    <input id="dni" type="text" [(ngModel)]="nuevoUsuario.dni" />
 
-      <label for="dni">DNI</label>
-      <input id="dni" type="text" [(ngModel)]="nuevoUsuario.dni" />
+    <label for="password">Contraseña</label>
+    <input id="password" type="password" [(ngModel)]="nuevoUsuario.password" />
 
-      <label for="password">Contraseña</label>
-      <input id="password" type="password" [(ngModel)]="nuevoUsuario.password" />
+    <label for="rol">Rol</label>
+    <select id="rol" [(ngModel)]="nuevoUsuario.rol">
+      <option value="empleado">Empleado</option>
+      <option value="administrador">Administrador</option>
+      <option value="aibar">AIBAR</option>
+    </select>
 
-      <label for="rol">Rol</label>
-      <select id="rol" [(ngModel)]="nuevoUsuario.rol">
-        <option value="empleado">Empleado</option>
-        <option value="administrador">Administrador</option>
-        <option value="aibar">AIBAR</option>
-      </select>
-
-      <div class="acciones-modal">
-        <button (click)="cerrarAlta()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarAlta()">Crear usuario</button>
-      </div>
+    <div class="acciones-modal">
+      <button (click)="cerrarAlta()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarAlta()">Crear usuario</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalEditarAbierto()) {
-  <div class="modal-overlay" (click)="cerrarEditar()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Editar usuario</h2>
+  <app-modal titulo="Editar usuario" (cerrado)="cerrarEditar()">
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
-      }
+    <label for="nombreEdit">Nombre completo</label>
+    <input id="nombreEdit" type="text" [(ngModel)]="edicionUsuario.nombre_completo" />
 
-      <label for="nombreEdit">Nombre completo</label>
-      <input id="nombreEdit" type="text" [(ngModel)]="edicionUsuario.nombre_completo" />
+    <label for="dniEdit">DNI</label>
+    <input id="dniEdit" type="text" [(ngModel)]="edicionUsuario.dni" />
 
-      <label for="dniEdit">DNI</label>
-      <input id="dniEdit" type="text" [(ngModel)]="edicionUsuario.dni" />
+    <label for="rolEdit">Rol</label>
+    <select id="rolEdit" [(ngModel)]="edicionUsuario.rol">
+      <option value="empleado">Empleado</option>
+      <option value="administrador">Administrador</option>
+      <option value="aibar">AIBAR</option>
+    </select>
 
-      <label for="rolEdit">Rol</label>
-      <select id="rolEdit" [(ngModel)]="edicionUsuario.rol">
-        <option value="empleado">Empleado</option>
-        <option value="administrador">Administrador</option>
-        <option value="aibar">AIBAR</option>
-      </select>
-
-      <div class="acciones-modal">
-        <button (click)="cerrarEditar()">Cancelar</button>
-        <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
-      </div>
+    <div class="acciones-modal">
+      <button (click)="cerrarEditar()">Cancelar</button>
+      <button class="btn-primario" (click)="confirmarEdicion()">Guardar</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 @if (modalBajaAbierto()) {

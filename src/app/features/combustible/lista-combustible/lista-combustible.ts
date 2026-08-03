@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { CombustibleService } from '../../../core/services/combustible.service';
 import { CamionesService } from '../../../core/services/camiones.service';
@@ -10,12 +10,16 @@ import { Camion } from '../../../core/models/camion.model';
 import { Chofer } from '../../../core/models/chofer.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
 import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
+import { Modal } from '../../../shared/components/modal/modal';
+import { obtenerNombrePorId } from '../../../core/utils/entidades';
 
 @Component({
   selector: 'app-lista-combustible',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, Paginacion, BuscadorSelect],
+  imports: [FormsModule, DatePipe, DecimalPipe, Paginacion, BuscadorSelect, PaginaHeader, EstadoCarga, Modal],
   templateUrl: './lista-combustible.html',
   styleUrl: './lista-combustible.css'
 })
@@ -130,13 +134,25 @@ export class ListaCombustible implements OnInit {
     this.cargarCargas();
   }
 
+  cambiarFechaDesde(valor: string): void {
+    this.filtroFechaDesde.set(valor);
+    this.pagina.set(1);
+    this.cargarCargas();
+  }
+
+  cambiarFechaHasta(valor: string): void {
+    this.filtroFechaHasta.set(valor);
+    this.pagina.set(1);
+    this.cargarCargas();
+  }
+
   cambiarPagina(nueva: number): void {
     this.pagina.set(nueva);
     this.cargarCargas();
   }
 
   nombrePatente(camionId: string): string {
-    return this.camionesPorId()[camionId] ?? 'Desconocido';
+    return obtenerNombrePorId(this.camionesPorId(), camionId);
   }
 
   formularioVacio(): CargaCombustibleCreate {

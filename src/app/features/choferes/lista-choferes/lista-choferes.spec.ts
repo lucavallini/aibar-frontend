@@ -1,17 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { ListaChoferes } from './lista-choferes';
+import { ListaChoferesComponent } from './lista-choferes';
 
 describe('ListaChoferes', () => {
-  let component: ListaChoferes;
-  let fixture: ComponentFixture<ListaChoferes>;
+  let component: ListaChoferesComponent;
+  let fixture: ComponentFixture<ListaChoferesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListaChoferes],
+      imports: [ListaChoferesComponent],
+      providers: [provideHttpClientTesting()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ListaChoferes);
+    fixture = TestBed.createComponent(ListaChoferesComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,10 +1,7 @@
-<div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <h2>Finalizar viaje</h2>
-
-    @if (error()) {
-      <p class="error">{{ error() }}</p>
-    }
+<app-modal titulo="Finalizar viaje" (cerrado)="cerrar.emit()">
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
 
     <label for="fechaFin">Fecha y hora de finalizaci&oacute;n</label>
     <input id="fechaFin" type="datetime-local" [ngModel]="fechaFinInput()" (ngModelChange)="fechaFinInput.set($event)" />
@@ -34,5 +31,4 @@
       <button (click)="cerrar.emit()">Cancelar</button>
       <button class="btn-primario" (click)="onConfirmar()">Confirmar</button>
     </div>
-  </div>
-</div>
+</app-modal>

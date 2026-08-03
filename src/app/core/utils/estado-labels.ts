@@ -21,6 +21,13 @@ const LABELS_ACOPLADO: Record<string, string> = {
   viajando: 'Viajando',
 };
 
+const LABELS_VIAJE: Record<string, string> = {
+  pendiente: 'Esperando iniciar viaje',
+  en_curso: 'En curso',
+  finalizado: 'Finalizado',
+  cancelado: 'Cancelado',
+};
+
 export function labelEstadoChofer(estado: string): string {
   return LABELS_CHOFER[estado] ?? estado;
 }
@@ -31,4 +38,8 @@ export function labelEstadoCamion(estado: string): string {
 
 export function labelEstadoAcoplado(estado: string): string {
   return LABELS_ACOPLADO[estado] ?? estado;
+}
+
+export function labelEstadoViaje(estado: string): string {
+  return LABELS_VIAJE[estado] ?? estado;
 }

@@ -4,15 +4,17 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Usuario, UsuarioCreate, UsuarioUpdate } from '../../../core/models/usuario.model';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
+import { Modal } from '../../../shared/components/modal/modal';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
+import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-lista-usuarios',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TablaPaginada, Confirmar],
+  imports: [FormsModule, TablaPaginada, Confirmar, PaginaHeader, EstadoCarga, Modal],
   templateUrl: './lista-usuarios.html',
-  styleUrl: './lista-usuarios.css'
 })
 export class ListaUsuarios implements OnInit {
   usuarios = signal<Usuario[]>([]);
