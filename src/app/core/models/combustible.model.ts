@@ -5,7 +5,7 @@ export interface CargaCombustible {
   litros: number;
   monto: number;
   fecha: string;
-  kms_al_momento: number | null;
+  km_por_litro: number | null;
   registrado_por: string | null;
   creado_en: string;
 }
@@ -16,5 +16,5 @@ export interface CargaCombustibleCreate {
   litros: number;
   monto: number;
   fecha?: string;
-  kms_al_momento?: number;
+  km_por_litro?: number;
 }

@@ -65,17 +65,22 @@
           <th>Litros</th>
           <th>Monto</th>
           <th>Fecha</th>
-          <th>Kms al momento</th>
+          <th>Km/l</th>
         </tr>
       </thead>
       <tbody>
         @for (carga of cargas(); track carga.id) {
           <tr>
-            <td>{{ nombrePatente(carga.camion_id) }}</td>
+            <td>
+              {{ nombrePatente(carga.camion_id) }}
+              @if (carga.viaje_id) {
+                <span class="badge origen-viaje">Viaje</span>
+              }
+            </td>
             <td>{{ carga.litros }} L</td>
-            <td>${{ carga.monto | number }}</td>
+            <td>{{ carga.monto ? ('$' + (carga.monto | number)) : '—' }}</td>
             <td>{{ carga.fecha | date:'dd/MM/yyyy' }}</td>
-            <td>{{ carga.kms_al_momento || '-' }}</td>
+            <td>{{ carga.km_por_litro ?? '—' }}</td>
           </tr>
         } @empty {
           <tr><td colspan="5">No hay cargas registradas todavía.</td></tr>
@@ -114,9 +119,6 @@
 
     <label for="fecha">Fecha (si no se completa, usa hoy)</label>
     <input id="fecha" type="date" [(ngModel)]="nuevaCarga.fecha" />
-
-    <label for="kms">Kms al momento (opcional)</label>
-    <input id="kms" type="number" [(ngModel)]="nuevaCarga.kms_al_momento" />
 
     <div class="acciones-modal">
       <button (click)="cerrarModal()">Cancelar</button>

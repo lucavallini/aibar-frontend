@@ -156,7 +156,7 @@ export class ListaCombustible implements OnInit {
   }
 
   formularioVacio(): CargaCombustibleCreate {
-    return { camion_id: '', litros: 0, monto: 0, fecha: undefined, kms_al_momento: undefined };
+    return { camion_id: '', litros: 0, monto: 0, fecha: undefined };
   }
 
   abrirModal(): void {
