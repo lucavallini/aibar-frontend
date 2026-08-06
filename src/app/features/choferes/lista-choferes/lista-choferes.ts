@@ -196,7 +196,7 @@ export class ListaChoferesComponent implements OnInit {
       next: (respuesta) => this.empresas.set(respuesta.items)
     });
 
-    this.choferesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined }).subscribe({
+    this.choferesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined, incluir_kms_mes: true }).subscribe({
       next: (respuesta) => {
         this.choferes.set(respuesta.items);
         this.total.set(respuesta.total);

@@ -10,6 +10,7 @@ export interface Chofer {
   motivo_no_disponible: string | null;
   creado_en: string;
   creado_por: string | null;
+  kms_mes_actual: number | null;
 }
 
 export interface ChoferCreate {

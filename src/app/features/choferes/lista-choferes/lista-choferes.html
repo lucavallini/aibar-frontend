@@ -8,7 +8,7 @@
   <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()" />
 
   <app-tabla-paginada
-    [headers]="['Nombre', 'DNI', 'Estado', 'Teléfono', 'Empresa', 'Acciones']"
+    [headers]="['Nombre', 'DNI', 'Estado', 'Kms este mes', 'Teléfono', 'Empresa', 'Acciones']"
     [items]="choferes()"
     [cargando]="cargando()"
     [error]="error()"
@@ -28,6 +28,7 @@
             <span class="motivo-tabla">{{ chofer.motivo_no_disponible }}</span>
           }
         </td>
+        <td>{{ chofer.kms_mes_actual ?? '-' }}</td>
         <td>{{ chofer.telefono || '-' }}</td>
         <td>{{ nombreEmpresa(chofer.empresa_id) }}</td>
         <td (click)="$event.stopPropagation()">
