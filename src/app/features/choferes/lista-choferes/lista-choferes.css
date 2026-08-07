@@ -12,6 +12,18 @@
   color: var(--color-exito);
 }
 
+.badge.vencimiento.vencido {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.badge.vencimiento.proximo {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+  border-color: var(--color-alerta);
+}
+
 .detalle-info {
   display: grid;
   grid-template-columns: 1fr;

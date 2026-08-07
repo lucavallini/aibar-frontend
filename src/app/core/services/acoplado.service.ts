@@ -29,6 +29,10 @@ export class AcopladosService {
     return this.http.post<Acoplado>(`${this.apiUrl}/`, datos);
   }
 
+  obtenerPorId(id: string): Observable<Acoplado> {
+    return this.http.get<Acoplado>(`${this.apiUrl}/${id}`);
+  }
+
   actualizar(id: string, datos: Partial<AcopladoCreate>): Observable<Acoplado> {
     this.cache.clear(CACHE_KEY);
     return this.http.patch<Acoplado>(`${this.apiUrl}/${id}`, datos);

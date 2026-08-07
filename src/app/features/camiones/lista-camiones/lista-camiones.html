@@ -1,14 +1,47 @@
 <div class="contenedor">
   <app-pagina-header titulo="Camiones" accionLabel="+ Nuevo camión" [mostrarAccion]="!readonly()" (nuevo)="abrirModal()" />
 
-  <div class="buscador">
+  <div class="buscador fila-buscador">
     <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
+
+    <app-buscador-select
+      [items]="empresas()"
+      [selectedId]="filtroEmpresaId()"
+      displayKey="nombre"
+      placeholder="Todas las empresas"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Todas las empresas"
+      (selectionChange)="seleccionarEmpresa($event)"
+      (cleanSelection)="limpiarEmpresa()"
+    />
+
+    <app-buscador-select
+      [items]="choferes()"
+      [selectedId]="filtroChoferId()"
+      displayKey="nombre_completo"
+      placeholder="Todos los choferes"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Todos los choferes"
+      (selectionChange)="seleccionarFiltroChofer($event)"
+      (cleanSelection)="limpiarFiltroChofer()"
+    />
+
+    <app-buscador-select
+      [items]="acoplados()"
+      [selectedId]="filtroAcopladoId()"
+      displayKey="patente"
+      placeholder="Todos los acoplados"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Todos los acoplados"
+      (selectionChange)="seleccionarFiltroAcoplado($event)"
+      (cleanSelection)="limpiarFiltroAcoplado()"
+    />
   </div>
 
   <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalAbierto()" />
 
 <app-tabla-paginada
-  [headers]="['Patente', 'Marca', 'Modelo', 'Año', 'Tipo', 'Empresa', 'Estado', 'Acciones']"
+  [headers]="['Patente', 'Marca', 'Modelo', 'Año', 'Tipo', 'Empresa', 'Chofer asignado', 'Acoplado asignado', 'Estado', 'Acciones']"
   [items]="camiones()"
   [cargando]="cargando()"
   [error]="error()"
@@ -26,6 +59,8 @@
       <td>{{ camion.anio || '-' }}</td>
       <td>{{ camion.tipo || '-' }}</td>
       <td>{{ nombreEmpresa(camion.empresa_id) }}</td>
+      <td>{{ choferAsignado(camion) || '-' }}</td>
+      <td>{{ acopladoPatente(camion) || '-' }}</td>
       <td>
         <span class="badge" [class]="camion.estado">{{ labelEstadoCamion(camion.estado) }}</span>
         @if (camion.estado === 'no_disponible' && camion.motivo_no_disponible) {
@@ -34,6 +69,7 @@
       </td>
       <td>
         @if (!readonly()) {
+          <button class="btn-mini" (click)="abrirAsignar(camion)">Asignar</button>
           <button class="btn-mini" (click)="abrirEditar(camion)">Editar</button>
           <button class="btn-mini btn-mini-peligro" (click)="abrirBaja(camion)">Baja</button>
         }
@@ -127,4 +163,42 @@
     (empresaCreada)="onEmpresaCreada($event)"
     (cancelar)="cerrarMiniModalEmpresa()"
   ></app-mini-modal-empresa>
+}
+
+@if (modalAsignarAbierto()) {
+  @let camion = asignacionCamion();
+  @if (camion) {
+    <app-modal titulo="Asignar — {{ camion.patente }}" (cerrado)="cerrarAsignar()">
+      @if (error()) { <p class="error">{{ error() }}</p> }
+
+      <label>Chofer asignado</label>
+      <app-buscador-select
+        [items]="choferes()"
+        [selectedId]="asignarChoferId() ?? undefined"
+        displayKey="nombre_completo"
+        placeholder="Sin chofer asignado"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Sin chofer"
+        (selectionChange)="seleccionarChoferAsignacion($event)"
+        (cleanSelection)="limpiarChoferAsignacion()"
+      />
+
+      <label>Acoplado asignado</label>
+      <app-buscador-select
+        [items]="acoplados()"
+        [selectedId]="asignarAcopladoId() ?? undefined"
+        displayKey="patente"
+        placeholder="Sin acoplado asignado"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Sin acoplado"
+        (selectionChange)="seleccionarAcopladoAsignacion($event)"
+        (cleanSelection)="limpiarAcopladoAsignacion()"
+      />
+
+      <div class="acciones-modal">
+        <button (click)="cerrarAsignar()">Cancelar</button>
+        <button class="btn-primario" (click)="confirmarAsignar()">Guardar</button>
+      </div>
+    </app-modal>
+  }
 }

@@ -13,13 +13,14 @@ import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/
 import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 import { Modal } from '../../../shared/components/modal/modal';
 
 @Component({
   selector: 'app-lista-acoplados',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
+  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, BuscadorSelect, Modal],
   templateUrl: './lista-acoplados.html',
 })
 export class ListaAcoplados implements OnInit {
@@ -28,6 +29,7 @@ export class ListaAcoplados implements OnInit {
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
+  filtroEmpresaId = signal('');
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -120,6 +122,18 @@ export class ListaAcoplados implements OnInit {
     this.cargarAcoplados();
   }
 
+  seleccionarEmpresa(empresa: Empresa): void {
+    this.filtroEmpresaId.set(empresa.id);
+    this.pagina.set(1);
+    this.cargarAcoplados();
+  }
+
+  limpiarEmpresa(): void {
+    this.filtroEmpresaId.set('');
+    this.pagina.set(1);
+    this.cargarAcoplados();
+  }
+
   cargarAcoplados(): void {
     this.cargando.set(true);
     this.error.set(null);
@@ -128,7 +142,7 @@ export class ListaAcoplados implements OnInit {
       next: (respuesta) => this.empresas.set(respuesta.items)
     });
 
-    this.acopladosService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined }).subscribe({
+    this.acopladosService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined, empresa_id: this.filtroEmpresaId() || undefined }).subscribe({
       next: (respuesta) => {
         this.acopladosList.set(respuesta.items);
         this.total.set(respuesta.total);

@@ -4,6 +4,7 @@ import { Viaje } from '../../../core/models/viaje.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Acoplado } from '../../../core/models/acoplado.model';
 import { labelEstadoViaje } from '../../../core/utils/estado-labels';
+import { litros100 } from '../../../core/utils/combustible';
 
 @Component({
   selector: 'app-tramo-viaje',
@@ -27,6 +28,7 @@ export class TramoViaje {
   reanudar = output<Viaje>();
 
   labelEstado = labelEstadoViaje;
+  litros100 = litros100;
 
   patenteCamion(camionId: string | null): string {
     if (!camionId) return '';

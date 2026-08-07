@@ -11,6 +11,8 @@ export interface Chofer {
   creado_en: string;
   creado_por: string | null;
   kms_mes_actual: number | null;
+  carnet_vencimiento: string | null;
+  carga_peligrosa_vencimiento: string | null;
 }
 
 export interface ChoferCreate {
@@ -19,6 +21,8 @@ export interface ChoferCreate {
   telefono?: string;
   camion_id?: string;
   empresa_id?: string;
+  carnet_vencimiento?: string | null;
+  carga_peligrosa_vencimiento?: string | null;
 }
 
 export interface KmsPorMes {

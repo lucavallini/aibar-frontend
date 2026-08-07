@@ -2,15 +2,20 @@ import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@a
 import { FormsModule } from '@angular/forms';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
+import { ChoferesService } from '../../../core/services/choferes.service';
+import { AcopladosService } from '../../../core/services/acoplado.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Camion, CamionCreate } from '../../../core/models/camion.model';
 import { Empresa } from '../../../core/models/empresa.model';
+import { Chofer } from '../../../core/models/chofer.model';
+import { Acoplado } from '../../../core/models/acoplado.model';
 import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-paginada';
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
 import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 import { Modal } from '../../../shared/components/modal/modal';
 import { labelEstadoCamion } from '../../../core/utils/estado-labels';
 import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
@@ -19,15 +24,20 @@ import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
   selector: 'app-lista-camiones',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
+  imports: [FormsModule, TablaPaginada, Confirmar, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, BuscadorSelect, Modal],
   templateUrl: './lista-camiones.html',
 })
 export class ListaCamiones implements OnInit {
   camiones = signal<Camion[]>([]);
   empresas = signal<Empresa[]>([]);
+  choferes = signal<Chofer[]>([]);
+  acoplados = signal<Acoplado[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
+  filtroEmpresaId = signal('');
+  filtroChoferId = signal('');
+  filtroAcopladoId = signal('');
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -44,16 +54,33 @@ export class ListaCamiones implements OnInit {
 
   miniModalEmpresaAbierto = signal(false);
 
+  modalAsignarAbierto = signal(false);
+  asignacionCamion = signal<Camion | null>(null);
+  asignarChoferId = signal<string | null>(null);
+  asignarAcopladoId = signal<string | null>(null);
+
   readonly = computed(() => this.authService.getRol() === 'aibar');
 
   constructor(
     private camionesService: CamionesService,
     private empresasService: EmpresasService,
+    private choferesService: ChoferesService,
+    private acopladosService: AcopladosService,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.cargarAsignados();
     this.cargarCamiones();
+  }
+
+  cargarAsignados(): void {
+    this.choferesService.listar(1, 1000, { activos_only: false }).subscribe({
+      next: (respuesta) => this.choferes.set(respuesta.items)
+    });
+    this.acopladosService.listar(1, 1000).subscribe({
+      next: (respuesta) => this.acoplados.set(respuesta.items)
+    });
   }
 
   nombreEmpresa(empresaId: string | null): string {
@@ -122,6 +149,42 @@ export class ListaCamiones implements OnInit {
     this.cargarCamiones();
   }
 
+  seleccionarEmpresa(empresa: Empresa): void {
+    this.filtroEmpresaId.set(empresa.id);
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
+  limpiarEmpresa(): void {
+    this.filtroEmpresaId.set('');
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
+  seleccionarFiltroChofer(item: Chofer): void {
+    this.filtroChoferId.set(item.id);
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
+  limpiarFiltroChofer(): void {
+    this.filtroChoferId.set('');
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
+  seleccionarFiltroAcoplado(item: Acoplado): void {
+    this.filtroAcopladoId.set(item.id);
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
+  limpiarFiltroAcoplado(): void {
+    this.filtroAcopladoId.set('');
+    this.pagina.set(1);
+    this.cargarCamiones();
+  }
+
   cargarCamiones(): void {
     this.cargando.set(true);
     this.error.set(null);
@@ -130,7 +193,12 @@ export class ListaCamiones implements OnInit {
       next: (respuesta) => this.empresas.set(respuesta.items)
     });
 
-    this.camionesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined }).subscribe({
+    this.camionesService.listar(this.pagina(), this.tamanoPagina, {
+      busqueda: this.busqueda() || undefined,
+      empresa_id: this.filtroEmpresaId() || undefined,
+      chofer_id: this.filtroChoferId() || undefined,
+      acoplado_id: this.filtroAcopladoId() || undefined,
+    }).subscribe({
       next: (respuesta) => {
         this.camiones.set(respuesta.items);
         this.total.set(respuesta.total);
@@ -147,6 +215,64 @@ export class ListaCamiones implements OnInit {
   cambiarPagina(nueva: number): void {
     this.pagina.set(nueva);
     this.cargarCamiones();
+  }
+
+  choferAsignado(camion: Camion): string {
+    const chofer = this.choferes().find(c => c.camion_id === camion.id);
+    return chofer ? chofer.nombre_completo : '';
+  }
+
+  acopladoPatente(camion: Camion): string {
+    const acoplado = this.acoplados().find(a => a.id === camion.acoplado_id);
+    return acoplado ? acoplado.patente : '';
+  }
+
+  abrirAsignar(camion: Camion): void {
+    const chofer = this.choferes().find(c => c.camion_id === camion.id);
+    this.asignacionCamion.set(camion);
+    this.asignarChoferId.set(chofer ? chofer.id : null);
+    this.asignarAcopladoId.set(camion.acoplado_id);
+    this.error.set(null);
+    this.modalAsignarAbierto.set(true);
+  }
+
+  cerrarAsignar(): void {
+    this.modalAsignarAbierto.set(false);
+    this.asignacionCamion.set(null);
+    this.asignarChoferId.set(null);
+    this.asignarAcopladoId.set(null);
+  }
+
+  seleccionarChoferAsignacion(item: Chofer): void {
+    this.asignarChoferId.set(item.id);
+  }
+
+  limpiarChoferAsignacion(): void {
+    this.asignarChoferId.set(null);
+  }
+
+  seleccionarAcopladoAsignacion(item: Acoplado): void {
+    this.asignarAcopladoId.set(item.id);
+  }
+
+  limpiarAcopladoAsignacion(): void {
+    this.asignarAcopladoId.set(null);
+  }
+
+  confirmarAsignar(): void {
+    const camion = this.asignacionCamion();
+    if (!camion) return;
+
+    this.camionesService.asignarAsociados(camion.id, this.asignarChoferId(), this.asignarAcopladoId()).subscribe({
+      next: () => {
+        this.cerrarAsignar();
+        this.cargarAsignados();
+        this.cargarCamiones();
+      },
+      error: (err) => {
+        this.error.set(err.status === 409 ? 'No se puede reasignar: el camión o el chofer tienen un viaje pendiente o en curso' : 'No se pudo asignar');
+      }
+    });
   }
 
   formularioVacio(): CamionCreate {

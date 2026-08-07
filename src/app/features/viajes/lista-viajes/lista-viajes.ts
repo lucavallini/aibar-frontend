@@ -443,10 +443,47 @@ export class ListaViajes implements OnInit {
 
   seleccionarModalChofer(chofer: Chofer): void {
     this.nuevoViaje.chofer_id = chofer.id;
+
+    if (!chofer.camion_id) return;
+    const camion = this.camiones().find(c => c.id === chofer.camion_id);
+    if (camion) {
+      this.nuevoViaje.camion_id = camion.id;
+      this.autocompletarAcoplado(camion.acoplado_id);
+    } else {
+      this.camionesService.obtenerPorId(chofer.camion_id).subscribe({
+        next: (c) => {
+          if (!this.camiones().some(x => x.id === c.id)) {
+            this.camiones.update(lista => [...lista, c]);
+          }
+          this.nuevoViaje.camion_id = c.id;
+          this.autocompletarAcoplado(c.acoplado_id);
+        }
+      });
+    }
   }
 
-  seleccionarModalCamion(item: { id: string }): void {
+  autocompletarAcoplado(acopladoId: string | null): void {
+    if (!acopladoId) {
+      this.nuevoViaje.camion_id_2 = undefined;
+      return;
+    }
+    if (this.acopladosList().some(a => a.id === acopladoId)) {
+      this.nuevoViaje.camion_id_2 = acopladoId;
+    } else {
+      this.acopladosService.obtenerPorId(acopladoId).subscribe({
+        next: (a) => {
+          if (!this.acopladosList().some(x => x.id === a.id)) {
+            this.acopladosList.update(lista => [...lista, a]);
+          }
+          this.nuevoViaje.camion_id_2 = a.id;
+        }
+      });
+    }
+  }
+
+  seleccionarModalCamion(item: Camion): void {
     this.nuevoViaje.camion_id = item.id || undefined;
+    this.autocompletarAcoplado(item.acoplado_id ?? null);
   }
 
   seleccionarModalCamion2(item: { id: string }): void {
@@ -455,6 +492,7 @@ export class ListaViajes implements OnInit {
 
   limpiarModalCamion(): void {
     this.nuevoViaje.camion_id = undefined;
+    this.nuevoViaje.camion_id_2 = undefined;
   }
 
   limpiarModalCamion2(): void {

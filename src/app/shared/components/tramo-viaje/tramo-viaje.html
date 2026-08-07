@@ -21,7 +21,7 @@
         = {{ v.kms_recorridos }} kms
       </span>
     }
-    @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ v.km_por_litro }} km/l</span> }
+    @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ litros100(v.km_por_litro) }} L/100km</span> }
     @if (v.fecha_fin) { <span>{{ calcularDias(v.fecha_inicio, v.fecha_fin) }} días</span> }
     <span class="patentes">
       @if (patenteCamion(v.camion_id)) { Chasis: {{ patenteCamion(v.camion_id) }} }

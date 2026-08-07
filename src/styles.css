@@ -555,6 +555,18 @@ textarea {
   margin-bottom: 0.8rem;
 }
 
+.fila-buscador {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fila-buscador app-buscador-select {
+  max-width: 280px;
+  flex: 1;
+}
+
 .buscador input {
   width: 100%;
   max-width: 320px;

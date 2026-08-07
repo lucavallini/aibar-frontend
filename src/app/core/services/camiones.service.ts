@@ -29,9 +29,18 @@ export class CamionesService {
     return this.http.post<Camion>(`${this.apiUrl}/`, datos);
   }
 
+  obtenerPorId(id: string): Observable<Camion> {
+    return this.http.get<Camion>(`${this.apiUrl}/${id}`);
+  }
+
   actualizar(id: string, datos: Partial<CamionCreate>): Observable<Camion> {
     this.cache.clear(CACHE_KEY);
     return this.http.patch<Camion>(`${this.apiUrl}/${id}`, datos);
+  }
+
+  asignarAsociados(id: string, choferId: string | null, acopladoId: string | null): Observable<Camion> {
+    this.cache.clear(CACHE_KEY);
+    return this.http.patch<Camion>(`${this.apiUrl}/${id}/asignacion`, { chofer_id: choferId, acoplado_id: acopladoId });
   }
 
   cambiarEstado(id: string, estado: string, motivo?: string): Observable<Camion> {

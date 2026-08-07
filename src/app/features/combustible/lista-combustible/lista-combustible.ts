@@ -14,6 +14,7 @@ import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-he
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { Modal } from '../../../shared/components/modal/modal';
 import { obtenerNombrePorId } from '../../../core/utils/entidades';
+import { litros100 } from '../../../core/utils/combustible';
 
 @Component({
   selector: 'app-lista-combustible',
@@ -154,6 +155,8 @@ export class ListaCombustible implements OnInit {
   nombrePatente(camionId: string): string {
     return obtenerNombrePorId(this.camionesPorId(), camionId);
   }
+
+  litros100 = litros100;
 
   formularioVacio(): CargaCombustibleCreate {
     return { camion_id: '', litros: 0, monto: 0, fecha: undefined };

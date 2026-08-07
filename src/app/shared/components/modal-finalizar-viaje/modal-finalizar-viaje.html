@@ -16,7 +16,7 @@
     <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
 
     @if ((kmsRecorridos || kmsDescargado) && litrosCombustible && litrosCombustible > 0) {
-      <p class="rendimiento-preview">{{ ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0)) / litrosCombustible | number:'1.2-2' }} km/l</p>
+      <p class="rendimiento-preview">{{ litrosCombustible / ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0)) * 100 | number:'1.2-2' }} L/100km</p>
     }
 
     <label class="opcion-solo-ida">

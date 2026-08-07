@@ -1,14 +1,25 @@
 <div class="contenedor">
   <app-pagina-header titulo="Choferes" accionLabel="+ Nuevo chofer" [mostrarAccion]="!readonly()" (nuevo)="abrirAlta()" />
 
-  <div class="buscador">
+  <div class="buscador fila-buscador">
     <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
+
+    <app-buscador-select
+      [items]="empresas()"
+      [selectedId]="filtroEmpresaId()"
+      displayKey="nombre"
+      placeholder="Todas las empresas"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Todas las empresas"
+      (selectionChange)="seleccionarEmpresa($event)"
+      (cleanSelection)="limpiarEmpresa()"
+    />
   </div>
 
   <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()" />
 
   <app-tabla-paginada
-    [headers]="['Nombre', 'DNI', 'Estado', 'Kms este mes', 'Teléfono', 'Empresa', 'Acciones']"
+    [headers]="['Nombre', 'DNI', 'Estado', 'Kms este mes', 'Teléfono', 'Empresa', 'Venc. carnet', 'Venc. carga peligrosa', 'Acciones']"
     [items]="choferes()"
     [cargando]="cargando()"
     [error]="error()"
@@ -31,6 +42,20 @@
         <td>{{ chofer.kms_mes_actual ?? '-' }}</td>
         <td>{{ chofer.telefono || '-' }}</td>
         <td>{{ nombreEmpresa(chofer.empresa_id) }}</td>
+        <td>
+          @if (chofer.carnet_vencimiento) {
+            <span class="badge vencimiento" [class.vencido]="estaVencido(chofer.carnet_vencimiento)" [class.proximo]="vencePronto(chofer.carnet_vencimiento)">{{ chofer.carnet_vencimiento | date:'dd/MM/yyyy' }}</span>
+          } @else {
+            <span>—</span>
+          }
+        </td>
+        <td>
+          @if (chofer.carga_peligrosa_vencimiento) {
+            <span class="badge vencimiento" [class.vencido]="estaVencido(chofer.carga_peligrosa_vencimiento)" [class.proximo]="vencePronto(chofer.carga_peligrosa_vencimiento)">{{ chofer.carga_peligrosa_vencimiento | date:'dd/MM/yyyy' }}</span>
+          } @else {
+            <span>—</span>
+          }
+        </td>
         <td (click)="$event.stopPropagation()">
           @if (!readonly()) {
             <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
@@ -60,6 +85,12 @@
 
     <label for="telEdit">Teléfono</label>
     <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" (input)="edicionChofer.telefono = $event.target.value.toUpperCase()" />
+
+    <label for="carnetEdit">Vencimiento del carnet</label>
+    <input id="carnetEdit" type="date" [(ngModel)]="edicionChofer.carnet_vencimiento" />
+
+    <label for="cargaPeligrosaEdit">Venc. habil. carga peligrosa</label>
+    <input id="cargaPeligrosaEdit" type="date" [(ngModel)]="edicionChofer.carga_peligrosa_vencimiento" />
 
     <label>Empresa</label>
     <app-select-empresa
@@ -99,6 +130,12 @@
 
     <label for="telAlta">Teléfono</label>
     <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()" />
+
+    <label for="carnetAlta">Vencimiento del carnet</label>
+    <input id="carnetAlta" type="date" [(ngModel)]="nuevoChofer.carnet_vencimiento" />
+
+    <label for="cargaPeligrosaAlta">Venc. habil. carga peligrosa</label>
+    <input id="cargaPeligrosaAlta" type="date" [(ngModel)]="nuevoChofer.carga_peligrosa_vencimiento" />
 
     <label>Empresa</label>
     <app-select-empresa
@@ -146,8 +183,8 @@
         </div>
         @let r = rendimiento();
         <div class="kms-card rendimiento">
-          @if (r && r.km_por_litro !== null) {
-            <span class="kms-valor">{{ r.km_por_litro }} km/l</span>
+          @if (r && r.litros_100km !== null) {
+            <span class="kms-valor">{{ r.litros_100km }} L/100km</span>
             <span class="kms-label">{{ r.total_litros }} L en {{ r.total_kms }} kms</span>
           } @else {
             <span class="kms-valor">—</span>

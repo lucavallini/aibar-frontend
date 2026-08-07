@@ -6,6 +6,7 @@ export interface Camion {
   anio: number | null;
   tipo: string | null;
   empresa_id: string | null;
+  acoplado_id: string | null;
   activo: boolean;
   estado: 'disponible' | 'no_disponible' | 'esperando_iniciar_viaje' | 'viajando';
   motivo_no_disponible: string | null;

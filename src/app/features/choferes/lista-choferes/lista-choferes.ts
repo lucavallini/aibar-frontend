@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { Chofer, ChoferCreate, ChoferDetalle } from '../../../core/models/chofer.model';
@@ -15,6 +16,7 @@ import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/
 import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { SelectEmpresa } from '../../../shared/components/select-empresa/select-empresa';
+import { BuscadorSelect } from '../../../shared/components/buscador-select/buscador-select';
 import { Modal } from '../../../shared/components/modal/modal';
 import { labelEstadoChofer } from '../../../core/utils/estado-labels';
 import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
@@ -23,7 +25,7 @@ import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
   selector: 'app-lista-choferes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, Modal],
+  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, BuscadorSelect, Modal, DatePipe],
   templateUrl: './lista-choferes.html',
   styleUrl: './lista-choferes.css'
 })
@@ -33,6 +35,7 @@ export class ListaChoferesComponent implements OnInit {
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
+  filtroEmpresaId = signal('');
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -79,8 +82,22 @@ export class ListaChoferesComponent implements OnInit {
 
   labelEstadoChofer = labelEstadoChofer;
 
+  estaVencido(fecha: string | null): boolean {
+    if (!fecha) return false;
+    return new Date(fecha + 'T00:00:00') < new Date(new Date().toDateString());
+  }
+
+  vencePronto(fecha: string | null): boolean {
+    if (!fecha || this.estaVencido(fecha)) return false;
+    const vence = new Date(fecha + 'T00:00:00');
+    const limite = new Date();
+    limite.setDate(limite.getDate() + 30);
+    limite.setHours(0, 0, 0, 0);
+    return vence <= limite;
+  }
+
   formularioVacioAlta(): ChoferCreate {
-    return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined, empresa_id: undefined };
+    return { nombre_completo: '', dni: '', telefono: '', camion_id: undefined, empresa_id: undefined, carnet_vencimiento: null, carga_peligrosa_vencimiento: null };
   }
 
   abrirAlta(): void {
@@ -136,6 +153,8 @@ export class ListaChoferesComponent implements OnInit {
       dni: chofer.dni ?? undefined,
       telefono: chofer.telefono ?? undefined,
       empresa_id: chofer.empresa_id ?? undefined,
+      carnet_vencimiento: chofer.carnet_vencimiento ?? null,
+      carga_peligrosa_vencimiento: chofer.carga_peligrosa_vencimiento ?? null,
     };
     this.error.set(null);
     this.modalEditarAbierto.set(true);
@@ -188,6 +207,18 @@ export class ListaChoferesComponent implements OnInit {
     this.cargarChoferes();
   }
 
+  seleccionarEmpresa(empresa: Empresa): void {
+    this.filtroEmpresaId.set(empresa.id);
+    this.pagina.set(1);
+    this.cargarChoferes();
+  }
+
+  limpiarEmpresa(): void {
+    this.filtroEmpresaId.set('');
+    this.pagina.set(1);
+    this.cargarChoferes();
+  }
+
   cargarChoferes(): void {
     this.cargando.set(true);
     this.error.set(null);
@@ -196,7 +227,7 @@ export class ListaChoferesComponent implements OnInit {
       next: (respuesta) => this.empresas.set(respuesta.items)
     });
 
-    this.choferesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined, incluir_kms_mes: true }).subscribe({
+    this.choferesService.listar(this.pagina(), this.tamanoPagina, { busqueda: this.busqueda() || undefined, empresa_id: this.filtroEmpresaId() || undefined, incluir_kms_mes: true }).subscribe({
       next: (respuesta) => {
         this.choferes.set(respuesta.items);
         this.total.set(respuesta.total);
