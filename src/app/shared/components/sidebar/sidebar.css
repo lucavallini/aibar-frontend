@@ -17,6 +17,7 @@ nav {
 }
 
 .item-menu {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -47,6 +48,17 @@ nav {
   color: var(--color-sidebar-activo);
   font-weight: 750;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-sidebar-activo) 13%, transparent);
+}
+
+.item-menu.activo::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background-color: var(--color-sidebar-activo);
 }
 
 @media (max-width: 768px) {

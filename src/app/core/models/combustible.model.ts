@@ -18,3 +18,10 @@ export interface CargaCombustibleCreate {
   fecha?: string;
   km_por_litro?: number;
 }
+
+export interface GastoTotalCamion {
+  camion_id: string;
+  total_litros: number;
+  total_monto: number;
+  cantidad_cargas: number;
+}

@@ -1,0 +1,38 @@
+<app-modal tamano="grande" titulo="Observaciones del mes" (cerrado)="cerrado.emit()">
+  <div class="buscador fila-buscador">
+    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
+
+    <app-buscador-select
+      [items]="empresas()"
+      [selectedId]="filtroEmpresaId()"
+      displayKey="nombre"
+      placeholder="Todas las empresas"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Todas las empresas"
+      (selectionChange)="seleccionarEmpresa($event)"
+      (cleanSelection)="limpiarEmpresa()"
+    />
+  </div>
+
+  <app-estado-carga [cargando]="cargando()" [error]="error()" />
+
+  @if (!cargando() && !error()) {
+    <div class="obs-mes-lista">
+      @for (chofer of choferesFiltrados(); track chofer.id) {
+        <div class="obs-mes-item">
+          <div class="obs-mes-cabecera">
+            <span class="obs-mes-nombre">{{ chofer.nombre_completo }}</span>
+            <span class="obs-mes-empresa">{{ nombreEmpresa(chofer.empresa_id) }}</span>
+          </div>
+          <p class="obs-mes-texto">{{ observacionDe(chofer.id)?.observacion }}</p>
+        </div>
+      } @empty {
+        <p class="sin-datos">No hay observaciones cargadas este mes.</p>
+      }
+    </div>
+  }
+
+  <div class="acciones-modal">
+    <button class="btn-primario" (click)="cerrado.emit()">Cerrar</button>
+  </div>
+</app-modal>

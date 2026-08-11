@@ -39,7 +39,7 @@ export class CamionesService {
   }
 
   asignarAsociados(id: string, choferId: string | null, acopladoId: string | null): Observable<Camion> {
-    this.cache.clear(CACHE_KEY);
+    this.cache.invalidarFlota();
     return this.http.patch<Camion>(`${this.apiUrl}/${id}/asignacion`, { chofer_id: choferId, acoplado_id: acopladoId });
   }
 

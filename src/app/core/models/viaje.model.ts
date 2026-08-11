@@ -37,6 +37,14 @@ export interface ViajeCreate {
   fecha_inicio: string;
 }
 
+export interface ViajeFinalizar {
+  fecha_fin: string;
+  kms_recorridos: number;
+  kms_descargado?: number;
+  litros_combustible?: number;
+  solo_ida?: boolean;
+}
+
 export interface ViajeReanudar {
   chofer_id?: string;
   camion_id?: string;

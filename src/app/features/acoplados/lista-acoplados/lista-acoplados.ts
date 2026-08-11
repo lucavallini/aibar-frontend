@@ -46,7 +46,7 @@ export class ListaAcoplados implements OnInit {
 
   miniModalEmpresaAbierto = signal(false);
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private acopladosService: AcopladosService,

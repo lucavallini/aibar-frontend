@@ -10,7 +10,10 @@
         displayKey="patente"
         idKey="id"
         placeholder="Todos los camiones"
+        [mostrarLimpiar]="true"
+        textoLimpiar="Todos"
         (selectionChange)="cambiarFiltroCamion($event)"
+        (cleanSelection)="limpiarFiltroCamion()"
       />
     </div>
 

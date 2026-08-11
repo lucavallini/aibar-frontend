@@ -1,10 +1,12 @@
+import { EstadoFlota } from './estado.model';
+
 export interface Acoplado {
   id: string;
   patente: string;
   tipo: string | null;
   empresa_id: string | null;
   activo: boolean;
-  estado: 'disponible' | 'no_disponible' | 'esperando_iniciar_viaje' | 'viajando';
+  estado: EstadoFlota;
   motivo_no_disponible: string | null;
   creado_en: string;
 }

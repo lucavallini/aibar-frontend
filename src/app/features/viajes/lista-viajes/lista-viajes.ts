@@ -6,7 +6,7 @@ import { CamionesService } from '../../../core/services/camiones.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { AcopladosService } from '../../../core/services/acoplado.service';
-import { Viaje, ViajeCreate, ViajeReanudar } from '../../../core/models/viaje.model';
+import { Viaje, ViajeCreate, ViajeReanudar, ViajeFinalizar } from '../../../core/models/viaje.model';
 import { Chofer } from '../../../core/models/chofer.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Acoplado } from '../../../core/models/acoplado.model';
@@ -77,7 +77,7 @@ export class ListaViajes implements OnInit {
     { label: '30 días', valor: 30 },
   ];
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  readonly = computed(() => this.authService.esSoloLectura());
 
   filtrosEstado: { label: string; valor: FiltroEstado }[] = [
     { label: 'Todos', valor: 'todos' },
@@ -505,11 +505,11 @@ export class ListaViajes implements OnInit {
     this.error.set(null);
   }
 
-  onFinalizarConfirmado(datos: { fecha_fin: string; kms_recorridos: number; kms_descargado?: number; litros_combustible?: number; solo_ida?: boolean }): void {
+  onFinalizarConfirmado(datos: ViajeFinalizar): void {
     const viaje = this.viajeSeleccionado();
     if (!viaje) return;
 
-    this.viajesService.finalizar(viaje.id, datos.fecha_fin, datos.kms_recorridos, datos.litros_combustible, datos.kms_descargado, datos.solo_ida ?? false).subscribe({
+    this.viajesService.finalizar(viaje.id, datos).subscribe({
       next: () => {
         this.cerrarModal();
         this.cargarViajes();

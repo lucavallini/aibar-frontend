@@ -36,7 +36,7 @@
 
 .filtro label {
   display: block;
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--color-texto-secundario);
   margin-bottom: 0.3rem;
@@ -60,7 +60,7 @@
   border-radius: 999px;
   background: var(--color-fondo-suave);
   color: var(--color-texto-secundario);
-  font-size: 0.72rem;
+  font-size: var(--fs-sm);
   text-align: center;
 }
 
@@ -83,18 +83,6 @@
   font-size: 0.8rem;
   color: var(--color-texto-secundario);
   font-style: italic;
-}
-
-.modal textarea {
-  width: 100%;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio);
-  background: var(--color-input);
-  color: var(--color-texto);
-  font-size: 0.9rem;
-  font-family: inherit;
-  resize: vertical;
 }
 
 .modal-descripcion {

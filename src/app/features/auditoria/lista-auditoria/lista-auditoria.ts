@@ -3,13 +3,14 @@ import { DatePipe } from '@angular/common';
 import { AuditoriaService } from '../../../core/services/auditoria.service';
 import { Auditoria } from '../../../core/models/auditoria.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
+import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-lista-auditoria',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, Paginacion, FormsModule],
+  imports: [DatePipe, Paginacion, PaginaHeader, FormsModule],
   templateUrl: './lista-auditoria.html',
 })
 export class ListaAuditoria implements OnInit {

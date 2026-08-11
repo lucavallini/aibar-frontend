@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -18,7 +18,7 @@ interface ItemMenu {
   styleUrl: './sidebar.css'
 })
 export class Sidebar {
-  @Input() abierta = false;
+  abierta = input(false);
 
   itemsMenu: ItemMenu[] = [
     { label: 'Viajes', ruta: '/viajes', soloAdmin: false, icono: 'viajes' },
@@ -34,7 +34,7 @@ export class Sidebar {
   constructor(private authService: AuthService) {}
 
   get itemsVisibles(): ItemMenu[] {
-    const esAdmin = this.authService.getRol() === 'administrador' || this.authService.getRol() === 'aibar';
+    const esAdmin = this.authService.esAdmin();
     return this.itemsMenu.filter(item => !item.soloAdmin || esAdmin);
   }
 }

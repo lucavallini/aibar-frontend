@@ -39,7 +39,7 @@ export class ListaMultas implements OnInit {
   modalAbierto = signal(false);
   nuevaMulta: MultaCreate = this.formularioVacio();
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private multasService: MultasService,

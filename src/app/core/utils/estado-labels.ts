@@ -7,14 +7,7 @@ const LABELS_CHOFER: Record<string, string> = {
   licencia: 'Licencia',
 };
 
-const LABELS_CAMION: Record<string, string> = {
-  disponible: 'Disponible',
-  no_disponible: 'No disponible',
-  esperando_iniciar_viaje: 'Esperando iniciar viaje',
-  viajando: 'Viajando',
-};
-
-const LABELS_ACOPLADO: Record<string, string> = {
+const LABELS_FLOTA: Record<string, string> = {
   disponible: 'Disponible',
   no_disponible: 'No disponible',
   esperando_iniciar_viaje: 'Esperando iniciar viaje',
@@ -33,11 +26,11 @@ export function labelEstadoChofer(estado: string): string {
 }
 
 export function labelEstadoCamion(estado: string): string {
-  return LABELS_CAMION[estado] ?? estado;
+  return LABELS_FLOTA[estado] ?? estado;
 }
 
 export function labelEstadoAcoplado(estado: string): string {
-  return LABELS_ACOPLADO[estado] ?? estado;
+  return LABELS_FLOTA[estado] ?? estado;
 }
 
 export function labelEstadoViaje(estado: string): string {

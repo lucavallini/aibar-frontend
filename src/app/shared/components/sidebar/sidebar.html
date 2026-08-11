@@ -1,4 +1,4 @@
-<aside class="sidebar" [class.abierta]="abierta">
+<aside class="sidebar" [class.abierta]="abierta()">
   <nav>
     @for (item of itemsVisibles; track item.ruta) {
       <a [routerLink]="item.ruta" routerLinkActive="activo" class="item-menu">

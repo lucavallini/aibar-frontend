@@ -27,4 +27,10 @@ export class ApiCache {
       if (key.startsWith(pattern)) this.store.delete(key);
     }
   }
+
+  invalidarFlota(): void {
+    this.clear('choferes');
+    this.clear('camiones');
+    this.clear('acoplados');
+  }
 }

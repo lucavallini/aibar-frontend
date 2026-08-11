@@ -14,6 +14,8 @@
       (selectionChange)="seleccionarEmpresa($event)"
       (cleanSelection)="limpiarEmpresa()"
     />
+
+    <button class="btn-mini btn-ver-observaciones" (click)="abrirObservacionesMes()">Ver todas las observaciones</button>
   </div>
 
   <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()" />
@@ -258,4 +260,8 @@
       </div>
     </app-modal>
   }
+}
+
+@if (modalObservacionesMesAbierto()) {
+  <app-observaciones-mes [empresas]="empresas()" (cerrado)="cerrarObservacionesMes()" />
 }

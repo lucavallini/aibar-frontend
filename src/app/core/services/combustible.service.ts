@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CargaCombustible, CargaCombustibleCreate } from '../models/combustible.model';
+import { CargaCombustible, CargaCombustibleCreate, GastoTotalCamion } from '../models/combustible.model';
 import { RespuestaPaginada } from '../models/paginacion.model';
 import { buildListParams } from '../utils/http-params.helper';
 
@@ -20,7 +20,7 @@ export class CombustibleService {
     return this.http.post<CargaCombustible>(`${this.apiUrl}/`, datos);
   }
 
-  gastoTotalPorCamion(camionId: string): Observable<{ camion_id: string; total_litros: number; total_monto: number; cantidad_cargas: number }> {
-    return this.http.get<any>(`${this.apiUrl}/${camionId}/gasto-total`);
+  gastoTotalPorCamion(camionId: string): Observable<GastoTotalCamion> {
+    return this.http.get<GastoTotalCamion>(`${this.apiUrl}/${camionId}/gasto-total`);
   }
 }

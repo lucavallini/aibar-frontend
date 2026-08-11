@@ -26,7 +26,7 @@ export class LoginComponent {
     this.authService.login(this.nombreUsuario, this.password).subscribe({
       next: () => {
         this.cargando.set(false);
-        this.router.navigate(['/choferes']); // por ahora redirige acá, después vemos el home real
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.cargando.set(false);

@@ -1,9 +1,13 @@
+import { EstadoFlota } from './estado.model';
+
+export type EstadoChofer = EstadoFlota | 'inactivo' | 'licencia';
+
 export interface Chofer {
   id: string;
   nombre_completo: string;
   dni: string | null;
   telefono: string | null;
-  estado: 'disponible' | 'no_disponible' | 'esperando_iniciar_viaje' | 'viajando' | 'inactivo' | 'licencia';
+  estado: EstadoChofer;
   camion_id: string | null;
   empresa_id: string | null;
   activo: boolean;
@@ -35,7 +39,7 @@ export interface ChoferDetalle {
   nombre_completo: string;
   dni: string | null;
   telefono: string | null;
-  estado: string;
+  estado: EstadoChofer;
   empresa_id: string | null;
   activo: boolean;
   kms_mes_actual: number;

@@ -43,7 +43,7 @@
   margin-left: 0.35rem;
   background: var(--color-info-fondo);
   color: var(--color-info);
-  font-size: 0.68rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: 999px;

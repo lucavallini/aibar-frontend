@@ -24,10 +24,6 @@ export class ChoferesService {
       .pipe(tap(data => this.cache.set(cacheKey, data)));
   }
 
-  obtenerPorId(id: string): Observable<Chofer> {
-    return this.http.get<Chofer>(`${this.apiUrl}/${id}`);
-  }
-
   obtenerDetalle(id: string): Observable<ChoferDetalle> {
     return this.http.get<ChoferDetalle>(`${this.apiUrl}/${id}/detalle`);
   }

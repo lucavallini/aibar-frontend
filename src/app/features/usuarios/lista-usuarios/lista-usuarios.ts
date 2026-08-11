@@ -34,7 +34,9 @@ export class ListaUsuarios implements OnInit {
   usuarioSeleccionado = signal<Usuario | null>(null);
   edicionUsuario: UsuarioUpdate = {};
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  usuarioCreado = signal<Usuario | null>(null);
+
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private usuariosService: UsuariosService,
@@ -88,6 +90,10 @@ export class ListaUsuarios implements OnInit {
     this.modalAltaAbierto.set(false);
   }
 
+  cerrarUsuarioCreado(): void {
+    this.usuarioCreado.set(null);
+  }
+
   confirmarAlta(): void {
     if (!this.nuevoUsuario.nombre_completo.trim() || !this.nuevoUsuario.dni.trim() || this.nuevoUsuario.password.length < 6) {
       this.error.set('Completá nombre, DNI y una contraseña de al menos 6 caracteres');
@@ -99,7 +105,7 @@ export class ListaUsuarios implements OnInit {
         this.cerrarAlta();
         this.pagina.set(1);
         this.cargarUsuarios();
-        alert(`Usuario creado: ${usuarioCreado.nombre_usuario}\nComunicale este usuario y la contraseña que elegiste.`);
+        this.usuarioCreado.set(usuarioCreado);
       },
       error: (err) => {
         if (err.status === 400) {

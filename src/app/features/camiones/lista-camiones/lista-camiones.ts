@@ -59,7 +59,7 @@ export class ListaCamiones implements OnInit {
   asignarChoferId = signal<string | null>(null);
   asignarAcopladoId = signal<string | null>(null);
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private camionesService: CamionesService,

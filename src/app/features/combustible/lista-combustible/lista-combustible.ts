@@ -5,7 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CombustibleService } from '../../../core/services/combustible.service';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { ChoferesService } from '../../../core/services/choferes.service';
-import { CargaCombustible, CargaCombustibleCreate } from '../../../core/models/combustible.model';
+import { CargaCombustible, CargaCombustibleCreate, GastoTotalCamion } from '../../../core/models/combustible.model';
 import { Camion } from '../../../core/models/camion.model';
 import { Chofer } from '../../../core/models/chofer.model';
 import { Paginacion } from '../../../shared/components/paginacion/paginacion';
@@ -34,7 +34,7 @@ export class ListaCombustible implements OnInit {
   filtroChoferId = signal<string>('');
   filtroFechaDesde = signal<string>('');
   filtroFechaHasta = signal<string>('');
-  gastoTotal = signal<{ total_litros: number; total_monto: number; cantidad_cargas: number } | null>(null);
+  gastoTotal = signal<GastoTotalCamion | null>(null);
 
   cargando = signal(true);
   error = signal<string | null>(null);
@@ -47,7 +47,7 @@ export class ListaCombustible implements OnInit {
   modalAbierto = signal(false);
   nuevaCarga: CargaCombustibleCreate = this.formularioVacio();
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private combustibleService: CombustibleService,
@@ -117,13 +117,19 @@ export class ListaCombustible implements OnInit {
     this.cargarCargas();
   }
 
-  cambiarFiltroCamion(camion: any): void {
+  cambiarFiltroCamion(camion: Camion | null): void {
     this.filtroCamionId.set(camion ? camion.id : '');
     this.pagina.set(1);
     this.cargarCargas();
   }
 
-  cambiarFiltroChofer(chofer: any): void {
+  limpiarFiltroCamion(): void {
+    this.filtroCamionId.set('');
+    this.pagina.set(1);
+    this.cargarCargas();
+  }
+
+  cambiarFiltroChofer(chofer: Chofer | null): void {
     this.filtroChoferId.set(chofer ? chofer.id : '');
     this.pagina.set(1);
     this.cargarCargas();

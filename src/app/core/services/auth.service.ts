@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginResponse } from '../models/usuario.model';
+import { ApiCache } from '../utils/api-cache';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
   // signal reactivo: cualquier componente puede saber al instante si hay sesión
   isLoggedIn = signal<boolean>(this.hayToken());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private cache: ApiCache) {}
 
   login(nombreUsuario: string, password: string): Observable<LoginResponse> {
     const body = new URLSearchParams();
@@ -33,6 +34,7 @@ export class AuthService {
 
   logout(): void {
     sessionStorage.removeItem(this.tokenKey);
+    this.cache.clear();
     this.isLoggedIn.set(false);
     this.router.navigate(['/login']);
   }
@@ -46,18 +48,27 @@ export class AuthService {
   }
 
   getPayload(): { sub: string; rol: string } | null {
-  const token = this.getToken();
-  if (!token) return null;
+    const token = this.getToken();
+    if (!token) return null;
 
-  try {
-    const payloadBase64 = token.split('.')[1];
-    return JSON.parse(atob(payloadBase64));
-  } catch {
-    return null;
+    try {
+      const payloadBase64 = token.split('.')[1];
+      return JSON.parse(atob(payloadBase64));
+    } catch {
+      return null;
+    }
   }
-};
 
   getRol(): string | null {
     return this.getPayload()?.rol ?? null;
+  }
+
+  esSoloLectura(): boolean {
+    return this.getRol() === 'aibar';
+  }
+
+  esAdmin(): boolean {
+    const rol = this.getRol();
+    return rol === 'administrador' || rol === 'aibar';
   }
 }

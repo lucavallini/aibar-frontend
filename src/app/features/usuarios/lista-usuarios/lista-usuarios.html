@@ -89,6 +89,16 @@
   </app-modal>
 }
 
+@if (usuarioCreado()) {
+  <app-modal titulo="Usuario creado" [cerrable]="true" (cerrado)="cerrarUsuarioCreado()">
+    <p class="exito">Usuario "{{ usuarioCreado()!.nombre_usuario }}" creado correctamente.</p>
+    <p>Comunicale este usuario y la contraseña que elegiste.</p>
+    <div class="acciones-modal">
+      <button class="btn-primario" (click)="cerrarUsuarioCreado()">Listo</button>
+    </div>
+  </app-modal>
+}
+
 @if (modalBajaAbierto()) {
   <app-confirmar
     titulo="Dar de baja usuario"

@@ -1,0 +1,51 @@
+.obs-mes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.obs-mes-item {
+  padding: 0.6rem 0.7rem;
+  background: var(--color-fondo-suave);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.obs-mes-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.obs-mes-nombre {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.obs-mes-empresa {
+  color: var(--color-texto-secundario);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.obs-mes-texto {
+  margin: 0;
+  font-size: 0.88rem;
+  white-space: pre-wrap;
+}
+
+.sin-datos {
+  text-align: center;
+  color: var(--color-texto-secundario);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 576px) {
+  .obs-mes-cabecera {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+}

@@ -11,7 +11,7 @@ import { TablaPaginada } from '../../../shared/components/tabla-paginada/tabla-p
 import { Confirmar } from '../../../shared/components/confirmar/confirmar';
 import { FormsModule } from '@angular/forms';
 import { ObservacionesService } from '../../../core/services/observaciones.service';
-import { Observacion, ObservacionCreate } from '../../../core/models/observacion.model';
+import { Observacion } from '../../../core/models/observacion.model';
 import { MiniModalEmpresa } from '../../../shared/components/mini-modal-empresa/mini-modal-empresa';
 import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
@@ -20,12 +20,13 @@ import { BuscadorSelect } from '../../../shared/components/buscador-select/busca
 import { Modal } from '../../../shared/components/modal/modal';
 import { labelEstadoChofer } from '../../../core/utils/estado-labels';
 import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
+import { ObservacionesMesComponent } from '../observaciones-mes/observaciones-mes';
 
 @Component({
   selector: 'app-lista-choferes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, BuscadorSelect, Modal, DatePipe],
+  imports: [TablaPaginada, Confirmar, FormsModule, MiniModalEmpresa, PaginaHeader, EstadoCarga, SelectEmpresa, BuscadorSelect, Modal, DatePipe, ObservacionesMesComponent],
   templateUrl: './lista-choferes.html',
   styleUrl: './lista-choferes.css'
 })
@@ -62,7 +63,9 @@ export class ListaChoferesComponent implements OnInit {
   choferObsSeleccionado = signal<Chofer | null>(null);
   exitoObs = signal<string | null>(null);
 
-  readonly = computed(() => this.authService.getRol() === 'aibar');
+  modalObservacionesMesAbierto = signal(false);
+
+  readonly = computed(() => this.authService.esSoloLectura());
 
   constructor(
     private choferesService: ChoferesService,
@@ -266,10 +269,6 @@ export class ListaChoferesComponent implements OnInit {
     });
   }
 
-  cerrarSesion(): void {
-    this.authService.logout();
-  }
-
   abrirMiniModalEmpresa(): void {
     this.error.set(null);
     this.miniModalEmpresaAbierto.set(true);
@@ -292,6 +291,14 @@ export class ListaChoferesComponent implements OnInit {
   }
 
   // ---- Observaciones ----
+
+  abrirObservacionesMes(): void {
+    this.modalObservacionesMesAbierto.set(true);
+  }
+
+  cerrarObservacionesMes(): void {
+    this.modalObservacionesMesAbierto.set(false);
+  }
 
   abrirObservaciones(chofer: Chofer): void {
     this.choferObsSeleccionado.set(chofer);

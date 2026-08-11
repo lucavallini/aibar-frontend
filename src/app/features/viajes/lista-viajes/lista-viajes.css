@@ -28,7 +28,7 @@
   .tarjeta-viaje:hover {
     transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--color-primario) 30%, var(--color-borde));
-    box-shadow: 0 6px 18px rgb(16 107 86 / 0.13);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primario) 13%, transparent);
     background: color-mix(in srgb, var(--color-fondo-panel) 94%, var(--color-primario-claro) 6%);
   }
 
