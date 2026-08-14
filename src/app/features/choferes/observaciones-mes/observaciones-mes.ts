@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { ObservacionesService } from '../../../core/services/observaciones.service';
 import { Chofer } from '../../../core/models/chofer.model';
@@ -25,7 +24,7 @@ export class ObservacionesMesComponent implements OnInit {
   cerrado = output<void>();
 
   choferes = signal<Chofer[]>([]);
-  observacionesPorChofer = signal<Record<string, Observacion | null>>({});
+  observacionesPorChofer = signal<Record<string, Observacion>>({});
   cargando = signal(true);
   error = signal<string | null>(null);
   busqueda = signal('');
@@ -44,38 +43,22 @@ export class ObservacionesMesComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.choferesService.listar(1, 500).subscribe({
-      next: (respuesta) => {
-        this.choferes.set(respuesta.items);
-
-        if (respuesta.items.length === 0) {
-          this.observacionesPorChofer.set({});
-          this.cargando.set(false);
-          return;
-        }
-
-        forkJoin(
-          respuesta.items.map(chofer =>
-            this.observacionesService.listar(chofer.id).pipe(
-              map(lista => [chofer.id, this.observacionDelMesActual(lista)] as const),
-              catchError(() => of([chofer.id, null] as const))
-            )
-          )
-        ).subscribe(resultados => {
-          this.observacionesPorChofer.set(Object.fromEntries(resultados));
-          this.cargando.set(false);
-        });
+    forkJoin({
+      choferes: this.choferesService.listar(1, 500),
+      observaciones: this.observacionesService.listarMesActual(),
+    }).subscribe({
+      next: ({ choferes, observaciones }) => {
+        this.choferes.set(choferes.items);
+        const mapa: Record<string, Observacion> = {};
+        observaciones.forEach(obs => mapa[obs.chofer_id] = obs);
+        this.observacionesPorChofer.set(mapa);
+        this.cargando.set(false);
       },
       error: () => {
         this.error.set('No se pudieron cargar los choferes');
         this.cargando.set(false);
       }
     });
-  }
-
-  private observacionDelMesActual(lista: Observacion[]): Observacion | null {
-    const hoy = new Date();
-    return lista.find(o => o.mes === hoy.getMonth() + 1 && o.anio === hoy.getFullYear()) ?? null;
   }
 
   nombreEmpresa(empresaId: string | null): string {

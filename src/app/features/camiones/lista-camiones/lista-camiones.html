@@ -2,7 +2,7 @@
   <app-pagina-header titulo="Camiones" accionLabel="+ Nuevo camión" [mostrarAccion]="!readonly()" (nuevo)="abrirModal()" />
 
   <div class="buscador fila-buscador">
-    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
+    <input type="text" [ngModel]="busquedaInput()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar por patente..." />
 
     <app-buscador-select
       [items]="empresas()"

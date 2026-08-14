@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { ChoferesService } from '../../../core/services/choferes.service';
@@ -34,10 +36,12 @@ export class ListaCamiones implements OnInit {
   acoplados = signal<Acoplado[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
+  busquedaInput = signal('');
   busqueda = signal('');
   filtroEmpresaId = signal('');
   filtroChoferId = signal('');
   filtroAcopladoId = signal('');
+  private busquedaCambio$ = new Subject<string>();
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -67,7 +71,13 @@ export class ListaCamiones implements OnInit {
     private choferesService: ChoferesService,
     private acopladosService: AcopladosService,
     private authService: AuthService
-  ) {}
+  ) {
+    this.busquedaCambio$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(valor => {
+      this.busqueda.set(valor);
+      this.pagina.set(1);
+      this.cargarCamiones();
+    });
+  }
 
   ngOnInit(): void {
     this.cargarAsignados();
@@ -144,9 +154,8 @@ export class ListaCamiones implements OnInit {
   }
 
   cambiarBusqueda(valor: string): void {
-    this.busqueda.set(valor);
-    this.pagina.set(1);
-    this.cargarCamiones();
+    this.busquedaInput.set(valor);
+    this.busquedaCambio$.next(valor);
   }
 
   seleccionarEmpresa(empresa: Empresa): void {

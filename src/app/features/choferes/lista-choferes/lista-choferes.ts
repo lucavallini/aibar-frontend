@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
 import { Chofer, ChoferCreate, ChoferDetalle } from '../../../core/models/chofer.model';
@@ -35,8 +37,10 @@ export class ListaChoferesComponent implements OnInit {
   empresas = signal<Empresa[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
+  busquedaInput = signal('');
   busqueda = signal('');
   filtroEmpresaId = signal('');
+  private busquedaCambio$ = new Subject<string>();
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -73,7 +77,13 @@ export class ListaChoferesComponent implements OnInit {
     private viajesService: ViajesService,
     private authService: AuthService,
     private observacionesService: ObservacionesService
-  ) {}
+  ) {
+    this.busquedaCambio$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(valor => {
+      this.busqueda.set(valor);
+      this.pagina.set(1);
+      this.cargarChoferes();
+    });
+  }
 
   ngOnInit(): void {
     this.cargarChoferes();
@@ -205,9 +215,8 @@ export class ListaChoferesComponent implements OnInit {
   }
 
   cambiarBusqueda(valor: string): void {
-    this.busqueda.set(valor);
-    this.pagina.set(1);
-    this.cargarChoferes();
+    this.busquedaInput.set(valor);
+    this.busquedaCambio$.next(valor);
   }
 
   seleccionarEmpresa(empresa: Empresa): void {

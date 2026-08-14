@@ -2,7 +2,7 @@
   <app-pagina-header titulo="Choferes" accionLabel="+ Nuevo chofer" [mostrarAccion]="!readonly()" (nuevo)="abrirAlta()" />
 
   <div class="buscador fila-buscador">
-    <input type="text" [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
+    <input type="text" [ngModel]="busquedaInput()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
 
     <app-buscador-select
       [items]="empresas()"

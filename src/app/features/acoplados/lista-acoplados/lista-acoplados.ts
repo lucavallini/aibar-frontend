@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { AcopladosService } from '../../../core/services/acoplado.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
@@ -28,8 +30,10 @@ export class ListaAcoplados implements OnInit {
   empresas = signal<Empresa[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
+  busquedaInput = signal('');
   busqueda = signal('');
   filtroEmpresaId = signal('');
+  private busquedaCambio$ = new Subject<string>();
 
   pagina = signal(1);
   totalPaginas = signal(1);
@@ -52,7 +56,13 @@ export class ListaAcoplados implements OnInit {
     private acopladosService: AcopladosService,
     private empresasService: EmpresasService,
     private authService: AuthService
-  ) {}
+  ) {
+    this.busquedaCambio$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(valor => {
+      this.busqueda.set(valor);
+      this.pagina.set(1);
+      this.cargarAcoplados();
+    });
+  }
 
   ngOnInit(): void {
     this.cargarAcoplados();
@@ -117,9 +127,8 @@ export class ListaAcoplados implements OnInit {
   }
 
   cambiarBusqueda(valor: string): void {
-    this.busqueda.set(valor);
-    this.pagina.set(1);
-    this.cargarAcoplados();
+    this.busquedaInput.set(valor);
+    this.busquedaCambio$.next(valor);
   }
 
   seleccionarEmpresa(empresa: Empresa): void {
