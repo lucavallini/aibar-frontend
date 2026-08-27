@@ -4,6 +4,8 @@
   <div class="controles">
     <button (click)="irAPagina(pagina() - 1)" [disabled]="pagina() === 1">← Anterior</button>
     <span class="numero-pagina">Página {{ pagina() }} de {{ totalPaginas() }}</span>
-    <button (click)="irAPagina(pagina() + 1)" [disabled]="pagina() === totalPaginas()">Siguiente →</button>
+    <button (click)="irAPagina(pagina() + 1)" [disabled]="pagina() === totalPaginas()">
+      Siguiente →
+    </button>
   </div>
 </div>

@@ -11,7 +11,9 @@
       @if (items().length > 0) {
         <ng-content></ng-content>
       } @else {
-        <tr><td [attr.colspan]="headers().length">{{ emptyMessage() }}</td></tr>
+        <tr>
+          <td [attr.colspan]="headers().length">{{ emptyMessage() }}</td>
+        </tr>
       }
     </tbody>
   </table>

@@ -3,32 +3,44 @@
     <p class="error">{{ error() }}</p>
   }
 
-    <label for="fechaFin">Fecha y hora de finalizaci&oacute;n</label>
-    <input id="fechaFin" type="datetime-local" [ngModel]="fechaFinInput()" (ngModelChange)="fechaFinInput.set($event)" />
+  <label for="fechaFin">Fecha y hora de finalizaci&oacute;n</label>
+  <input
+    id="fechaFin"
+    type="datetime-local"
+    [ngModel]="fechaFinInput()"
+    (ngModelChange)="fechaFinInput.set($event)"
+  />
 
-    <label for="kmsCargado">KM cargado</label>
-    <input id="kmsCargado" type="number" [(ngModel)]="kmsRecorridos" min="0" />
+  <label for="kmsCargado">KM cargado</label>
+  <input id="kmsCargado" type="number" [(ngModel)]="kmsRecorridos" min="0" />
 
-    <label for="kmsDescargado">KM descargado (opcional)</label>
-    <input id="kmsDescargado" type="number" [(ngModel)]="kmsDescargado" min="0" />
+  <label for="kmsDescargado">KM descargado (opcional)</label>
+  <input id="kmsDescargado" type="number" [(ngModel)]="kmsDescargado" min="0" />
 
-    <label for="litros">Litros de combustible (opcional)</label>
-    <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
+  <label for="litros">Litros de combustible (opcional)</label>
+  <input id="litros" type="number" [(ngModel)]="litrosCombustible" min="0" step="0.1" />
 
-    @if ((kmsRecorridos || kmsDescargado) && litrosCombustible && litrosCombustible > 0) {
-      <p class="rendimiento-preview">{{ litrosCombustible / ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0)) * 100 | number:'1.2-2' }} L/100km</p>
-    }
+  @if ((kmsRecorridos || kmsDescargado) && litrosCombustible && litrosCombustible > 0) {
+    <p class="rendimiento-preview">
+      {{
+        (litrosCombustible / ((kmsRecorridos ?? 0) + (kmsDescargado ?? 0))) * 100 | number: '1.2-2'
+      }}
+      L/100km
+    </p>
+  }
 
-    <label class="opcion-solo-ida">
-      <input type="checkbox" [ngModel]="soloIda()" (ngModelChange)="soloIda.set($event)" />
-      Es solo de ida (sin vuelta)
-    </label>
-    @if (soloIda()) {
-      <p class="nota-solo-ida">El viaje se finalizará como solo de ida y no se podrá agregar vuelta.</p>
-    }
+  <label class="opcion-solo-ida">
+    <input type="checkbox" [ngModel]="soloIda()" (ngModelChange)="soloIda.set($event)" />
+    Es solo de ida (sin vuelta)
+  </label>
+  @if (soloIda()) {
+    <p class="nota-solo-ida">
+      El viaje se finalizará como solo de ida y no se podrá agregar vuelta.
+    </p>
+  }
 
-    <div class="acciones-modal">
-      <button (click)="cerrar.emit()">Cancelar</button>
-      <button class="btn-primario" (click)="onConfirmar()">Confirmar</button>
-    </div>
+  <div class="acciones-modal">
+    <button (click)="cerrar.emit()">Cancelar</button>
+    <button class="btn-primario" (click)="onConfirmar()">Confirmar</button>
+  </div>
 </app-modal>

@@ -8,14 +8,14 @@ import { ThemeService } from '../../../core/services/theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './header.html',
-  styleUrl: './header.css'
+  styleUrl: './header.css',
 })
 export class Header {
   toggleSidebar = output<void>();
 
   constructor(
     private authService: AuthService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
   ) {}
 
   onToggleSidebar(): void {

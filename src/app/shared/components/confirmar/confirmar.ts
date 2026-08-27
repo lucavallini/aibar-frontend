@@ -7,7 +7,7 @@ import { Modal } from '../modal/modal';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Modal],
   templateUrl: './confirmar.html',
-  styleUrl: './confirmar.css'
+  styleUrl: './confirmar.css',
 })
 export class Confirmar {
   titulo = input('¿Confirmás esta acción?');

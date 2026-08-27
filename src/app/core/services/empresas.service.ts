@@ -14,14 +14,24 @@ const CACHE_KEY = 'empresas';
 export class EmpresasService {
   private apiUrl = `${environment.apiUrl}/empresas`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 100, filtros?: Record<string, any>): Observable<RespuestaPaginada<Empresa>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 100,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Empresa>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Empresa>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Empresa>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Empresa>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 
   crear(datos: { nombre: string }): Observable<Empresa> {

@@ -15,13 +15,14 @@ interface ItemMenu {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css'
+  styleUrl: './sidebar.css',
 })
 export class Sidebar {
   abierta = input(false);
 
   itemsMenu: ItemMenu[] = [
     { label: 'Viajes', ruta: '/viajes', soloAdmin: false, icono: 'viajes' },
+    { label: 'Mapa', ruta: '/mapa', soloAdmin: false, icono: 'mapa' },
     { label: 'Choferes', ruta: '/choferes', soloAdmin: false, icono: 'choferes' },
     { label: 'Camiones', ruta: '/camiones', soloAdmin: false, icono: 'camiones' },
     { label: 'Acoplados', ruta: '/acoplados', soloAdmin: false, icono: 'acoplados' },
@@ -35,6 +36,6 @@ export class Sidebar {
 
   get itemsVisibles(): ItemMenu[] {
     const esAdmin = this.authService.esAdmin();
-    return this.itemsMenu.filter(item => !item.soloAdmin || esAdmin);
+    return this.itemsMenu.filter((item) => !item.soloAdmin || esAdmin);
   }
 }

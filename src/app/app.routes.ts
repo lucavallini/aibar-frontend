@@ -20,6 +20,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'viajes', component: ListaViajes },
+      { path: 'mapa', loadComponent: () => import('./features/mapa/mapa-flota/mapa-flota').then(m => m.MapaFlota) },
       { path: 'choferes', component: ListaChoferesComponent },
       { path: '', redirectTo: 'viajes', pathMatch: 'full' },
       { path: 'camiones', component: ListaCamiones },

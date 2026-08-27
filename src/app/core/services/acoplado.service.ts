@@ -14,14 +14,24 @@ const CACHE_KEY = 'acoplados';
 export class AcopladosService {
   private apiUrl = `${environment.apiUrl}/acoplados`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Acoplado>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 20,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Acoplado>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Acoplado>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Acoplado>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Acoplado>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 
   crear(datos: AcopladoCreate): Observable<Acoplado> {
@@ -40,7 +50,10 @@ export class AcopladosService {
 
   cambiarEstado(id: string, estado: string, motivo?: string): Observable<Acoplado> {
     this.cache.clear(CACHE_KEY);
-    return this.http.patch<Acoplado>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
+    return this.http.patch<Acoplado>(`${this.apiUrl}/${id}/estado`, {
+      estado,
+      motivo_no_disponible: motivo ?? null,
+    });
   }
 
   darDeBaja(id: string): Observable<Acoplado> {

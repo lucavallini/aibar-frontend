@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, input, output, signal, computed, HostListener, ElementRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+  computed,
+  HostListener,
+  ElementRef,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -7,7 +16,7 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule],
   templateUrl: './buscador-select.html',
-  styleUrl: './buscador-select.css'
+  styleUrl: './buscador-select.css',
 })
 export class BuscadorSelect {
   items = input<any[]>([]);
@@ -37,7 +46,7 @@ export class BuscadorSelect {
   itemsFiltrados = computed(() => {
     const filtro = this.busqueda().toLowerCase();
     if (!filtro) return this.items();
-    return this.items().filter(item => {
+    return this.items().filter((item) => {
       const valor = String(item[this.displayKey()] ?? '').toLowerCase();
       return valor.includes(filtro);
     });
@@ -46,13 +55,13 @@ export class BuscadorSelect {
   displayText = computed(() => {
     const id = this.selectedId();
     if (!id) return this.placeholder();
-    const item = this.items().find(i => String(i[this.idKey()]) === id);
+    const item = this.items().find((i) => String(i[this.idKey()]) === id);
     return item ? String(item[this.displayKey()] ?? '') : this.placeholder();
   });
 
   abrir(event: MouseEvent): void {
     event.stopPropagation();
-    this.dropdownAbierta.update(v => !v);
+    this.dropdownAbierta.update((v) => !v);
     if (!this.dropdownAbierta()) return;
     this.busqueda.set('');
     setTimeout(() => {

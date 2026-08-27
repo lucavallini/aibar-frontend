@@ -21,4 +21,26 @@ describe('Layout', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('el menú se puede ocultar y volver a mostrar', () => {
+    const inicial = component.sidebarAbierta();
+
+    component.toggleSidebar();
+    expect(component.sidebarAbierta()).toBe(!inicial);
+
+    component.toggleSidebar();
+    expect(component.sidebarAbierta()).toBe(inicial);
+  });
+
+  it('la clase del menú acompaña al estado', () => {
+    const menu = () => fixture.nativeElement.querySelector('.sidebar');
+
+    component.sidebarAbierta.set(true);
+    fixture.detectChanges();
+    expect(menu().classList.contains('abierta')).toBe(true);
+
+    component.sidebarAbierta.set(false);
+    fixture.detectChanges();
+    expect(menu().classList.contains('abierta')).toBe(false);
+  });
 });

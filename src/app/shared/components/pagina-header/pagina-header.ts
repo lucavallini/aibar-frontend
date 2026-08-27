@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './pagina-header.html',
-  styleUrl: './pagina-header.css'
+  styleUrl: './pagina-header.css',
 })
 export class PaginaHeader {
   titulo = input.required<string>();

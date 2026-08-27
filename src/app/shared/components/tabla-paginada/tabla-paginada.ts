@@ -7,7 +7,7 @@ import { Paginacion } from '../paginacion/paginacion';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Paginacion],
   templateUrl: './tabla-paginada.html',
-  styleUrl: './tabla-paginada.css'
+  styleUrl: './tabla-paginada.css',
 })
 export class TablaPaginada {
   headers = input.required<string[]>();

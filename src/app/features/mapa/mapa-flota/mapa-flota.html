@@ -1,0 +1,305 @@
+<div class="lienzo" #lienzo [class.inmersivo]="pantallaCompleta()">
+  <div #mapa class="mapa"></div>
+
+  <div class="acciones">
+    @if (generadoEn(); as fecha) {
+      <span class="sello" [class.actualizando]="cargando()">
+        <span class="pulso" aria-hidden="true"></span>
+        {{ fecha | date: 'HH:mm:ss' }}
+      </span>
+    }
+
+    <button
+      type="button"
+      class="boton-icono"
+      (click)="alternarTarjeta()"
+      aria-label="Mostrar u ocultar el panel"
+      [attr.aria-pressed]="tarjetaVisible()"
+      [title]="tarjetaVisible() ? 'Ocultar el panel' : 'Mostrar el panel'"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M9 4v16" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      class="boton-icono"
+      (click)="alternarPantallaCompleta()"
+      aria-label="Ver el mapa en pantalla completa"
+      [attr.aria-pressed]="pantallaCompleta()"
+      [title]="pantallaCompleta() ? 'Salir de pantalla completa' : 'Ver solo el mapa'"
+    >
+      @if (pantallaCompleta()) {
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6" />
+        </svg>
+      } @else {
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" />
+        </svg>
+      }
+    </button>
+  </div>
+
+  @if (tarjetaVisible()) {
+    <aside class="tarjeta">
+      @switch (vista()) {
+        @case ('unidad') {
+          @if (seleccionada(); as unidad) {
+            <header>
+              <button type="button" class="volver" (click)="volverAFiltros()">
+                <span aria-hidden="true">←</span> Volver
+              </button>
+              <h2>{{ unidad.patente }}</h2>
+              <span class="etiqueta" [class]="claseUnidad(unidad)">
+                @switch (unidad.categoria) {
+                  @case ('no_registrada') {
+                    No registrada en el sistema
+                  }
+                  @case ('sin_gps') {
+                    GPS no disponible
+                  }
+                  @case ('dada_de_baja') {
+                    Dada de baja en el sistema
+                  }
+                  @default {
+                    {{ unidad.viaje ? 'En viaje' : 'Sin viaje asignado' }}
+                  }
+                }
+              </span>
+            </header>
+
+            @if (unidad.categoria !== 'no_registrada') {
+              <section>
+                <h3>Unidad</h3>
+                <dl>
+                  <div>
+                    <dt>Marca</dt>
+                    <dd>{{ unidad.marca || '—' }}</dd>
+                  </div>
+                  <div>
+                    <dt>Modelo</dt>
+                    <dd>{{ unidad.modelo || '—' }}</dd>
+                  </div>
+                  <div>
+                    <dt>Empresa</dt>
+                    <dd>{{ unidad.empresa_nombre || '—' }}</dd>
+                  </div>
+                </dl>
+              </section>
+
+              @if (unidad.viaje; as viaje) {
+                <section>
+                  <h3>Viaje {{ viaje.estado === 'pendiente' ? 'asignado' : 'en curso' }}</h3>
+                  <p class="trayecto">
+                    <span>{{ viaje.origen }}</span>
+                    <span class="flecha" aria-hidden="true">→</span>
+                    <span>{{ viaje.destino }}</span>
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>Chofer</dt>
+                      <dd>{{ viaje.chofer_nombre || '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Cliente</dt>
+                      <dd>{{ viaje.cliente || '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Carga</dt>
+                      <dd>{{ viaje.carga || '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Tarifa</dt>
+                      <dd>{{ viaje.tarifa ? '$' + (viaje.tarifa | number) : '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Inicio</dt>
+                      <dd>{{ viaje.fecha_inicio | date: 'dd/MM HH:mm' }}</dd>
+                    </div>
+                  </dl>
+
+                  @if (recorrido(); as traza) {
+                    <dl class="traza">
+                      <div>
+                        <dt>Recorrido</dt>
+                        <dd>{{ traza.distancia_km | number: '1.0-1' }} km</dd>
+                      </div>
+                      <div>
+                        <dt>Velocidad máxima</dt>
+                        <dd>{{ traza.velocidad_maxima_kph }} km/h</dd>
+                      </div>
+                      <div>
+                        <dt>Detenciones</dt>
+                        <dd>{{ traza.detenciones.length }}</dd>
+                      </div>
+                    </dl>
+                    <button type="button" class="chip" (click)="ocultarRecorrido()">
+                      Ocultar recorrido
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="chip"
+                      [disabled]="cargandoRecorrido()"
+                      (click)="verRecorrido(viaje.id)"
+                    >
+                      {{ cargandoRecorrido() ? 'Cargando recorrido...' : 'Mostrar recorrido' }}
+                    </button>
+                  }
+
+                  @if (errorRecorrido(); as mensaje) {
+                    <p class="ayuda aviso">{{ mensaje }}</p>
+                  }
+                </section>
+              } @else {
+                <p class="ayuda">Sin viaje pendiente ni en curso.</p>
+              }
+            }
+
+            @if (esUbicada(unidad)) {
+              <section>
+                <h3>Rastreo satelital</h3>
+                <dl>
+                  <div>
+                    <dt>Velocidad</dt>
+                    <dd>{{ unidad.posicion.velocidad_kph | number: '1.0-0' }} km/h</dd>
+                  </div>
+                  <div>
+                    <dt>Contacto</dt>
+                    <dd>{{ unidad.telemetria.contacto_encendido ? 'Encendido' : 'Apagado' }}</dd>
+                  </div>
+                  <div>
+                    <dt>Reportó</dt>
+                    <dd [class.viejo]="reporteViejo(unidad)">
+                      hace {{ unidad.posicion.minutos_desde_reporte }} min
+                    </dd>
+                  </div>
+                </dl>
+                @if (reporteViejo(unidad)) {
+                  <p class="ayuda aviso">El equipo no reporta hace más de 30 minutos.</p>
+                }
+              </section>
+            }
+          }
+        }
+
+        @case ('sin_gps') {
+          <header>
+            <button type="button" class="volver" (click)="volverAFiltros()">
+              <span aria-hidden="true">←</span> Volver
+            </button>
+            <h2>GPS no disponible</h2>
+          </header>
+          <p class="ayuda">
+            Están en el sistema pero el rastreo no las reporta. Si la patente está mal cargada,
+            corregila y aparecen en el mapa.
+          </p>
+          <ul class="listado">
+            @for (unidad of sinGps(); track unidad.patente) {
+              <li>
+                <strong>{{ unidad.patente }}</strong>
+                @if (unidad.categoria === 'sin_gps' && unidad.viaje) {
+                  <span class="detalle"
+                    >{{ unidad.viaje.origen }} → {{ unidad.viaje.destino }}</span
+                  >
+                }
+              </li>
+            }
+          </ul>
+        }
+
+        @default {
+          <header>
+            <h2>Flota</h2>
+          </header>
+
+          <input
+            type="search"
+            class="input"
+            placeholder="Buscar patente"
+            [ngModel]="busquedaInput()"
+            (ngModelChange)="onBusqueda($event)"
+          />
+
+          <app-select-empresa
+            [empresas]="empresas()"
+            [value]="filtroEmpresaId()"
+            (valueChange)="onEmpresa($event)"
+          />
+
+          <button
+            type="button"
+            class="chip"
+            [class.activo]="soloEnViaje()"
+            (click)="alternarSoloEnViaje()"
+          >
+            Solo en viaje
+          </button>
+
+          <app-estado-carga [cargando]="cargando()" [error]="error()" />
+
+          @if (resumen(); as r) {
+            <ul class="conteo">
+              <li><span class="punto estado-viajando"></span>{{ r.en_viaje }} en viaje</li>
+              <li><span class="punto estado-libre"></span>{{ r.en_mapa }} en el mapa</li>
+              @if (r.sin_gps) {
+                <li>
+                  <button type="button" class="enlace" (click)="verSinGps()">
+                    <span class="punto estado-sin-gps"></span>{{ r.sin_gps }} sin GPS
+                  </button>
+                </li>
+              }
+              @if (r.dadas_de_baja) {
+                <li>
+                  <span class="punto estado-dada-de-baja"></span>{{ r.dadas_de_baja }} dadas de baja
+                </li>
+              }
+              @if (r.no_registradas) {
+                <li>
+                  <span class="punto estado-no-registrada"></span>{{ r.no_registradas }} no
+                  registradas
+                </li>
+              }
+            </ul>
+          }
+
+          <details class="referencias">
+            <summary>Referencias</summary>
+            <ul>
+              @for (referencia of referencias; track referencia.clase) {
+                <li>
+                  <span class="punto" [class]="referencia.clase"></span>
+                  <span>{{ referencia.texto }}</span>
+                </li>
+              }
+            </ul>
+          </details>
+        }
+      }
+    </aside>
+  }
+</div>

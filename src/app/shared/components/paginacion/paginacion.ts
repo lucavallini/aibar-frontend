@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './paginacion.html',
-  styleUrl: './paginacion.css'
+  styleUrl: './paginacion.css',
 })
 export class Paginacion {
   pagina = input(1);

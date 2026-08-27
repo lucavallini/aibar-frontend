@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './estado-carga.html',
-  styleUrl: './estado-carga.css'
+  styleUrl: './estado-carga.css',
 })
 export class EstadoCarga {
   cargando = input(false);

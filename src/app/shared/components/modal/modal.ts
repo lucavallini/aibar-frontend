@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, OnDestroy, output, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  input,
+  OnDestroy,
+  output,
+  viewChild,
+} from '@angular/core';
 import { Subscription, fromEvent } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -8,7 +17,7 @@ import { filter } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './modal.html',
-  styleUrl: './modal.css'
+  styleUrl: './modal.css',
 })
 export class Modal implements AfterViewInit, OnDestroy {
   titulo = input<string | undefined>(undefined);
@@ -21,7 +30,7 @@ export class Modal implements AfterViewInit, OnDestroy {
 
   constructor() {
     this.escSub = fromEvent<KeyboardEvent>(document, 'keydown')
-      .pipe(filter(e => e.key === 'Escape'))
+      .pipe(filter((e) => e.key === 'Escape'))
       .subscribe(() => {
         if (this.cerrable()) this.cerrado.emit();
       });

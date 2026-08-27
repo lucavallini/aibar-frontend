@@ -10,22 +10,38 @@
   </div>
   <span class="ruta">{{ v.origen }} → {{ v.destino }}</span>
   <div class="tramo-datos">
-    <span>Fecha: {{ v.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</span>
-    @if (v.cliente) { <span>Cliente: {{ v.cliente }}</span> }
-    @if (v.carga) { <span>Carga: {{ v.carga }}</span> }
-    @if (v.tarifa) { <span>Tarifa: ${{ v.tarifa | number }}</span> }
+    <span>Fecha: {{ v.fecha_inicio | date: 'dd/MM/yyyy HH:mm' }}</span>
+    @if (v.cliente) {
+      <span>Cliente: {{ v.cliente }}</span>
+    }
+    @if (v.carga) {
+      <span>Carga: {{ v.carga }}</span>
+    }
+    @if (v.tarifa) {
+      <span>Tarifa: ${{ v.tarifa | number }}</span>
+    }
     @if (v.kms_recorridos) {
       <span>
         {{ v.kms_recorridos - (v.kms_descargado ?? 0) }} carg
-        @if (v.kms_descargado) { + {{ v.kms_descargado }} vac }
+        @if (v.kms_descargado) {
+          + {{ v.kms_descargado }} vac
+        }
         = {{ v.kms_recorridos }} kms
       </span>
     }
-    @if (v.km_por_litro) { <span>{{ v.litros_combustible }} L | {{ litros100(v.km_por_litro) }} L/100km</span> }
-    @if (v.fecha_fin) { <span>{{ calcularDias(v.fecha_inicio, v.fecha_fin) }} días</span> }
+    @if (v.km_por_litro) {
+      <span>{{ v.litros_combustible }} L | {{ litros100(v.km_por_litro) }} L/100km</span>
+    }
+    @if (v.fecha_fin) {
+      <span>{{ calcularDias(v.fecha_inicio, v.fecha_fin) }} días</span>
+    }
     <span class="patentes">
-      @if (patenteCamion(v.camion_id)) { Chasis: {{ patenteCamion(v.camion_id) }} }
-      @if (patenteCamion(v.camion_id_2)) { | Acoplado: {{ patenteCamion(v.camion_id_2) }} }
+      @if (patenteCamion(v.camion_id)) {
+        Chasis: {{ patenteCamion(v.camion_id) }}
+      }
+      @if (patenteCamion(v.camion_id_2)) {
+        | Acoplado: {{ patenteCamion(v.camion_id_2) }}
+      }
     </span>
   </div>
   <div class="acciones-viaje">
@@ -36,7 +52,9 @@
     @if (v.estado === 'en_curso' && !readonly()) {
       <button class="btn-accion finalizar" (click)="finalizar.emit(v)">Finalizar</button>
       @if (!esVueltaActual) {
-        <button class="btn-accion finalizar-sin-vuelta" (click)="finalizarSinVuelta.emit(v)">Finalizar sin vuelta</button>
+        <button class="btn-accion finalizar-sin-vuelta" (click)="finalizarSinVuelta.emit(v)">
+          Finalizar sin vuelta
+        </button>
       }
       <button class="btn-accion cancelar" (click)="cancelar.emit(v)">Cancelar</button>
     }

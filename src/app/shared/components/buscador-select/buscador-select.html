@@ -5,7 +5,14 @@
   </div>
   @if (dropdownAbierta()) {
     <div class="buscador-select-dropdown">
-      <input type="text" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" (click)="onInputClick($event)" placeholder="Buscar..." autofocus />
+      <input
+        type="text"
+        [ngModel]="busqueda()"
+        (ngModelChange)="busqueda.set($event)"
+        (click)="onInputClick($event)"
+        placeholder="Buscar..."
+        autofocus
+      />
       <div class="opciones">
         @if (mostrarLimpiar()) {
           <div class="opcion" (mousedown)="limpiar()">
@@ -13,7 +20,11 @@
           </div>
         }
         @for (item of itemsFiltrados(); track itemId(item)) {
-          <div class="opcion" [class.seleccionada]="selectedId() === itemId(item)" (mousedown)="seleccionar(item)">
+          <div
+            class="opcion"
+            [class.seleccionada]="selectedId() === itemId(item)"
+            (mousedown)="seleccionar(item)"
+          >
             {{ item[displayKey()] }}
           </div>
         } @empty {

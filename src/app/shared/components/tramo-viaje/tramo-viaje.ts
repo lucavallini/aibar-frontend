@@ -12,7 +12,7 @@ import { litros100 } from '../../../core/utils/combustible';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, DecimalPipe],
   templateUrl: './tramo-viaje.html',
-  styleUrl: './tramo-viaje.css'
+  styleUrl: './tramo-viaje.css',
 })
 export class TramoViaje {
   viaje = input.required<Viaje>();
@@ -32,7 +32,9 @@ export class TramoViaje {
 
   patenteCamion(camionId: string | null): string {
     if (!camionId) return '';
-    return this.camionesPorId()[camionId]?.patente ?? this.acopladosPorId()[camionId]?.patente ?? '';
+    return (
+      this.camionesPorId()[camionId]?.patente ?? this.acopladosPorId()[camionId]?.patente ?? ''
+    );
   }
 
   calcularDias(inicio: string, fin: string | null): number | null {

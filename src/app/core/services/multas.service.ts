@@ -14,14 +14,24 @@ const CACHE_KEY = 'multas';
 export class MultasService {
   private apiUrl = `${environment.apiUrl}/multas`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Multa>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 20,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Multa>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Multa>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Multa>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Multa>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 
   crear(datos: MultaCreate): Observable<Multa> {

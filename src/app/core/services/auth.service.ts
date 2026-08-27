@@ -14,7 +14,11 @@ export class AuthService {
   // signal reactivo: cualquier componente puede saber al instante si hay sesión
   isLoggedIn = signal<boolean>(this.hayToken());
 
-  constructor(private http: HttpClient, private router: Router, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cache: ApiCache,
+  ) {}
 
   login(nombreUsuario: string, password: string): Observable<LoginResponse> {
     const body = new URLSearchParams();
@@ -22,14 +26,16 @@ export class AuthService {
     body.set('username', nombreUsuario);
     body.set('password', password);
 
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, body.toString(), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    }).pipe(
-      tap(respuesta => {
-        sessionStorage.setItem(this.tokenKey, respuesta.access_token);
-        this.isLoggedIn.set(true);
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/auth/login`, body.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       })
-    );
+      .pipe(
+        tap((respuesta) => {
+          sessionStorage.setItem(this.tokenKey, respuesta.access_token);
+          this.isLoggedIn.set(true);
+        }),
+      );
   }
 
   logout(): void {

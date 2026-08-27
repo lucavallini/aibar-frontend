@@ -14,14 +14,24 @@ const CACHE_KEY = 'choferes';
 export class ChoferesService {
   private apiUrl = `${environment.apiUrl}/choferes`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Chofer>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 20,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Chofer>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Chofer>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Chofer>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Chofer>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 
   obtenerDetalle(id: string): Observable<ChoferDetalle> {
@@ -35,7 +45,10 @@ export class ChoferesService {
 
   cambiarEstado(id: string, estado: string, motivo?: string): Observable<Chofer> {
     this.cache.clear(CACHE_KEY);
-    return this.http.patch<Chofer>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
+    return this.http.patch<Chofer>(`${this.apiUrl}/${id}/estado`, {
+      estado,
+      motivo_no_disponible: motivo ?? null,
+    });
   }
 
   actualizar(id: string, datos: Partial<ChoferCreate>): Observable<Chofer> {

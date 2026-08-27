@@ -1,0 +1,492 @@
+/* El mapa ocupa todo el área de contenido: anula el padding del layout con su propio margen. */
+:host {
+  display: block;
+  margin: calc(var(--padding-contenido) * -1);
+  height: calc(100dvh - var(--altura-header));
+}
+
+.lienzo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-fondo-suave);
+}
+
+.lienzo.inmersivo {
+  height: 100dvh;
+}
+
+.mapa {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Controles --- */
+
+.acciones {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.boton-icono {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  transition: var(--transicion);
+}
+
+.boton-icono:hover {
+  color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.boton-icono svg {
+  width: 17px;
+  height: 17px;
+}
+
+.sello {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 34px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  box-shadow: var(--sombra);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-texto-secundario);
+}
+
+.pulso {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-exito);
+}
+
+.sello.actualizando .pulso {
+  animation: latir 1s ease-in-out infinite;
+}
+
+@keyframes latir {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* --- Tarjeta flotante --- */
+
+.tarjeta {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 290px;
+  max-width: calc(100% - 1.5rem);
+  max-height: calc(100% - 1.5rem);
+  overflow-y: auto;
+  padding: 0.9rem;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-elevada);
+}
+
+.tarjeta header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tarjeta h2 {
+  margin: 0;
+  font-size: var(--fs-lg);
+  letter-spacing: -0.01em;
+}
+
+.tarjeta h3 {
+  margin: 0 0 0.35rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-texto-secundario);
+}
+
+.tarjeta section + section {
+  margin-top: 0.15rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+.volver {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texto-secundario);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.volver:hover {
+  color: var(--color-primario);
+}
+
+.etiqueta {
+  align-self: flex-start;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  background: var(--color-neutro-fondo);
+  color: var(--color-neutro);
+}
+
+.etiqueta.estado-viajando,
+.etiqueta.estado-detenida {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.etiqueta.estado-sin-senal,
+.etiqueta.estado-sin-gps {
+  background: var(--color-alerta-fondo);
+  color: var(--color-alerta);
+}
+
+.etiqueta.estado-no-registrada {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.etiqueta.estado-dada-de-baja {
+  background: color-mix(in srgb, #7c5cd6 14%, transparent);
+  color: #7c5cd6;
+}
+
+.trayecto {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.flecha {
+  color: var(--color-primario);
+}
+
+dl {
+  margin: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: var(--fs-sm);
+}
+
+dt {
+  color: var(--color-texto-secundario);
+}
+
+dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+dd.viejo {
+  color: var(--color-alerta);
+}
+
+.chip {
+  align-self: flex-start;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  background: var(--color-fondo-panel);
+  color: var(--color-texto-secundario);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  transition: var(--transicion);
+}
+
+.chip:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.traza {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--color-borde);
+}
+
+.chip.activo {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+.conteo {
+  margin: 0;
+  padding: 0.6rem 0 0;
+  border-top: 1px solid var(--color-borde);
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+  font-size: var(--fs-sm);
+  color: var(--color-texto-secundario);
+}
+
+.conteo li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Círculo perfecto pase lo que pase: sin crecer, sin encogerse y sin estirarse a lo alto. */
+/* El prefijo "estado-" evita chocar con las clases sueltas de badge de styles.css
+   (.viajando, .pendiente, ...), que inyectan min-height y padding y deforman el punto. */
+.punto {
+  display: block;
+  flex: 0 0 10px;
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.enlace {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.listado {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.listado li {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-sm);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.detalle {
+  font-size: var(--fs-xs);
+  color: var(--color-texto-secundario);
+}
+
+.ayuda {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--color-texto-secundario);
+}
+
+.ayuda.aviso {
+  color: var(--color-alerta);
+}
+
+/* --- Marcadores: los inyecta Leaflet fuera del template, por eso van sin encapsular --- */
+
+.punto.estado-viajando,
+:host ::ng-deep .marcador.estado-viajando {
+  background: var(--color-exito);
+}
+
+.punto.estado-detenida,
+:host ::ng-deep .marcador.estado-detenida {
+  background: var(--color-info);
+}
+
+.punto.estado-libre,
+:host ::ng-deep .marcador.estado-libre {
+  background: var(--color-neutro);
+}
+
+.punto.estado-sin-senal,
+.punto.estado-sin-gps,
+:host ::ng-deep .marcador.estado-sin-senal {
+  background: var(--color-alerta);
+}
+
+.punto.estado-no-registrada,
+:host ::ng-deep .marcador.estado-no-registrada {
+  background: var(--color-error);
+}
+
+.punto.estado-dada-de-baja,
+:host ::ng-deep .marcador.estado-dada-de-baja {
+  background: #7c5cd6;
+}
+
+:host ::ng-deep .marcador {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion);
+}
+
+:host ::ng-deep .marcador.activo {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primario) 28%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sello.actualizando .pulso {
+    animation: none;
+  }
+
+  :host ::ng-deep .marcador,
+  .referencias summary::before {
+    transition: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .tarjeta {
+    width: calc(100% - 1.5rem);
+    max-height: 55%;
+  }
+}
+
+/* --- Referencias --- */
+
+.referencias {
+  border-top: 1px solid var(--color-borde);
+  padding-top: 0.6rem;
+}
+
+.referencias summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--fs-xs);
+  color: var(--color-texto-secundario);
+}
+
+.referencias summary::-webkit-details-marker {
+  display: none;
+}
+
+.referencias summary::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform var(--transicion);
+}
+
+.referencias[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.referencias summary:hover {
+  color: var(--color-primario);
+}
+
+.referencias ul {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--fs-xs);
+  color: var(--color-texto-secundario);
+}
+
+.referencias li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* --- Hitos de salida y llegada del recorrido --- */
+
+:host ::ng-deep .hito {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: var(--sombra);
+}
+
+:host ::ng-deep .hito.inicio {
+  background: var(--color-exito);
+}
+
+:host ::ng-deep .hito.fin {
+  background: var(--color-error);
+}
+
+:host ::ng-deep .hito.camino {
+  background: var(--color-info);
+}
+
+:host ::ng-deep .hito b {
+  position: absolute;
+  top: 15px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--color-fondo-panel);
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  box-shadow: var(--sombra);
+}

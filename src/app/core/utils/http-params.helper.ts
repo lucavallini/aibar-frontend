@@ -1,17 +1,23 @@
 import { HttpParams } from '@angular/common/http';
 
-export function buildListParams(pagina: number, tamanoPagina: number, filtros?: Record<string, any>): HttpParams {
-  let params = new HttpParams()
-    .set('pagina', pagina.toString())
-    .set('tamano_pagina', tamanoPagina.toString());
+/** Agrega los filtros con valor a los parámetros, descartando vacíos y nulos. */
+export function buildParams(filtros?: Record<string, any>, base = new HttpParams()): HttpParams {
+  if (!filtros) return base;
 
-  if (filtros) {
-    Object.entries(filtros).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== '') {
-        params = params.set(k, String(v));
-      }
-    });
-  }
+  return Object.entries(filtros).reduce(
+    (params, [k, v]) =>
+      v !== undefined && v !== null && v !== '' ? params.set(k, String(v)) : params,
+    base,
+  );
+}
 
-  return params;
+export function buildListParams(
+  pagina: number,
+  tamanoPagina: number,
+  filtros?: Record<string, any>,
+): HttpParams {
+  return buildParams(
+    filtros,
+    new HttpParams().set('pagina', pagina.toString()).set('tamano_pagina', tamanoPagina.toString()),
+  );
 }

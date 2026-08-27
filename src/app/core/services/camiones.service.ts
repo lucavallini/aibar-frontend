@@ -14,14 +14,24 @@ const CACHE_KEY = 'camiones';
 export class CamionesService {
   private apiUrl = `${environment.apiUrl}/camiones`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Camion>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 20,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Camion>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Camion>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Camion>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Camion>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 
   crear(datos: CamionCreate): Observable<Camion> {
@@ -38,14 +48,24 @@ export class CamionesService {
     return this.http.patch<Camion>(`${this.apiUrl}/${id}`, datos);
   }
 
-  asignarAsociados(id: string, choferId: string | null, acopladoId: string | null): Observable<Camion> {
+  asignarAsociados(
+    id: string,
+    choferId: string | null,
+    acopladoId: string | null,
+  ): Observable<Camion> {
     this.cache.invalidarFlota();
-    return this.http.patch<Camion>(`${this.apiUrl}/${id}/asignacion`, { chofer_id: choferId, acoplado_id: acopladoId });
+    return this.http.patch<Camion>(`${this.apiUrl}/${id}/asignacion`, {
+      chofer_id: choferId,
+      acoplado_id: acopladoId,
+    });
   }
 
   cambiarEstado(id: string, estado: string, motivo?: string): Observable<Camion> {
     this.cache.clear(CACHE_KEY);
-    return this.http.patch<Camion>(`${this.apiUrl}/${id}/estado`, { estado, motivo_no_disponible: motivo ?? null });
+    return this.http.patch<Camion>(`${this.apiUrl}/${id}/estado`, {
+      estado,
+      motivo_no_disponible: motivo ?? null,
+    });
   }
 
   darDeBaja(id: string): Observable<Camion> {

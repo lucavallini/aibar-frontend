@@ -14,13 +14,23 @@ const CACHE_KEY = 'auditoria';
 export class AuditoriaService {
   private apiUrl = `${environment.apiUrl}/auditoria`;
 
-  constructor(private http: HttpClient, private cache: ApiCache) {}
+  constructor(
+    private http: HttpClient,
+    private cache: ApiCache,
+  ) {}
 
-  listar(pagina: number = 1, tamanoPagina: number = 20, filtros?: Record<string, any>): Observable<RespuestaPaginada<Auditoria>> {
+  listar(
+    pagina: number = 1,
+    tamanoPagina: number = 20,
+    filtros?: Record<string, any>,
+  ): Observable<RespuestaPaginada<Auditoria>> {
     const cacheKey = `${CACHE_KEY}_${pagina}_${tamanoPagina}_${JSON.stringify(filtros ?? {})}`;
     const cached = this.cache.get<RespuestaPaginada<Auditoria>>(cacheKey);
     if (cached) return of(cached);
-    return this.http.get<RespuestaPaginada<Auditoria>>(`${this.apiUrl}/`, { params: buildListParams(pagina, tamanoPagina, filtros) })
-      .pipe(tap(data => this.cache.set(cacheKey, data)));
+    return this.http
+      .get<RespuestaPaginada<Auditoria>>(`${this.apiUrl}/`, {
+        params: buildListParams(pagina, tamanoPagina, filtros),
+      })
+      .pipe(tap((data) => this.cache.set(cacheKey, data)));
   }
 }

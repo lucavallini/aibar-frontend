@@ -2,6 +2,7 @@
   color-scheme: light;
 
   --altura-header: 64px;
+  --padding-contenido: 1.25rem;
   --ancho-sidebar: 240px;
 
   --color-fondo: #f7f9f8;
@@ -139,19 +140,29 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   font-size: 15px;
   line-height: 1.5;
   background-color: var(--color-fondo);
   color: var(--color-texto);
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 button {
   font-family: inherit;
   font-weight: 600;
   line-height: 1.2;
-  transition: background-color 0.15s, opacity 0.15s, transform 0.1s;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s,
+    transform 0.1s;
 }
 
 button:active {
@@ -163,13 +174,19 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: var(--fs-base);
-  transition: border-color var(--transicion), box-shadow var(--transicion);
+  transition:
+    border-color var(--transicion),
+    box-shadow var(--transicion);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--color-primario) !important;
   box-shadow: 0 0 0 3px var(--color-primario-claro);
@@ -247,7 +264,10 @@ tbody tr:last-child td {
   background: var(--color-primario);
   color: #ffffff;
   box-shadow: var(--sombra);
-  transition: background-color var(--transicion), box-shadow var(--transicion), transform var(--transicion);
+  transition:
+    background-color var(--transicion),
+    box-shadow var(--transicion),
+    transform var(--transicion);
 }
 
 .btn-primario:hover {
@@ -288,10 +308,23 @@ p.error {
 
 .badge,
 :is(
-  .disponible, .viajando, .inactivo, .no_disponible, .esperando_iniciar_viaje,
-  .pendiente, .en_curso, .finalizado, .cancelado,
-  .alta, .edicion, .cancelacion, .baja, .solo_ida,
-  .administrador, .empleado, .licencia
+  .disponible,
+  .viajando,
+  .inactivo,
+  .no_disponible,
+  .esperando_iniciar_viaje,
+  .pendiente,
+  .en_curso,
+  .finalizado,
+  .cancelado,
+  .alta,
+  .edicion,
+  .cancelacion,
+  .baja,
+  .solo_ida,
+  .administrador,
+  .empleado,
+  .licencia
 ) {
   display: inline-flex;
   align-items: center;
@@ -305,8 +338,14 @@ p.error {
   white-space: nowrap;
 }
 
-.badge.disponible, .badge.finalizado, .badge.alta, .badge.administrador,
-.disponible, .finalizado, .alta, .administrador {
+.badge.disponible,
+.badge.finalizado,
+.badge.alta,
+.badge.administrador,
+.disponible,
+.finalizado,
+.alta,
+.administrador {
   background: var(--color-exito-fondo);
   color: var(--color-exito);
 }
@@ -317,26 +356,42 @@ p.error {
   color: var(--color-info);
 }
 
-.badge.pendiente, .badge.esperando_iniciar_viaje,
-.pendiente, .esperando_iniciar_viaje {
+.badge.pendiente,
+.badge.esperando_iniciar_viaje,
+.pendiente,
+.esperando_iniciar_viaje {
   background: var(--color-alerta-fondo);
   color: var(--color-alerta);
 }
 
-.badge.en_curso, .badge.edicion, .badge.empleado,
-.en_curso, .edicion, .empleado {
+.badge.en_curso,
+.badge.edicion,
+.badge.empleado,
+.en_curso,
+.edicion,
+.empleado {
   background: var(--color-info-fondo);
   color: var(--color-info);
 }
 
-.badge.inactivo, .badge.cancelado, .badge.cancelacion, .badge.no_disponible,
-.inactivo, .cancelado, .cancelacion, .no_disponible {
+.badge.inactivo,
+.badge.cancelado,
+.badge.cancelacion,
+.badge.no_disponible,
+.inactivo,
+.cancelado,
+.cancelacion,
+.no_disponible {
   background: var(--color-error-fondo);
   color: var(--color-error);
 }
 
-.badge.baja, .badge.solo_ida, .badge.solo-ida,
-.baja, .solo_ida, .solo-ida {
+.badge.baja,
+.badge.solo_ida,
+.badge.solo-ida,
+.baja,
+.solo_ida,
+.solo-ida {
   background: var(--color-neutro-fondo);
   color: var(--color-neutro);
 }
@@ -355,7 +410,9 @@ p.error {
 }
 
 @keyframes aparecer-overlay {
-  from { opacity: 0; }
+  from {
+    opacity: 0;
+  }
 }
 
 @keyframes aparecer-modal {
@@ -517,7 +574,10 @@ textarea {
   border-radius: var(--radio);
   cursor: pointer;
   color: #fff;
-  transition: opacity var(--transicion), box-shadow var(--transicion), transform var(--transicion);
+  transition:
+    opacity var(--transicion),
+    box-shadow var(--transicion),
+    transform var(--transicion);
 }
 
 .btn-accion:hover {

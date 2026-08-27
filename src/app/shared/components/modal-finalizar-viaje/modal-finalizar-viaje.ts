@@ -9,14 +9,20 @@ import { Modal } from '../modal/modal';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, DecimalPipe, Modal],
   templateUrl: './modal-finalizar-viaje.html',
-  styleUrl: './modal-finalizar-viaje.css'
+  styleUrl: './modal-finalizar-viaje.css',
 })
 export class ModalFinalizarViaje {
   error = input<string | null>(null);
   soloIdaInicial = input(false);
 
   cerrar = output<void>();
-  confirmar = output<{ fecha_fin: string; kms_recorridos: number; kms_descargado?: number; litros_combustible?: number; solo_ida: boolean }>();
+  confirmar = output<{
+    fecha_fin: string;
+    kms_recorridos: number;
+    kms_descargado?: number;
+    litros_combustible?: number;
+    solo_ida: boolean;
+  }>();
 
   kmsRecorridos: number | null = null;
   kmsDescargado: number | null = null;
