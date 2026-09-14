@@ -1,8 +1,18 @@
 <div class="contenedor">
-  <app-pagina-header titulo="Choferes" accionLabel="+ Nuevo chofer" [mostrarAccion]="!readonly()" (nuevo)="abrirAlta()" />
+  <app-pagina-header
+    titulo="Choferes"
+    accionLabel="+ Nuevo chofer"
+    [mostrarAccion]="!readonly()"
+    (nuevo)="abrirAlta()"
+  />
 
   <div class="buscador fila-buscador">
-    <input type="text" [ngModel]="busquedaInput()" (ngModelChange)="cambiarBusqueda($event)" placeholder="Buscar chofer..." />
+    <input
+      type="text"
+      [ngModel]="busquedaInput()"
+      (ngModelChange)="cambiarBusqueda($event)"
+      placeholder="Buscar chofer..."
+    />
 
     <app-buscador-select
       [items]="empresas()"
@@ -15,13 +25,79 @@
       (cleanSelection)="limpiarEmpresa()"
     />
 
-    <button class="btn-mini btn-ver-observaciones" (click)="abrirObservacionesMes()">Ver todas las observaciones</button>
+    <button class="btn-mini btn-ver-observaciones" (click)="abrirObservacionesMes()">
+      Ver todas las observaciones
+    </button>
   </div>
 
-  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()" />
+  <div class="filtros">
+    <div class="filtro">
+      <label for="choferDesde">Desde</label>
+      <input
+        id="choferDesde"
+        type="date"
+        class="input-fecha"
+        [ngModel]="filtroFechaDesde()"
+        (ngModelChange)="cambiarFiltroFechaDesde($event)"
+      />
+    </div>
+    <div class="filtro">
+      <label for="choferHasta">Hasta</label>
+      <input
+        id="choferHasta"
+        type="date"
+        class="input-fecha"
+        [ngModel]="filtroFechaHasta()"
+        (ngModelChange)="cambiarFiltroFechaHasta($event)"
+      />
+    </div>
+    <div class="filtro">
+      <label>Período</label>
+      <div class="filtro-botones">
+        @for (opcion of opcionesDias; track opcion.label) {
+          <button
+            class="btn-filtro"
+            [class.activo]="filtroDias() === opcion.valor"
+            (click)="cambiarFiltroDias(opcion.valor)"
+          >
+            {{ opcion.label }}
+          </button>
+        }
+      </div>
+    </div>
+    @if (hayFiltrosPeriodo()) {
+      <div class="filtro">
+        <label>&nbsp;</label>
+        <button class="btn-filtro" (click)="limpiarFiltrosPeriodo()">Limpiar período</button>
+      </div>
+    }
+  </div>
+
+  @if (avisoPeriodo(); as aviso) {
+    <p class="aviso-periodo">{{ aviso }}</p>
+  }
+
+  @if (periodo(); as p) {
+    <p class="resumen-periodo">
+      Del <strong>{{ p.desde | date: 'dd/MM/yyyy' }}</strong>
+      @if (p.hasta) {
+        al <strong>{{ p.hasta | date: 'dd/MM/yyyy' }}</strong>
+      } @else {
+        a <strong>hoy</strong>
+      }
+      · <strong>{{ p.total_kms | number: '1.0-0' }} km</strong> en
+      <strong>{{ p.total_viajes }}</strong> viajes finalizados
+    </p>
+  }
+
+  <app-estado-carga
+    [cargando]="cargando()"
+    [error]="error()"
+    [mostrarError]="!modalEditarAbierto() && !modalBajaAbierto() && !modalDetalleAbierto()"
+  />
 
   <app-tabla-paginada
-    [headers]="['Nombre', 'DNI', 'Estado', 'Kms este mes', 'Teléfono', 'Empresa', 'Venc. carnet', 'Venc. carga peligrosa', 'Acciones']"
+    [headers]="['Chofer', 'Estado', 'Período', 'Contacto', 'Vencimientos', 'Acciones']"
     [items]="choferes()"
     [cargando]="cargando()"
     [error]="error()"
@@ -33,36 +109,64 @@
   >
     @for (chofer of choferes(); track chofer.id) {
       <tr class="fila-clickeable" (click)="abrirDetalle(chofer)">
-        <td>{{ chofer.nombre_completo }}</td>
-        <td>{{ chofer.dni || '-' }}</td>
+        <td>
+          <span class="dato-principal">{{ chofer.nombre_completo }}</span>
+          <span class="dato-secundario">DNI {{ chofer.dni || '—' }}</span>
+        </td>
         <td>
           <span class="badge" [class]="chofer.estado">{{ labelEstadoChofer(chofer.estado) }}</span>
           @if (chofer.estado === 'no_disponible' && chofer.motivo_no_disponible) {
             <span class="motivo-tabla">{{ chofer.motivo_no_disponible }}</span>
           }
         </td>
-        <td>{{ chofer.kms_mes_actual ?? '-' }}</td>
-        <td>{{ chofer.telefono || '-' }}</td>
-        <td>{{ nombreEmpresa(chofer.empresa_id) }}</td>
-        <td>
-          @if (chofer.carnet_vencimiento) {
-            <span class="badge vencimiento" [class.vencido]="estaVencido(chofer.carnet_vencimiento)" [class.proximo]="vencePronto(chofer.carnet_vencimiento)">{{ chofer.carnet_vencimiento | date:'dd/MM/yyyy' }}</span>
-          } @else {
-            <span>—</span>
-          }
+        <td class="celda-periodo">
+          <span class="dato-principal">{{ chofer.kms_periodo | number: '1.0-0' }} km</span>
+          <span class="dato-secundario">
+            {{ chofer.viajes_periodo }} viajes · {{ chofer.promedio_kms_viaje | number: '1.0-0' }}
+            km/viaje
+          </span>
         </td>
         <td>
-          @if (chofer.carga_peligrosa_vencimiento) {
-            <span class="badge vencimiento" [class.vencido]="estaVencido(chofer.carga_peligrosa_vencimiento)" [class.proximo]="vencePronto(chofer.carga_peligrosa_vencimiento)">{{ chofer.carga_peligrosa_vencimiento | date:'dd/MM/yyyy' }}</span>
-          } @else {
-            <span>—</span>
-          }
+          <span class="dato-principal">{{ chofer.telefono || '—' }}</span>
+          <span class="dato-secundario">{{ nombreEmpresa(chofer.empresa_id) }}</span>
         </td>
-        <td (click)="$event.stopPropagation()">
+        <td class="celda-vencimientos">
+          <span class="linea-vencimiento">
+            <span class="dato-secundario">Carnet</span>
+            @if (chofer.carnet_vencimiento) {
+              <span
+                class="badge vencimiento"
+                [class.vencido]="estaVencido(chofer.carnet_vencimiento)"
+                [class.proximo]="vencePronto(chofer.carnet_vencimiento)"
+                >{{ chofer.carnet_vencimiento | date: 'dd/MM/yy' }}</span
+              >
+            } @else {
+              <span>—</span>
+            }
+          </span>
+          <span class="linea-vencimiento">
+            <span class="dato-secundario">Peligrosa</span>
+            @if (chofer.carga_peligrosa_vencimiento) {
+              <span
+                class="badge vencimiento"
+                [class.vencido]="estaVencido(chofer.carga_peligrosa_vencimiento)"
+                [class.proximo]="vencePronto(chofer.carga_peligrosa_vencimiento)"
+                >{{ chofer.carga_peligrosa_vencimiento | date: 'dd/MM/yy' }}</span
+              >
+            } @else {
+              <span>—</span>
+            }
+          </span>
+        </td>
+        <td class="celda-acciones" (click)="$event.stopPropagation()">
           @if (!readonly()) {
             <button class="btn-mini" (click)="abrirEditar(chofer)">Editar</button>
             @if (mostrarBotonLicencia(chofer)) {
-              <button class="btn-mini" [class]="claseBotonLicencia(chofer)" (click)="toggleLicencia(chofer)">
+              <button
+                class="btn-mini"
+                [class]="claseBotonLicencia(chofer)"
+                (click)="toggleLicencia(chofer)"
+              >
                 {{ textoBotonLicencia(chofer) }}
               </button>
             }
@@ -77,22 +181,43 @@
 
 @if (modalEditarAbierto()) {
   <app-modal titulo="Editar chofer" (cerrado)="cerrarEditar()">
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
     <label for="nombreEdit">Nombre completo</label>
-    <input id="nombreEdit" type="text" [(ngModel)]="edicionChofer.nombre_completo" (input)="edicionChofer.nombre_completo = $event.target.value.toUpperCase()" />
+    <input
+      id="nombreEdit"
+      type="text"
+      [(ngModel)]="edicionChofer.nombre_completo"
+      (input)="edicionChofer.nombre_completo = $event.target.value.toUpperCase()"
+    />
 
     <label for="dniEdit">DNI</label>
-    <input id="dniEdit" type="text" [(ngModel)]="edicionChofer.dni" (input)="edicionChofer.dni = $event.target.value.toUpperCase()" />
+    <input
+      id="dniEdit"
+      type="text"
+      [(ngModel)]="edicionChofer.dni"
+      (input)="edicionChofer.dni = $event.target.value.toUpperCase()"
+    />
 
     <label for="telEdit">Teléfono</label>
-    <input id="telEdit" type="text" [(ngModel)]="edicionChofer.telefono" (input)="edicionChofer.telefono = $event.target.value.toUpperCase()" />
+    <input
+      id="telEdit"
+      type="text"
+      [(ngModel)]="edicionChofer.telefono"
+      (input)="edicionChofer.telefono = $event.target.value.toUpperCase()"
+    />
 
     <label for="carnetEdit">Vencimiento del carnet</label>
     <input id="carnetEdit" type="date" [(ngModel)]="edicionChofer.carnet_vencimiento" />
 
     <label for="cargaPeligrosaEdit">Venc. habil. carga peligrosa</label>
-    <input id="cargaPeligrosaEdit" type="date" [(ngModel)]="edicionChofer.carga_peligrosa_vencimiento" />
+    <input
+      id="cargaPeligrosaEdit"
+      type="date"
+      [(ngModel)]="edicionChofer.carga_peligrosa_vencimiento"
+    />
 
     <label>Empresa</label>
     <app-select-empresa
@@ -113,7 +238,11 @@
 @if (modalBajaAbierto()) {
   <app-confirmar
     titulo="Dar de baja chofer"
-    [mensaje]="'¿Seguro que querés dar de baja a ' + choferSeleccionado()?.nombre_completo + '? Podés reactivarlo después si hace falta.'"
+    [mensaje]="
+      '¿Seguro que querés dar de baja a ' +
+      choferSeleccionado()?.nombre_completo +
+      '? Podés reactivarlo después si hace falta.'
+    "
     textoConfirmar="Dar de baja"
     (confirmar)="confirmarBaja()"
     (cancelar)="cerrarBaja()"
@@ -122,22 +251,43 @@
 
 @if (modalAltaAbierto()) {
   <app-modal titulo="Nuevo chofer" (cerrado)="cerrarAlta()">
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
     <label for="nombreAlta">Nombre completo</label>
-    <input id="nombreAlta" type="text" [(ngModel)]="nuevoChofer.nombre_completo" (input)="nuevoChofer.nombre_completo = $event.target.value.toUpperCase()" />
+    <input
+      id="nombreAlta"
+      type="text"
+      [(ngModel)]="nuevoChofer.nombre_completo"
+      (input)="nuevoChofer.nombre_completo = $event.target.value.toUpperCase()"
+    />
 
     <label for="dniAlta">DNI</label>
-    <input id="dniAlta" type="text" [(ngModel)]="nuevoChofer.dni" (input)="nuevoChofer.dni = $event.target.value.toUpperCase()" />
+    <input
+      id="dniAlta"
+      type="text"
+      [(ngModel)]="nuevoChofer.dni"
+      (input)="nuevoChofer.dni = $event.target.value.toUpperCase()"
+    />
 
     <label for="telAlta">Teléfono</label>
-    <input id="telAlta" type="text" [(ngModel)]="nuevoChofer.telefono" (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()" />
+    <input
+      id="telAlta"
+      type="text"
+      [(ngModel)]="nuevoChofer.telefono"
+      (input)="nuevoChofer.telefono = $event.target.value.toUpperCase()"
+    />
 
     <label for="carnetAlta">Vencimiento del carnet</label>
     <input id="carnetAlta" type="date" [(ngModel)]="nuevoChofer.carnet_vencimiento" />
 
     <label for="cargaPeligrosaAlta">Venc. habil. carga peligrosa</label>
-    <input id="cargaPeligrosaAlta" type="date" [(ngModel)]="nuevoChofer.carga_peligrosa_vencimiento" />
+    <input
+      id="cargaPeligrosaAlta"
+      type="date"
+      [(ngModel)]="nuevoChofer.carga_peligrosa_vencimiento"
+    />
 
     <label>Empresa</label>
     <app-select-empresa
@@ -156,7 +306,11 @@
 }
 
 @if (modalDetalleAbierto()) {
-  <app-modal tamano="grande" [titulo]="choferDetalle()?.nombre_completo" (cerrado)="cerrarDetalle()">
+  <app-modal
+    tamano="grande"
+    [titulo]="choferDetalle()?.nombre_completo"
+    (cerrado)="cerrarDetalle()"
+  >
     @let detalle = choferDetalle();
     @if (detalle) {
       <div class="detalle-info">
@@ -224,7 +378,11 @@
 @if (modalObservacionesAbierto()) {
   @let chofer = choferObsSeleccionado();
   @if (chofer) {
-    <app-modal tamano="grande" titulo="Observaciones — {{ chofer.nombre_completo }}" (cerrado)="cerrarObservaciones()">
+    <app-modal
+      tamano="grande"
+      titulo="Observaciones — {{ chofer.nombre_completo }}"
+      (cerrado)="cerrarObservaciones()"
+    >
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
@@ -235,9 +393,19 @@
 
       <div class="obs-actual">
         <h3>Mes actual</h3>
-        <textarea [(ngModel)]="observacionActual" rows="4" placeholder="Escribí una observación para este mes..."></textarea>
+        <textarea
+          [(ngModel)]="observacionActual"
+          rows="4"
+          placeholder="Escribí una observación para este mes..."
+        ></textarea>
         @if (!readonly()) {
-          <button class="btn-primario" (click)="guardarObservacion()" [disabled]="!observacionActual.trim()">Guardar</button>
+          <button
+            class="btn-primario"
+            (click)="guardarObservacion()"
+            [disabled]="!observacionActual.trim()"
+          >
+            Guardar
+          </button>
         }
       </div>
 

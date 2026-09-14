@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { ChoferesService } from '../../../core/services/choferes.service';
@@ -17,7 +25,7 @@ import { obtenerNombreEmpresa } from '../../../core/utils/entidades';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, Modal, EstadoCarga, BuscadorSelect],
   templateUrl: './observaciones-mes.html',
-  styleUrl: './observaciones-mes.css'
+  styleUrl: './observaciones-mes.css',
 })
 export class ObservacionesMesComponent implements OnInit {
   empresas = input<Empresa[]>([]);
@@ -32,7 +40,7 @@ export class ObservacionesMesComponent implements OnInit {
 
   constructor(
     private choferesService: ChoferesService,
-    private observacionesService: ObservacionesService
+    private observacionesService: ObservacionesService,
   ) {}
 
   ngOnInit(): void {
@@ -50,14 +58,14 @@ export class ObservacionesMesComponent implements OnInit {
       next: ({ choferes, observaciones }) => {
         this.choferes.set(choferes.items);
         const mapa: Record<string, Observacion> = {};
-        observaciones.forEach(obs => mapa[obs.chofer_id] = obs);
+        observaciones.forEach((obs) => (mapa[obs.chofer_id] = obs));
         this.observacionesPorChofer.set(mapa);
         this.cargando.set(false);
       },
       error: () => {
         this.error.set('No se pudieron cargar los choferes');
         this.cargando.set(false);
-      }
+      },
     });
   }
 
@@ -85,7 +93,7 @@ export class ObservacionesMesComponent implements OnInit {
     const texto = this.busqueda().trim().toLowerCase();
     const empresa = this.filtroEmpresaId();
     const observaciones = this.observacionesPorChofer();
-    return this.choferes().filter(chofer => {
+    return this.choferes().filter((chofer) => {
       if (!observaciones[chofer.id]) return false;
       if (empresa && chofer.empresa_id !== empresa) return false;
       if (texto && !chofer.nombre_completo.toLowerCase().includes(texto)) return false;

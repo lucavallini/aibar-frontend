@@ -185,8 +185,11 @@ export class MapaFlota implements OnInit, AfterViewInit {
       })
       .subscribe({
         next: (flota) => this.aplicar(flota),
-        error: () => {
-          this.error.set('No se pudo obtener la posición de las unidades.');
+        error: (respuesta) => {
+          // El backend explica qué falló; mostrarlo evita tener que mirar la consola.
+          this.error.set(
+            respuesta?.error?.detail ?? 'No se pudo obtener la posición de las unidades.',
+          );
           this.cargando.set(false);
         },
       });

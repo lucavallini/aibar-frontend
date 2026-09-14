@@ -162,3 +162,88 @@ h3 {
     flex-direction: column;
   }
 }
+
+.resumen-periodo {
+  margin: 0 0 0.75rem;
+  font-size: var(--fs-sm);
+  color: var(--color-texto-secundario);
+}
+
+.resumen-periodo strong {
+  color: var(--color-texto);
+}
+
+/* La tabla tenía 11 columnas y no entraba en pantalla. Los datos que se leen juntos
+   ahora comparten celda: el principal arriba y el contexto abajo, en chico. */
+.dato-principal {
+  display: block;
+  white-space: nowrap;
+}
+
+.dato-secundario {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--color-texto-secundario);
+  white-space: nowrap;
+}
+
+.celda-periodo .dato-principal {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.celda-vencimientos {
+  display: table-cell;
+}
+
+.linea-vencimiento {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.linea-vencimiento + .linea-vencimiento {
+  margin-top: 0.2rem;
+}
+
+.linea-vencimiento .dato-secundario {
+  min-width: 58px;
+}
+
+/* Los botones se apilaban de a uno y estiraban la fila a lo alto. */
+.celda-acciones {
+  white-space: normal;
+  /* Ancho suficiente para dos botones por renglón: si no, caen de a uno y la fila
+     se estira a lo alto. */
+  min-width: 200px;
+}
+
+.celda-acciones .btn-mini {
+  display: inline-flex;
+  margin: 0.15rem 0.2rem 0.15rem 0;
+  min-height: 32px;
+  padding: 0.25rem 0.55rem;
+  font-size: var(--fs-xs);
+}
+
+/* Con seis columnas el aire lateral de cada celda se vuelve caro: recuperarlo es lo que
+   permite que la tabla entre entera sin scroll horizontal. Solo afecta a esta pantalla. */
+.contenedor :is(th, td) {
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+}
+
+/* En pantallas más chicas que un notebook común la tabla no entra por ancho. Antes de
+   empujar la página entera, que se desplace dentro de su propia tarjeta: así nunca queda
+   una columna recortada ni aparece scroll horizontal en toda la pantalla. */
+@media (max-width: 1200px) {
+  .contenedor {
+    overflow-x: auto;
+  }
+}
+
+.aviso-periodo {
+  margin: 0 0 0.75rem;
+  font-size: var(--fs-sm);
+  color: var(--color-alerta);
+}
