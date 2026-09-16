@@ -787,3 +787,61 @@ textarea {
     width: 100%;
   }
 }
+
+/* --- Mapa de flota: colores de estado de las unidades ---
+   Los marcadores los inyecta Leaflet fuera del template de Angular, así que sus
+   estilos son globales por naturaleza. Los puntos de la leyenda comparten los mismos
+   colores, y por eso se declaran juntos: un solo lugar donde cambiar cada estado. */
+
+.punto.estado-viajando,
+.marcador.estado-viajando {
+  background: var(--color-exito);
+}
+
+.punto.estado-detenida,
+.marcador.estado-detenida {
+  background: var(--color-info);
+}
+
+.punto.estado-libre,
+.marcador.estado-libre {
+  background: var(--color-neutro);
+}
+
+.punto.estado-sin-senal,
+.punto.estado-sin-gps,
+.marcador.estado-sin-senal {
+  background: var(--color-alerta);
+}
+
+.punto.estado-no-registrada,
+.marcador.estado-no-registrada {
+  background: var(--color-error);
+}
+
+.punto.estado-dada-de-baja,
+.marcador.estado-dada-de-baja {
+  background: #7c5cd6;
+}
+
+.marcador {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion);
+}
+
+.marcador.activo {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primario) 28%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marcador {
+    transition: none;
+  }
+}

@@ -124,4 +124,25 @@ export interface Recorrido {
   recortado: boolean;
   /** True si la unidad sigue rodando: el último punto es dónde va, no dónde llegó. */
   en_camino: boolean;
+  /** True cuando no hay traza porque el viaje quedó fuera de lo que el proveedor guarda. */
+  sin_datos_por_antiguedad: boolean;
+}
+
+/** Viaje del buscador histórico del mapa, ya con patente y chofer resueltos. */
+export interface ViajeHistorico {
+  id: string;
+  origen: string;
+  destino: string;
+  estado: string;
+  fecha_inicio: string;
+  fecha_fin: string | null;
+  chofer_nombre: string | null;
+  patente: string | null;
+}
+
+export interface FiltrosHistorico {
+  chofer_id?: string;
+  patente?: string;
+  fecha_desde?: string;
+  fecha_hasta?: string;
 }

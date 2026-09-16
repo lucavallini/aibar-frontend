@@ -19,6 +19,8 @@ import * as L from 'leaflet';
 
 import { TelemetriaService } from '../../../core/services/telemetria.service';
 import { EmpresasService } from '../../../core/services/empresas.service';
+import { ChoferesService } from '../../../core/services/choferes.service';
+import { Chofer } from '../../../core/models/chofer.model';
 import { Empresa } from '../../../core/models/empresa.model';
 import {
   Flota,
@@ -26,6 +28,7 @@ import {
   ResumenFlota,
   Unidad,
   UnidadConPosicion,
+  ViajeHistorico,
   tienePosicion,
 } from '../../../core/models/telemetria.model';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
@@ -36,6 +39,9 @@ const ZOOM_INICIAL = 6;
 const ZOOM_UNIDAD = 12;
 const REFRESCO_MS = 30_000;
 const MINUTOS_REPORTE_VIEJO = 30;
+
+/** Desde este zoom las etiquetas quedan fijas: más lejos se pisarían entre ellas. */
+const ZOOM_ETIQUETAS = 11;
 const COLOR_RECORRIDO = '#106b56';
 
 /**
@@ -51,8 +57,11 @@ const CAPA_BASE = {
   zoomMaximo: 18,
 };
 
-/** Contenido de la tarjeta flotante: una sola superficie, tres estados. */
-type VistaTarjeta = 'filtros' | 'unidad' | 'sin_gps';
+/** Contenido de la tarjeta flotante: una sola superficie, sus estados. */
+type VistaTarjeta = 'filtros' | 'unidad' | 'sin_gps' | 'historico';
+
+/** El mapa mira el presente o el pasado; no son el mismo trabajo. */
+type ModoMapa = 'ahora' | 'historico';
 
 @Component({
   selector: 'app-mapa-flota',
@@ -65,6 +74,7 @@ type VistaTarjeta = 'filtros' | 'unidad' | 'sin_gps';
 export class MapaFlota implements OnInit, AfterViewInit {
   private telemetriaService = inject(TelemetriaService);
   private empresasService = inject(EmpresasService);
+  private choferesService = inject(ChoferesService);
   private destroyRef = inject(DestroyRef);
 
   private lienzo = viewChild.required<ElementRef<HTMLElement>>('lienzo');
@@ -73,6 +83,8 @@ export class MapaFlota implements OnInit, AfterViewInit {
   private capaMarcadores = L.layerGroup();
   private capaRecorrido = L.layerGroup();
   private marcadores = new Map<string, L.Marker>();
+  /** Etiqueta de cada unidad, para poder recrearla al cambiar el zoom. */
+  private etiquetas = new Map<string, string>();
 
   unidades = signal<Unidad[]>([]);
   resumen = signal<ResumenFlota | null>(null);
@@ -88,6 +100,18 @@ export class MapaFlota implements OnInit, AfterViewInit {
   pantallaCompleta = signal(false);
   tarjetaVisible = signal(true);
   private vistaManual = signal<VistaTarjeta>('filtros');
+
+  modo = signal<ModoMapa>('ahora');
+  choferes = signal<Chofer[]>([]);
+  histChoferId = signal('');
+  histPatente = signal('');
+  histDesde = signal('');
+  histHasta = signal('');
+  histViajes = signal<ViajeHistorico[]>([]);
+  histBuscando = signal(false);
+  histBuscado = signal(false);
+  histError = signal<string | null>(null);
+  viajeElegido = signal<ViajeHistorico | null>(null);
 
   busquedaInput = signal('');
   busqueda = signal('');
@@ -108,7 +132,11 @@ export class MapaFlota implements OnInit, AfterViewInit {
   sinGps = computed(() => this.unidades().filter((u) => u.categoria === 'sin_gps'));
 
   /** Seleccionar una unidad manda sobre lo que se estuviera mirando. */
-  vista = computed<VistaTarjeta>(() => (this.seleccionada() ? 'unidad' : this.vistaManual()));
+  vista = computed<VistaTarjeta>(() => {
+    if (this.seleccionada()) return 'unidad';
+    if (this.modo() === 'historico') return 'historico';
+    return this.vistaManual();
+  });
 
   ngOnInit(): void {
     this.busquedaCambio$
@@ -120,7 +148,7 @@ export class MapaFlota implements OnInit, AfterViewInit {
 
     interval(REFRESCO_MS)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.cargar(true));
+      .subscribe(() => this.modo() === 'ahora' && this.cargar(true));
 
     this.empresasService.listar(1, 200).subscribe({
       next: (respuesta) => this.empresas.set(respuesta.items),
@@ -147,6 +175,7 @@ export class MapaFlota implements OnInit, AfterViewInit {
 
     this.observarTamano();
     this.observarPantallaCompleta();
+    this.observarZoom();
     this.cargar();
   }
 
@@ -217,12 +246,14 @@ export class MapaFlota implements OnInit, AfterViewInit {
 
       if (existente) {
         existente.setLatLng(posicion).setIcon(this.icono(unidad));
+        this.rotular(existente, unidad);
         continue;
       }
 
-      const marcador = L.marker(posicion, { icon: this.icono(unidad), title: unidad.patente })
+      const marcador = L.marker(posicion, { icon: this.icono(unidad) })
         .on('click', () => this.seleccionar(unidad))
         .addTo(this.capaMarcadores);
+      this.rotular(marcador, unidad);
       this.marcadores.set(unidad.patente, marcador);
     }
 
@@ -230,8 +261,53 @@ export class MapaFlota implements OnInit, AfterViewInit {
       if (!vigentes.has(patente)) {
         this.capaMarcadores.removeLayer(marcador);
         this.marcadores.delete(patente);
+        this.etiquetas.delete(patente);
       }
     }
+  }
+
+  /** Patente y, si está viajando, quién la maneja. */
+  private rotular(marcador: L.Marker, unidad: UnidadConPosicion): void {
+    const chofer = 'viaje' in unidad ? (unidad.viaje?.chofer_nombre ?? null) : null;
+    const pie =
+      chofer ?? (unidad.categoria === 'no_registrada' ? 'No registrada' : 'Sin viaje asignado');
+
+    const html = `<strong>${unidad.patente}</strong><span>${pie}</span>`;
+
+    if (this.etiquetas.get(unidad.patente) === html && marcador.getTooltip()) return;
+
+    this.etiquetas.set(unidad.patente, html);
+    this.aplicarEtiqueta(marcador, html);
+  }
+
+  private aplicarEtiqueta(marcador: L.Marker, html: string): void {
+    const fija = (this.mapa?.getZoom() ?? ZOOM_INICIAL) >= ZOOM_ETIQUETAS;
+
+    marcador.unbindTooltip();
+    marcador.bindTooltip(html, {
+      permanent: fija,
+      direction: 'top',
+      offset: [0, -12],
+      className: 'etiqueta-mapa',
+      opacity: 1,
+    });
+  }
+
+  /** Al acercarse las etiquetas se fijan; al alejarse vuelven a salir solo con el mouse. */
+  private observarZoom(): void {
+    if (!this.mapa) return;
+
+    let fijasAntes = this.mapa.getZoom() >= ZOOM_ETIQUETAS;
+    this.mapa.on('zoomend', () => {
+      const fijasAhora = (this.mapa?.getZoom() ?? 0) >= ZOOM_ETIQUETAS;
+      if (fijasAhora === fijasAntes) return;
+
+      fijasAntes = fijasAhora;
+      for (const [patente, marcador] of this.marcadores) {
+        const html = this.etiquetas.get(patente);
+        if (html) this.aplicarEtiqueta(marcador, html);
+      }
+    });
   }
 
   private icono(unidad: UnidadConPosicion): L.DivIcon {
@@ -412,6 +488,107 @@ export class MapaFlota implements OnInit, AfterViewInit {
     })
       .bindTooltip(`${titulo}: ${hora}`)
       .addTo(this.capaRecorrido);
+  }
+
+  // --- Modo histórico: buscar viajes pasados y dibujar su recorrido ---
+
+  cambiarModo(modo: ModoMapa): void {
+    if (this.modo() === modo) return;
+
+    this.modo.set(modo);
+    this.ocultarRecorrido();
+    this.seleccionada.set(null);
+    this.viajeElegido.set(null);
+
+    if (modo === 'historico') {
+      this.capaMarcadores.clearLayers();
+      this.marcadores.clear();
+      this.etiquetas.clear();
+      if (!this.choferes().length) {
+        this.choferesService.listar(1, 500).subscribe({
+          next: (r) => this.choferes.set(r.items),
+          error: () => this.choferes.set([]),
+        });
+      }
+      return;
+    }
+
+    this.histViajes.set([]);
+    this.histBuscado.set(false);
+    this.cargar();
+  }
+
+  buscarHistorico(): void {
+    if (this.histBuscando()) return;
+
+    this.histBuscando.set(true);
+    this.histError.set(null);
+    this.viajeElegido.set(null);
+    this.ocultarRecorrido();
+
+    this.telemetriaService
+      .buscarViajes({
+        chofer_id: this.histChoferId() || undefined,
+        patente: this.histPatente() || undefined,
+        fecha_desde: this.histDesde() || undefined,
+        fecha_hasta: this.histHasta() || undefined,
+      })
+      .subscribe({
+        next: (viajes) => {
+          this.histBuscando.set(false);
+          this.histBuscado.set(true);
+          this.histViajes.set(viajes);
+        },
+        error: (respuesta) => {
+          this.histBuscando.set(false);
+          this.histBuscado.set(true);
+          this.histViajes.set([]);
+          this.histError.set(respuesta?.error?.detail ?? 'No se pudo buscar los viajes.');
+        },
+      });
+  }
+
+  limpiarHistorico(): void {
+    this.histChoferId.set('');
+    this.histPatente.set('');
+    this.histDesde.set('');
+    this.histHasta.set('');
+    this.histViajes.set([]);
+    this.histBuscado.set(false);
+    this.histError.set(null);
+    this.viajeElegido.set(null);
+    this.ocultarRecorrido();
+  }
+
+  elegirViaje(viaje: ViajeHistorico): void {
+    this.viajeElegido.set(viaje);
+    this.verRecorrido(viaje.id);
+  }
+
+  volverAlBuscador(): void {
+    this.viajeElegido.set(null);
+    this.ocultarRecorrido();
+  }
+
+  /**
+   * Un viaje guardado puede no tener traza por más de un motivo, y al operario le sirve
+   * saber cuál para poder corregirlo.
+   */
+  motivoSinRecorrido(traza: Recorrido): string | null {
+    if (traza.puntos.length) return null;
+
+    if (traza.sin_datos_por_antiguedad) {
+      return (
+        'El servicio de rastreo conserva alrededor de seis meses de recorridos y este viaje ' +
+        'es anterior, así que ya no quedan posiciones para dibujar.'
+      );
+    }
+
+    return (
+      'Este viaje no tiene recorrido satelital. Puede ser que la unidad haya viajado sin ' +
+      'equipo de rastreo, que el equipo no haya reportado, o que las fechas del viaje se ' +
+      'hayan cargado mal al guardarlo. Revisá las fechas y la patente antes de descartarlo.'
+    );
   }
 
   esUbicada = tienePosicion;

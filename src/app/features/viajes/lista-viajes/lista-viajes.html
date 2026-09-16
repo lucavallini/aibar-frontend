@@ -1,151 +1,186 @@
 <div class="contenedor">
-  <app-pagina-header titulo="Viajes" accionLabel="+ Nuevo viaje" [mostrarAccion]="!readonly()" (nuevo)="abrirModalNuevoViaje()" />
+  <app-pagina-header
+    titulo="Viajes"
+    accionLabel="+ Nuevo viaje"
+    [mostrarAccion]="!readonly()"
+    (nuevo)="abrirModalNuevoViaje()"
+  />
 
   <div class="contenido-viajes">
     <div class="lista-panel">
-  <div class="filtros">
-    <div class="filtro">
-      <label>Chofer</label>
-      <app-buscador-select
-        [items]="choferes()"
-        [selectedId]="filtroChoferId()"
-        displayKey="nombre_completo"
-        placeholder="Todos los choferes"
-        [mostrarLimpiar]="true"
-        textoLimpiar="Todos los choferes"
-        (selectionChange)="cambiarFiltroChoferId($event.id)"
-        (cleanSelection)="limpiarFiltroChoferId()"
-      />
-    </div>
-    <div class="filtro">
-      <label>Patente</label>
-      <app-buscador-select
-        [items]="camiones()"
-        [selectedId]="filtroPatente()"
-        displayKey="patente"
-        idKey="patente"
-        placeholder="Todas las patentes"
-        [mostrarLimpiar]="true"
-        textoLimpiar="Todas las patentes"
-        (selectionChange)="cambiarFiltroPatente($event.patente)"
-        (cleanSelection)="limpiarFiltroPatente()"
-      />
-    </div>
-    <div class="filtro">
-      <label>Empresa</label>
-      <app-buscador-select
-        [items]="empresas()"
-        [selectedId]="filtroEmpresaId()"
-        displayKey="nombre"
-        placeholder="Todas las empresas"
-        [mostrarLimpiar]="true"
-        textoLimpiar="Todas las empresas"
-        (selectionChange)="cambiarFiltroEmpresaId($event.id)"
-        (cleanSelection)="limpiarFiltroEmpresaId()"
-      />
-    </div>
-    <div class="filtro">
-      <label for="fechaDesde">Desde</label>
-      <input id="fechaDesde" type="date" [ngModel]="filtroFechaDesde()" (ngModelChange)="cambiarFiltroFechaDesde($event)" class="input-fecha" />
-    </div>
-    <div class="filtro">
-      <label for="fechaHasta">Hasta</label>
-      <input id="fechaHasta" type="date" [ngModel]="filtroFechaHasta()" (ngModelChange)="cambiarFiltroFechaHasta($event)" class="input-fecha" />
-    </div>
-    <div class="filtro">
-      <label>Estado</label>
-      <div class="filtro-botones">
-        @for (filtro of filtrosEstado; track filtro.valor) {
-          <button
-            class="btn-filtro"
-            [class.activo]="filtroEstado() === filtro.valor"
-            (click)="cambiarFiltroEstado(filtro.valor)"
-          >
-            {{ filtro.label }}
-          </button>
-        }
-      </div>
-    </div>
-    <div class="filtro">
-      <label>Período</label>
-      <div class="filtro-botones">
-        @for (opcion of opcionesDias; track opcion.label) {
-          <button
-            class="btn-filtro"
-            [class.activo]="filtroDias() === opcion.valor"
-            (click)="cambiarFiltroDias(opcion.valor)"
-          >
-            {{ opcion.label }}
-          </button>
-        }
-      </div>
-    </div>
-  </div>
-
-  <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!accionModal()" />
-
-  @if (!cargando()) {
-    <div class="lista-viajes">
-      @for (viaje of viajes(); track viaje.id) {
-        <div class="tarjeta-viaje" [class.tiene-vuelta]="!!viaje.viaje_vuelta" [class.terminado]="viajeTerminado(viaje)">
-          <div class="linea-principal">
-            <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
-            @if (nombreEmpresaChofer(viaje.chofer_id)) {
-              <span class="empresa">{{ nombreEmpresaChofer(viaje.chofer_id) }}</span>
-            }
-            <span class="linea-derecha">
-              @if (viajeTerminado(viaje)) {
-                <span class="badge terminado">✓ Terminado</span>
-              }
-              <span class="tarjeta-flecha" aria-hidden="true">→</span>
-            </span>
-          </div>
-
-          <app-tramo-viaje
-            [viaje]="viaje"
-            [readonly]="readonly()"
-            [camionesPorId]="camionesPorId()"
-            [acopladosPorId]="acopladosPorId()"
-            (iniciar)="iniciarViaje($event)"
-            (cancelar)="abrirModalCancelar($event)"
-            (finalizar)="abrirModalFinalizar($event)"
-            (finalizarSinVuelta)="abrirConfirmacionSinVuelta($event)"
-            (reanudar)="abrirModalReanudar($event)"
+      <div class="filtros">
+        <div class="filtro">
+          <label>Chofer</label>
+          <app-buscador-select
+            [items]="choferes()"
+            [selectedId]="filtroChoferId()"
+            displayKey="nombre_completo"
+            placeholder="Todos los choferes"
+            [mostrarLimpiar]="true"
+            textoLimpiar="Todos los choferes"
+            (selectionChange)="cambiarFiltroChoferId($event.id)"
+            (cleanSelection)="limpiarFiltroChoferId()"
           />
+        </div>
+        <div class="filtro">
+          <label>Patente</label>
+          <app-buscador-select
+            [items]="camiones()"
+            [selectedId]="filtroPatente()"
+            displayKey="patente"
+            idKey="patente"
+            placeholder="Todas las patentes"
+            [mostrarLimpiar]="true"
+            textoLimpiar="Todas las patentes"
+            (selectionChange)="cambiarFiltroPatente($event.patente)"
+            (cleanSelection)="limpiarFiltroPatente()"
+          />
+        </div>
+        <div class="filtro">
+          <label>Empresa</label>
+          <app-buscador-select
+            [items]="empresas()"
+            [selectedId]="filtroEmpresaId()"
+            displayKey="nombre"
+            placeholder="Todas las empresas"
+            [mostrarLimpiar]="true"
+            textoLimpiar="Todas las empresas"
+            (selectionChange)="cambiarFiltroEmpresaId($event.id)"
+            (cleanSelection)="limpiarFiltroEmpresaId()"
+          />
+        </div>
+        <div class="filtro">
+          <label for="fechaDesde">Desde</label>
+          <input
+            id="fechaDesde"
+            type="date"
+            [ngModel]="filtroFechaDesde()"
+            (ngModelChange)="cambiarFiltroFechaDesde($event)"
+            class="input-fecha"
+          />
+        </div>
+        <div class="filtro">
+          <label for="fechaHasta">Hasta</label>
+          <input
+            id="fechaHasta"
+            type="date"
+            [ngModel]="filtroFechaHasta()"
+            (ngModelChange)="cambiarFiltroFechaHasta($event)"
+            class="input-fecha"
+          />
+        </div>
+        <div class="filtro">
+          <label>Estado</label>
+          <div class="filtro-botones">
+            @for (filtro of filtrosEstado; track filtro.valor) {
+              <button
+                class="btn-filtro"
+                [class.activo]="filtroEstado() === filtro.valor"
+                (click)="cambiarFiltroEstado(filtro.valor)"
+              >
+                {{ filtro.label }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="filtro">
+          <label>Período</label>
+          <div class="filtro-botones">
+            @for (opcion of opcionesDias; track opcion.label) {
+              <button
+                class="btn-filtro"
+                [class.activo]="filtroDias() === opcion.valor"
+                (click)="cambiarFiltroDias(opcion.valor)"
+              >
+                {{ opcion.label }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
 
-          @if (viaje.viaje_vuelta) {
-            <div class="separador-viajes"></div>
-            <app-tramo-viaje
-              [viaje]="viaje.viaje_vuelta"
-              [esVuelta]="true"
-              [readonly]="readonly()"
-              [camionesPorId]="camionesPorId()"
-              [acopladosPorId]="acopladosPorId()"
-              (iniciar)="iniciarViaje($event)"
-              (cancelar)="abrirModalCancelar($event)"
-              (finalizar)="abrirModalFinalizar($event)"
-              (finalizarSinVuelta)="abrirConfirmacionSinVuelta($event)"
-              (reanudar)="abrirModalReanudar($event)"
-            />
-          }
+      <app-estado-carga [cargando]="cargando()" [error]="error()" [mostrarError]="!accionModal()" />
 
-          <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
-          @if (!viaje.viaje_vuelta && viaje.estado === 'finalizado' && !viaje.solo_ida && !readonly()) {
-            <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">+ Vuelta</button>
+      @if (!cargando()) {
+        <div class="lista-viajes">
+          @for (viaje of viajes(); track viaje.id) {
+            <div
+              class="tarjeta-viaje"
+              [class.tiene-vuelta]="!!viaje.viaje_vuelta"
+              [class.terminado]="viajeTerminado(viaje)"
+            >
+              <div class="linea-principal">
+                <span class="chofer">{{ nombreChofer(viaje.chofer_id) }}</span>
+                @if (nombreEmpresaChofer(viaje.chofer_id)) {
+                  <span class="empresa">{{ nombreEmpresaChofer(viaje.chofer_id) }}</span>
+                }
+                <span class="linea-derecha">
+                  @if (viajeTerminado(viaje)) {
+                    <span class="badge terminado">✓ Terminado</span>
+                  }
+                  <span class="tarjeta-flecha" aria-hidden="true">→</span>
+                </span>
+              </div>
+
+              <app-tramo-viaje
+                [viaje]="viaje"
+                [readonly]="readonly()"
+                [camionesPorId]="camionesPorId()"
+                [acopladosPorId]="acopladosPorId()"
+                (iniciar)="iniciarViaje($event)"
+                (cancelar)="abrirModalCancelar($event)"
+                (finalizar)="abrirModalFinalizar($event)"
+                (finalizarSinVuelta)="abrirConfirmacionSinVuelta($event)"
+                (reanudar)="abrirModalReanudar($event)"
+              />
+
+              @if (viaje.viaje_vuelta) {
+                <div class="separador-viajes"></div>
+                <app-tramo-viaje
+                  [viaje]="viaje.viaje_vuelta"
+                  [esVuelta]="true"
+                  [readonly]="readonly()"
+                  [camionesPorId]="camionesPorId()"
+                  [acopladosPorId]="acopladosPorId()"
+                  (iniciar)="iniciarViaje($event)"
+                  (cancelar)="abrirModalCancelar($event)"
+                  (finalizar)="abrirModalFinalizar($event)"
+                  (finalizarSinVuelta)="abrirConfirmacionSinVuelta($event)"
+                  (reanudar)="abrirModalReanudar($event)"
+                />
+              }
+
+              <div class="creado-por">Creado por: {{ nombreUsuario(viaje.asignado_por) }}</div>
+              <div class="acciones-tarjeta">
+                @if (
+                  !viaje.viaje_vuelta &&
+                  viaje.estado === 'finalizado' &&
+                  !viaje.solo_ida &&
+                  !readonly()
+                ) {
+                  <button class="btn-accion vuelta" (click)="abrirModalVuelta(viaje)">
+                    + Vuelta
+                  </button>
+                }
+                @if (puedeEliminar()) {
+                  <button class="btn-accion eliminar" (click)="abrirEliminar(viaje)">
+                    Eliminar
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p>No hay viajes para este filtro.</p>
           }
         </div>
-      } @empty {
-        <p>No hay viajes para este filtro.</p>
+        <app-paginacion
+          [pagina]="pagina()"
+          [totalPaginas]="totalPaginas()"
+          [total]="total()"
+          (cambioPagina)="cambiarPagina($event)"
+        ></app-paginacion>
       }
     </div>
-    <app-paginacion
-      [pagina]="pagina()"
-      [totalPaginas]="totalPaginas()"
-      [total]="total()"
-      (cambioPagina)="cambiarPagina($event)"
-    ></app-paginacion>
-  }
-  </div>
 
     <app-estado-flota
       [choferes]="choferes()"
@@ -161,79 +196,106 @@
 @if (accionModal() === 'nuevo' || accionModal() === 'vuelta' || accionModal() === 'reanudar') {
   <app-modal
     tamano="grande"
-    [titulo]="accionModal() === 'vuelta' ? 'Agregar vuelta' : accionModal() === 'reanudar' ? 'Reanudar viaje' : 'Nuevo viaje'"
+    [titulo]="
+      accionModal() === 'vuelta'
+        ? 'Agregar vuelta'
+        : accionModal() === 'reanudar'
+          ? 'Reanudar viaje'
+          : 'Nuevo viaje'
+    "
     (cerrado)="cerrarModal()"
   >
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
 
-      @if (error()) {
-        <p class="error">{{ error() }}</p>
+    <label>{{
+      accionModal() === 'vuelta'
+        ? 'Chofer (vuelta)'
+        : accionModal() === 'reanudar'
+          ? 'Chofer'
+          : 'Chofer disponible'
+    }}</label>
+    <app-buscador-select
+      [items]="choferes()"
+      [selectedId]="nuevoViaje.chofer_id"
+      displayKey="nombre_completo"
+      placeholder="Elegí un chofer"
+      (selectionChange)="seleccionarModalChofer($event)"
+    />
+
+    <label>Chasis (opcional)</label>
+    <app-buscador-select
+      [items]="camiones()"
+      [selectedId]="nuevoViaje.camion_id"
+      displayKey="patente"
+      placeholder="Sin especificar"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Sin especificar"
+      (selectionChange)="seleccionarModalCamion($event)"
+      (cleanSelection)="limpiarModalCamion()"
+    />
+
+    <label>Acoplado / Batea (opcional)</label>
+    <app-buscador-select
+      [items]="acopladosList()"
+      [selectedId]="nuevoViaje.camion_id_2"
+      displayKey="patente"
+      placeholder="Sin especificar"
+      [mostrarLimpiar]="true"
+      textoLimpiar="Sin especificar"
+      (selectionChange)="seleccionarModalCamion2($event)"
+      (cleanSelection)="limpiarModalCamion2()"
+    />
+
+    <label for="cliente">Cliente</label>
+    <input
+      id="cliente"
+      type="text"
+      [(ngModel)]="nuevoViaje.cliente"
+      (input)="nuevoViaje.cliente = $event.target.value.toUpperCase()"
+    />
+
+    <label for="origen">Origen</label>
+    <input
+      id="origen"
+      type="text"
+      [(ngModel)]="nuevoViaje.origen"
+      (input)="nuevoViaje.origen = $event.target.value.toUpperCase()"
+    />
+
+    <label for="destino">Destino</label>
+    <input
+      id="destino"
+      type="text"
+      [(ngModel)]="nuevoViaje.destino"
+      (input)="nuevoViaje.destino = $event.target.value.toUpperCase()"
+    />
+
+    <label for="carga">Carga</label>
+    <input
+      id="carga"
+      type="text"
+      [(ngModel)]="nuevoViaje.carga"
+      (input)="nuevoViaje.carga = $event.target.value.toUpperCase()"
+    />
+
+    <label for="tarifa">Tarifa</label>
+    <input id="tarifa" type="number" [(ngModel)]="nuevoViaje.tarifa" />
+
+    <label for="fechaInicio">Fecha y hora de salida</label>
+    <input id="fechaInicio" type="datetime-local" [(ngModel)]="nuevoViaje.fecha_inicio" />
+
+    <div class="acciones-modal">
+      <button (click)="cerrarModal()">Cancelar</button>
+      @if (accionModal() === 'vuelta') {
+        <button class="btn-primario" (click)="confirmarVuelta()">Agregar vuelta</button>
+      } @else if (accionModal() === 'reanudar') {
+        <button class="btn-primario" (click)="confirmarReanudar()">Reanudar viaje</button>
+      } @else {
+        <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
       }
-
-      <label>{{
-        accionModal() === 'vuelta' ? 'Chofer (vuelta)' :
-        accionModal() === 'reanudar' ? 'Chofer' :
-        'Chofer disponible'
-      }}</label>
-      <app-buscador-select
-        [items]="choferes()"
-        [selectedId]="nuevoViaje.chofer_id"
-        displayKey="nombre_completo"
-        placeholder="Elegí un chofer"
-        (selectionChange)="seleccionarModalChofer($event)"
-      />
-
-      <label>Chasis (opcional)</label>
-      <app-buscador-select
-        [items]="camiones()"
-        [selectedId]="nuevoViaje.camion_id"
-        displayKey="patente"
-        placeholder="Sin especificar"
-        [mostrarLimpiar]="true"
-        textoLimpiar="Sin especificar"
-        (selectionChange)="seleccionarModalCamion($event)"
-        (cleanSelection)="limpiarModalCamion()"
-      />
-
-      <label>Acoplado / Batea (opcional)</label>
-      <app-buscador-select
-        [items]="acopladosList()"
-        [selectedId]="nuevoViaje.camion_id_2"
-        displayKey="patente"
-        placeholder="Sin especificar"
-        [mostrarLimpiar]="true"
-        textoLimpiar="Sin especificar"
-        (selectionChange)="seleccionarModalCamion2($event)"
-        (cleanSelection)="limpiarModalCamion2()"
-      />
-
-      <label for="cliente">Cliente</label>
-      <input id="cliente" type="text" [(ngModel)]="nuevoViaje.cliente" (input)="nuevoViaje.cliente = $event.target.value.toUpperCase()" />
-
-      <label for="origen">Origen</label>
-      <input id="origen" type="text" [(ngModel)]="nuevoViaje.origen" (input)="nuevoViaje.origen = $event.target.value.toUpperCase()" />
-
-      <label for="destino">Destino</label>
-      <input id="destino" type="text" [(ngModel)]="nuevoViaje.destino" (input)="nuevoViaje.destino = $event.target.value.toUpperCase()" />
-
-      <label for="carga">Carga</label>
-      <input id="carga" type="text" [(ngModel)]="nuevoViaje.carga" (input)="nuevoViaje.carga = $event.target.value.toUpperCase()" />
-
-      <label for="tarifa">Tarifa</label>
-      <input id="tarifa" type="number" [(ngModel)]="nuevoViaje.tarifa" />
-
-      <label for="fechaInicio">Fecha y hora de salida</label>
-      <input id="fechaInicio" type="datetime-local" [(ngModel)]="nuevoViaje.fecha_inicio" />
-
-      <div class="acciones-modal">
-        <button (click)="cerrarModal()">Cancelar</button>
-        @if (accionModal() === 'vuelta') {
-          <button class="btn-primario" (click)="confirmarVuelta()">Agregar vuelta</button>
-        } @else if (accionModal() === 'reanudar') {
-          <button class="btn-primario" (click)="confirmarReanudar()">Reanudar viaje</button>
-        } @else {
-          <button class="btn-primario" (click)="confirmarNuevoViaje()">Crear viaje</button>
-        }
-      </div>
+    </div>
   </app-modal>
 }
 
@@ -249,7 +311,11 @@
 @if (modalSinVuelta() && viajeSinVuelta()) {
   <app-confirmar
     titulo="Finalizar sin vuelta"
-    [mensaje]="'¿Seguro que querés finalizar el viaje de ' + nombreChofer(viajeSinVuelta()!.chofer_id) + ' sin vuelta? El viaje quedará como solo de ida.'"
+    [mensaje]="
+      '¿Seguro que querés finalizar el viaje de ' +
+      nombreChofer(viajeSinVuelta()!.chofer_id) +
+      ' sin vuelta? El viaje quedará como solo de ida.'
+    "
     textoConfirmar="Finalizar"
     (confirmar)="confirmarSinVuelta()"
     (cancelar)="cerrarConfirmacionSinVuelta()"
@@ -262,4 +328,14 @@
     (confirmar)="onCancelarConfirmado($event)"
     (cerrar)="cerrarModal()"
   ></app-modal-cancelar-viaje>
+}
+
+@if (viajeAEliminar(); as viaje) {
+  <app-confirmar
+    titulo="Eliminar el viaje definitivamente"
+    [mensaje]="mensajeEliminar(viaje)"
+    [textoConfirmar]="eliminando() ? 'Eliminando...' : 'Eliminar para siempre'"
+    (confirmar)="confirmarEliminar()"
+    (cancelar)="cerrarEliminar()"
+  ></app-confirmar>
 }

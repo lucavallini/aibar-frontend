@@ -66,6 +66,19 @@
 
   @if (tarjetaVisible()) {
     <aside class="tarjeta">
+      <div class="modos">
+        <button class="chip" [class.activo]="modo() === 'ahora'" (click)="cambiarModo('ahora')">
+          Ahora
+        </button>
+        <button
+          class="chip"
+          [class.activo]="modo() === 'historico'"
+          (click)="cambiarModo('historico')"
+        >
+          Histórico
+        </button>
+      </div>
+
       @switch (vista()) {
         @case ('unidad') {
           @if (seleccionada(); as unidad) {
@@ -207,6 +220,155 @@
           }
         }
 
+        @case ('historico') {
+          @if (viajeElegido(); as viaje) {
+            <header>
+              <button type="button" class="volver" (click)="volverAlBuscador()">
+                <span aria-hidden="true">←</span> Volver a la búsqueda
+              </button>
+              <h2>{{ viaje.patente || 'Sin patente' }}</h2>
+              <span class="etiqueta">{{ viaje.estado }}</span>
+            </header>
+
+            <section>
+              <h3>Viaje</h3>
+              <p class="trayecto">
+                <span>{{ viaje.origen }}</span>
+                <span class="flecha" aria-hidden="true">→</span>
+                <span>{{ viaje.destino }}</span>
+              </p>
+              <dl>
+                <div>
+                  <dt>Chofer</dt>
+                  <dd>{{ viaje.chofer_nombre || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Inicio</dt>
+                  <dd>{{ viaje.fecha_inicio | date: 'dd/MM/yyyy HH:mm' }}</dd>
+                </div>
+                <div>
+                  <dt>Fin</dt>
+                  <dd>
+                    {{ viaje.fecha_fin ? (viaje.fecha_fin | date: 'dd/MM/yyyy HH:mm') : '—' }}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <section>
+              <h3>Recorrido</h3>
+              @if (cargandoRecorrido()) {
+                <p class="ayuda">Buscando el recorrido...</p>
+              } @else if (recorrido(); as traza) {
+                @if (motivoSinRecorrido(traza); as motivo) {
+                  <p class="ayuda aviso">{{ motivo }}</p>
+                } @else {
+                  <dl>
+                    <div>
+                      <dt>Distancia</dt>
+                      <dd>{{ traza.distancia_km | number: '1.0-1' }} km</dd>
+                    </div>
+                    <div>
+                      <dt>Velocidad máxima</dt>
+                      <dd>{{ traza.velocidad_maxima_kph }} km/h</dd>
+                    </div>
+                    <div>
+                      <dt>Detenciones</dt>
+                      <dd>{{ traza.detenciones.length }}</dd>
+                    </div>
+                  </dl>
+                }
+              }
+              @if (errorRecorrido(); as mensaje) {
+                <p class="ayuda aviso">{{ mensaje }}</p>
+              }
+            </section>
+          } @else {
+            <header>
+              <h2>Buscar recorridos</h2>
+            </header>
+
+            <label class="campo">
+              <span class="dato-secundario">Chofer</span>
+              <select
+                class="input"
+                [ngModel]="histChoferId()"
+                (ngModelChange)="histChoferId.set($event)"
+              >
+                <option value="">Todos</option>
+                @for (c of choferes(); track c.id) {
+                  <option [value]="c.id">{{ c.nombre_completo }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="campo">
+              <span class="dato-secundario">Patente</span>
+              <input
+                type="search"
+                class="input"
+                placeholder="Toda la flota"
+                [ngModel]="histPatente()"
+                (ngModelChange)="histPatente.set($event)"
+              />
+            </label>
+
+            <label class="campo">
+              <span class="dato-secundario">Desde</span>
+              <input
+                type="date"
+                class="input"
+                [ngModel]="histDesde()"
+                (ngModelChange)="histDesde.set($event)"
+              />
+            </label>
+
+            <label class="campo">
+              <span class="dato-secundario">Hasta</span>
+              <input
+                type="date"
+                class="input"
+                [ngModel]="histHasta()"
+                (ngModelChange)="histHasta.set($event)"
+              />
+            </label>
+
+            <div class="acciones-hist">
+              <button class="chip activo" [disabled]="histBuscando()" (click)="buscarHistorico()">
+                {{ histBuscando() ? 'Buscando...' : 'Buscar' }}
+              </button>
+              <button class="chip" (click)="limpiarHistorico()">Limpiar</button>
+            </div>
+
+            @if (histError(); as e) {
+              <p class="ayuda aviso">{{ e }}</p>
+            }
+
+            @if (histBuscado() && !histViajes().length && !histError()) {
+              <p class="ayuda">No hay viajes con esos filtros.</p>
+            }
+
+            @if (histViajes().length) {
+              <p class="ayuda">
+                {{ histViajes().length }} viaje(s). Tocá uno para ver su recorrido en el mapa.
+              </p>
+              <ul class="listado">
+                @for (v of histViajes(); track v.id) {
+                  <li>
+                    <button class="viaje-hist" (click)="elegirViaje(v)">
+                      <strong>{{ v.origen }} → {{ v.destino }}</strong>
+                      <span class="detalle">
+                        {{ v.fecha_inicio | date: 'dd/MM/yyyy' }} · {{ v.patente || 'sin patente' }}
+                      </span>
+                      <span class="detalle">{{ v.chofer_nombre || 'sin chofer' }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
+
         @case ('sin_gps') {
           <header>
             <button type="button" class="volver" (click)="volverAFiltros()">
@@ -240,7 +402,7 @@
           <input
             type="search"
             class="input"
-            placeholder="Buscar patente"
+            placeholder="Buscar patente o chofer"
             [ngModel]="busquedaInput()"
             (ngModelChange)="onBusqueda($event)"
           />

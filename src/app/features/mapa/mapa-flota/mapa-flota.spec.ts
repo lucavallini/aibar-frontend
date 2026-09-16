@@ -123,6 +123,96 @@ describe('MapaFlota', () => {
     responderFlota();
   });
 
+  it('en modo histórico se buscan viajes por chofer, patente y fechas', () => {
+    responderFlota();
+
+    component.cambiarModo('historico');
+    // Al entrar trae los choferes para el selector.
+    http.match((r) => r.url.includes('/choferes')).forEach((p) => p.flush({ items: [] }));
+
+    component.histChoferId.set('cho-1');
+    component.histPatente.set('AE195MX');
+    component.histDesde.set('2026-08-01');
+    component.histHasta.set('2026-08-31');
+    component.buscarHistorico();
+
+    const pedido = http.expectOne((r) => r.url === `${environment.apiUrl}/telemetria/viajes`);
+    expect(pedido.request.params.get('chofer_id')).toBe('cho-1');
+    expect(pedido.request.params.get('patente')).toBe('AE195MX');
+    expect(pedido.request.params.get('fecha_desde')).toBe('2026-08-01');
+    expect(pedido.request.params.get('fecha_hasta')).toBe('2026-08-31');
+    pedido.flush([
+      { id: 'via-9', origen: 'A', destino: 'B', patente: 'AE195MX', chofer_nombre: 'JUAN PEREZ' },
+    ]);
+
+    expect(component.histViajes().length).toBe(1);
+    // La patente y el chofer vienen resueltos del backend, el mapa no cruza ids.
+    expect(component.histViajes()[0].patente).toBe('AE195MX');
+    expect(component.histViajes()[0].chofer_nombre).toBe('JUAN PEREZ');
+  });
+
+  it('elegir un viaje del histórico dibuja su recorrido', () => {
+    responderFlota();
+    component.cambiarModo('historico');
+    http.match((r) => r.url.includes('/choferes')).forEach((p) => p.flush({ items: [] }));
+
+    component.elegirViaje({ id: 'via-9' } as never);
+
+    const pedido = http.expectOne(`${environment.apiUrl}/telemetria/viajes/via-9/recorrido`);
+    pedido.flush({
+      viaje_id: 'via-9',
+      patente: 'AE195MX',
+      distancia_km: 0,
+      velocidad_maxima_kph: 0,
+      puntos: [],
+      detenciones: [],
+      recortado: false,
+      en_camino: false,
+      sin_datos_por_antiguedad: true,
+    });
+
+    expect(component.recorrido()?.sin_datos_por_antiguedad).toBe(true);
+  });
+
+  it('explica por qué un viaje no tiene recorrido', () => {
+    const base = {
+      viaje_id: 'via-9',
+      patente: 'AE195MX',
+      distancia_km: 0,
+      velocidad_maxima_kph: 0,
+      puntos: [],
+      detenciones: [],
+      recortado: false,
+      en_camino: false,
+    };
+
+    const viejo = { ...base, sin_datos_por_antiguedad: true };
+    expect(component.motivoSinRecorrido(viejo as never)).toContain('seis meses');
+
+    const reciente = { ...base, sin_datos_por_antiguedad: false };
+    const motivo = component.motivoSinRecorrido(reciente as never) ?? '';
+    expect(motivo).toContain('sin equipo de rastreo');
+    expect(motivo).toContain('fechas');
+
+    const conTraza = { ...base, puntos: [{}], sin_datos_por_antiguedad: false };
+    expect(component.motivoSinRecorrido(conTraza as never)).toBeNull();
+
+    responderFlota();
+  });
+
+  it('volver a Ahora limpia lo del histórico y recarga la flota', () => {
+    responderFlota();
+    component.cambiarModo('historico');
+    http.match((r) => r.url.includes('/choferes')).forEach((p) => p.flush({ items: [] }));
+    component.histViajes.set([{ id: 'via-9' } as never]);
+
+    component.cambiarModo('ahora');
+
+    expect(component.histViajes()).toEqual([]);
+    expect(component.recorrido()).toBeNull();
+    responderFlota();
+  });
+
   it('al cargar el mapa no se pide ningún recorrido', () => {
     responderFlota();
     http.expectNone((r) => r.url.includes('/recorrido'));

@@ -13,6 +13,13 @@ import { RespuestaPaginada } from '../models/paginacion.model';
 import { buildListParams } from '../utils/http-params.helper';
 import { ApiCache } from '../utils/api-cache';
 
+/** Lo que informa el backend tras un borrado definitivo. */
+export interface ResultadoEliminacion {
+  eliminados: number;
+  cargas_combustible_eliminadas: number;
+  multas_desvinculadas: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ViajesService {
   private apiUrl = `${environment.apiUrl}/viajes`;
@@ -75,5 +82,11 @@ export class ViajesService {
     return this.http.get<RendimientoCombustible>(
       `${this.apiUrl}/rendimiento-combustible/${choferId}`,
     );
+  }
+
+  /** Borrado definitivo: se lleva el viaje de vuelta y sus cargas de combustible. */
+  eliminar(id: string): Observable<ResultadoEliminacion> {
+    this.cache.invalidarFlota();
+    return this.http.delete<ResultadoEliminacion>(`${this.apiUrl}/${id}`);
   }
 }

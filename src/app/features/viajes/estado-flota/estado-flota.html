@@ -6,9 +6,27 @@
   }
 
   <div class="filtro-botones tabs-flota">
-    <button class="btn-filtro" [class.activo]="vista() === 'choferes'" (click)="cambiarVista('choferes')">Choferes</button>
-    <button class="btn-filtro" [class.activo]="vista() === 'chasis'" (click)="cambiarVista('chasis')">Chasis</button>
-    <button class="btn-filtro" [class.activo]="vista() === 'acoplados'" (click)="cambiarVista('acoplados')">Acoplados</button>
+    <button
+      class="btn-filtro"
+      [class.activo]="vista() === 'choferes'"
+      (click)="cambiarVista('choferes')"
+    >
+      Choferes
+    </button>
+    <button
+      class="btn-filtro"
+      [class.activo]="vista() === 'chasis'"
+      (click)="cambiarVista('chasis')"
+    >
+      Chasis
+    </button>
+    <button
+      class="btn-filtro"
+      [class.activo]="vista() === 'acoplados'"
+      (click)="cambiarVista('acoplados')"
+    >
+      Acoplados
+    </button>
   </div>
 
   <div class="filtros">
@@ -88,7 +106,9 @@
 
   @if (vista() === 'choferes') {
     <section class="flota-seccion">
-      <h3>Choferes <span class="contador">{{ choferesFiltrados().length }}</span></h3>
+      <h3>
+        Choferes <span class="contador">{{ choferesFiltrados().length }}</span>
+      </h3>
       @if (cargando()) {
         <p class="estado-msg">Actualizando...</p>
       }
@@ -118,7 +138,9 @@
 
   @if (vista() === 'chasis') {
     <section class="flota-seccion">
-      <h3>Chasis <span class="contador">{{ camionesFiltrados().length }}</span></h3>
+      <h3>
+        Chasis <span class="contador">{{ camionesFiltrados().length }}</span>
+      </h3>
       @if (cargando()) {
         <p class="estado-msg">Actualizando...</p>
       }
@@ -148,7 +170,9 @@
 
   @if (vista() === 'acoplados') {
     <section class="flota-seccion">
-      <h3>Acoplados <span class="contador">{{ acopladosFiltrados().length }}</span></h3>
+      <h3>
+        Acoplados <span class="contador">{{ acopladosFiltrados().length }}</span>
+      </h3>
       @if (cargando()) {
         <p class="estado-msg">Actualizando...</p>
       }
@@ -193,7 +217,9 @@
     }
     <div class="acciones-modal">
       <button (click)="cerrarMotivo()">Cancelar</button>
-      <button class="btn-primario" [disabled]="!motivo().trim()" (click)="confirmarNoDisponible()">Guardar</button>
+      <button class="btn-primario" [disabled]="!motivo().trim()" (click)="confirmarNoDisponible()">
+        Guardar
+      </button>
     </div>
   </app-modal>
 }

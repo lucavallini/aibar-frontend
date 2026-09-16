@@ -2,7 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Flota, FiltrosFlota, Recorrido } from '../models/telemetria.model';
+import {
+  Flota,
+  FiltrosFlota,
+  FiltrosHistorico,
+  Recorrido,
+  ViajeHistorico,
+} from '../models/telemetria.model';
 import { buildParams } from '../utils/http-params.helper';
 
 @Injectable({ providedIn: 'root' })
@@ -21,5 +27,12 @@ export class TelemetriaService {
   /** Traza de un viaje. Es pesada, así que se pide solo cuando el usuario la abre. */
   obtenerRecorrido(viajeId: string): Observable<Recorrido> {
     return this.http.get<Recorrido>(`${this.apiUrl}/viajes/${viajeId}/recorrido`);
+  }
+
+  /** Viajes pasados para el modo histórico del mapa. */
+  buscarViajes(filtros: FiltrosHistorico): Observable<ViajeHistorico[]> {
+    return this.http.get<ViajeHistorico[]>(`${this.apiUrl}/viajes`, {
+      params: buildParams(filtros),
+    });
   }
 }

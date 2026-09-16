@@ -11,7 +11,11 @@ import { Empresa } from '../../../core/models/empresa.model';
 import { ChoferesService } from '../../../core/services/choferes.service';
 import { CamionesService } from '../../../core/services/camiones.service';
 import { AcopladosService } from '../../../core/services/acoplado.service';
-import { labelEstadoChofer, labelEstadoCamion, labelEstadoAcoplado } from '../../../core/utils/estado-labels';
+import {
+  labelEstadoChofer,
+  labelEstadoCamion,
+  labelEstadoAcoplado,
+} from '../../../core/utils/estado-labels';
 import { obtenerNombrePorId } from '../../../core/utils/entidades';
 
 type FiltroDisponibilidad = 'todos' | 'disponibles' | 'no_disponibles';
@@ -24,7 +28,7 @@ type VistaFlota = 'choferes' | 'chasis' | 'acoplados';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, BuscadorSelect, FlotaItem, Modal],
   templateUrl: './estado-flota.html',
-  styleUrl: './estado-flota.css'
+  styleUrl: './estado-flota.css',
 })
 export class EstadoFlota {
   choferes = input<Chofer[]>([]);
@@ -60,19 +64,19 @@ export class EstadoFlota {
   constructor(
     private choferesService: ChoferesService,
     private camionesService: CamionesService,
-    private acopladosService: AcopladosService
+    private acopladosService: AcopladosService,
   ) {}
 
   private empresasPorId = computed(() => {
     const mapa: Record<string, string> = {};
-    this.empresas().forEach(e => mapa[e.id] = e.nombre);
+    this.empresas().forEach((e) => (mapa[e.id] = e.nombre));
     return mapa;
   });
 
   choferesFiltrados = computed(() => {
     const empresa = this.filtroEmpresaId();
     const choferId = this.filtroChoferId();
-    return this.choferes().filter(c => {
+    return this.choferes().filter((c) => {
       if (empresa && c.empresa_id !== empresa) return false;
       if (choferId && c.id !== choferId) return false;
       return this.coincideFiltroEstado(c.estado);
@@ -82,7 +86,7 @@ export class EstadoFlota {
   camionesFiltrados = computed(() => {
     const empresa = this.filtroEmpresaId();
     const camionId = this.filtroCamionId();
-    return this.camiones().filter(c => {
+    return this.camiones().filter((c) => {
       if (empresa && c.empresa_id !== empresa) return false;
       if (camionId && c.id !== camionId) return false;
       return this.coincideFiltroEstado(c.estado);
@@ -92,7 +96,7 @@ export class EstadoFlota {
   acopladosFiltrados = computed(() => {
     const empresa = this.filtroEmpresaId();
     const acopladoId = this.filtroAcopladoId();
-    return this.acoplados().filter(a => {
+    return this.acoplados().filter((a) => {
       if (empresa && a.empresa_id !== empresa) return false;
       if (acopladoId && a.id !== acopladoId) return false;
       return this.coincideFiltroEstado(a.estado);
@@ -101,7 +105,9 @@ export class EstadoFlota {
 
   mostrarListaChoferes = computed(() => this.filtroChoferId() !== '' || this.verTodosChoferes());
   mostrarListaCamiones = computed(() => this.filtroCamionId() !== '' || this.verTodosCamiones());
-  mostrarListaAcoplados = computed(() => this.filtroAcopladoId() !== '' || this.verTodosAcoplados());
+  mostrarListaAcoplados = computed(
+    () => this.filtroAcopladoId() !== '' || this.verTodosAcoplados(),
+  );
 
   private coincideFiltroEstado(estado: string): boolean {
     const filtro = this.filtroEstado();
@@ -184,11 +190,12 @@ export class EstadoFlota {
     }
 
     this.cargando.set(true);
-    const req: Observable<Chofer | Camion | Acoplado> = modal.tipo === 'chofer'
-      ? this.choferesService.cambiarEstado(modal.id, 'no_disponible', motivo)
-      : modal.tipo === 'camion'
-        ? this.camionesService.cambiarEstado(modal.id, 'no_disponible', motivo)
-        : this.acopladosService.cambiarEstado(modal.id, 'no_disponible', motivo);
+    const req: Observable<Chofer | Camion | Acoplado> =
+      modal.tipo === 'chofer'
+        ? this.choferesService.cambiarEstado(modal.id, 'no_disponible', motivo)
+        : modal.tipo === 'camion'
+          ? this.camionesService.cambiarEstado(modal.id, 'no_disponible', motivo)
+          : this.acopladosService.cambiarEstado(modal.id, 'no_disponible', motivo);
 
     req.subscribe({
       next: () => {
@@ -199,18 +206,19 @@ export class EstadoFlota {
       error: () => {
         this.cargando.set(false);
         this.error.set('No se pudo actualizar el estado');
-      }
+      },
     });
   }
 
   marcarDisponible(tipo: TipoFlota, item: Chofer | Camion | Acoplado): void {
     this.error.set(null);
     this.cargando.set(true);
-    const req: Observable<Chofer | Camion | Acoplado> = tipo === 'chofer'
-      ? this.choferesService.cambiarEstado(item.id, 'disponible')
-      : tipo === 'camion'
-        ? this.camionesService.cambiarEstado(item.id, 'disponible')
-        : this.acopladosService.cambiarEstado(item.id, 'disponible');
+    const req: Observable<Chofer | Camion | Acoplado> =
+      tipo === 'chofer'
+        ? this.choferesService.cambiarEstado(item.id, 'disponible')
+        : tipo === 'camion'
+          ? this.camionesService.cambiarEstado(item.id, 'disponible')
+          : this.acopladosService.cambiarEstado(item.id, 'disponible');
 
     req.subscribe({
       next: () => {
@@ -220,7 +228,7 @@ export class EstadoFlota {
       error: () => {
         this.cargando.set(false);
         this.error.set('No se pudo actualizar el estado');
-      }
+      },
     });
   }
 }

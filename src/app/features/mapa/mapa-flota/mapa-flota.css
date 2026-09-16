@@ -328,61 +328,11 @@ dd.viejo {
   color: var(--color-alerta);
 }
 
-/* --- Marcadores: los inyecta Leaflet fuera del template, por eso van sin encapsular --- */
-
-.punto.estado-viajando,
-:host ::ng-deep .marcador.estado-viajando {
-  background: var(--color-exito);
-}
-
-.punto.estado-detenida,
-:host ::ng-deep .marcador.estado-detenida {
-  background: var(--color-info);
-}
-
-.punto.estado-libre,
-:host ::ng-deep .marcador.estado-libre {
-  background: var(--color-neutro);
-}
-
-.punto.estado-sin-senal,
-.punto.estado-sin-gps,
-:host ::ng-deep .marcador.estado-sin-senal {
-  background: var(--color-alerta);
-}
-
-.punto.estado-no-registrada,
-:host ::ng-deep .marcador.estado-no-registrada {
-  background: var(--color-error);
-}
-
-.punto.estado-dada-de-baja,
-:host ::ng-deep .marcador.estado-dada-de-baja {
-  background: #7c5cd6;
-}
-
-:host ::ng-deep .marcador {
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin: 2px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: var(--sombra);
-  transition: transform var(--transicion);
-}
-
-:host ::ng-deep .marcador.activo {
-  transform: scale(1.35);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primario) 28%, transparent);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sello.actualizando .pulso {
     animation: none;
   }
 
-  :host ::ng-deep .marcador,
   .referencias summary::before {
     transition: none;
   }
@@ -489,4 +439,70 @@ dd.viejo {
   letter-spacing: 0.02em;
   white-space: nowrap;
   box-shadow: var(--sombra);
+}
+
+.modos {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.campo {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.acciones-hist {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.viaje-hist {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+.viaje-hist:hover {
+  border-color: var(--color-primario);
+}
+
+.viaje-hist.elegido {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+}
+
+/* --- Etiqueta de la unidad sobre el mapa --- */
+
+:host ::ng-deep .etiqueta-mapa {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo-panel);
+  box-shadow: var(--sombra);
+  color: var(--color-texto);
+  font-size: var(--fs-xs);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .etiqueta-mapa strong {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+:host ::ng-deep .etiqueta-mapa span {
+  display: block;
+  color: var(--color-texto-secundario);
+}
+
+/* La flechita del globo tiene que acompañar al fondo de la etiqueta. */
+:host ::ng-deep .etiqueta-mapa.leaflet-tooltip-top::before {
+  border-top-color: var(--color-borde);
 }
