@@ -116,8 +116,13 @@ export interface DetencionRecorrido {
 export interface Recorrido {
   viaje_id: string;
   patente: string;
-  distancia_km: number;
+  /** Kilómetros recorridos dentro del rango real del viaje. */
+  distancia_viaje_km: number;
+  /** Kilómetros de los días completos que devolvió el proveedor, sin recortar. */
+  distancia_periodo_km: number;
+  /** Máxima dentro del viaje. */
   velocidad_maxima_kph: number;
+  velocidad_maxima_periodo_kph: number;
   puntos: PuntoRecorrido[];
   detenciones: DetencionRecorrido[];
   /** El proveedor devuelve días completos; true cuando se recortó al rango del viaje. */

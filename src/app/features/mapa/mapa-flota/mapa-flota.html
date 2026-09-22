@@ -158,8 +158,12 @@
                   @if (recorrido(); as traza) {
                     <dl class="traza">
                       <div>
-                        <dt>Recorrido</dt>
-                        <dd>{{ traza.distancia_km | number: '1.0-1' }} km</dd>
+                        <dt>Este viaje</dt>
+                        <dd>{{ traza.distancia_viaje_km | number: '1.0-1' }} km</dd>
+                      </div>
+                      <div>
+                        <dt>Días completos</dt>
+                        <dd>{{ traza.distancia_periodo_km | number: '1.0-1' }} km</dd>
                       </div>
                       <div>
                         <dt>Velocidad máxima</dt>
@@ -265,8 +269,12 @@
                 } @else {
                   <dl>
                     <div>
-                      <dt>Distancia</dt>
-                      <dd>{{ traza.distancia_km | number: '1.0-1' }} km</dd>
+                      <dt>Este viaje</dt>
+                      <dd>{{ traza.distancia_viaje_km | number: '1.0-1' }} km</dd>
+                    </div>
+                    <div>
+                      <dt>Días completos</dt>
+                      <dd>{{ traza.distancia_periodo_km | number: '1.0-1' }} km</dd>
                     </div>
                     <div>
                       <dt>Velocidad máxima</dt>
@@ -277,6 +285,10 @@
                       <dd>{{ traza.detenciones.length }}</dd>
                     </div>
                   </dl>
+                  <p class="ayuda">
+                    "Este viaje" cuenta solo entre la salida y la llegada. "Días completos" es todo
+                    lo que la unidad anduvo esos días, incluido antes y después del viaje.
+                  </p>
                 }
               }
               @if (errorRecorrido(); as mensaje) {

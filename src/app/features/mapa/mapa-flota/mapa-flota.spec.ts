@@ -162,8 +162,10 @@ describe('MapaFlota', () => {
     pedido.flush({
       viaje_id: 'via-9',
       patente: 'AE195MX',
-      distancia_km: 0,
+      distancia_viaje_km: 0,
+      distancia_periodo_km: 0,
       velocidad_maxima_kph: 0,
+      velocidad_maxima_periodo_kph: 0,
       puntos: [],
       detenciones: [],
       recortado: false,
@@ -178,8 +180,10 @@ describe('MapaFlota', () => {
     const base = {
       viaje_id: 'via-9',
       patente: 'AE195MX',
-      distancia_km: 0,
+      distancia_viaje_km: 0,
+      distancia_periodo_km: 0,
       velocidad_maxima_kph: 0,
+      velocidad_maxima_periodo_kph: 0,
       puntos: [],
       detenciones: [],
       recortado: false,
@@ -242,8 +246,10 @@ describe('MapaFlota', () => {
     pedido.flush({
       viaje_id: 'via-1',
       patente: 'AE195MX',
-      distancia_km: 615.1,
+      distancia_viaje_km: 615.1,
+      distancia_periodo_km: 980.4,
       velocidad_maxima_kph: 88,
+      velocidad_maxima_periodo_kph: 92,
       puntos: [
         {
           latitud: -33.1,
