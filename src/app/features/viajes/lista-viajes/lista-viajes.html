@@ -263,6 +263,11 @@
       [(ngModel)]="nuevoViaje.origen"
       (input)="nuevoViaje.origen = $event.target.value.toUpperCase()"
     />
+    <app-sugerencia-campo
+      campo="lugar"
+      [texto]="nuevoViaje.origen ?? ''"
+      (aceptada)="nuevoViaje.origen = $event"
+    />
 
     <label for="destino">Destino</label>
     <input
@@ -271,6 +276,11 @@
       [(ngModel)]="nuevoViaje.destino"
       (input)="nuevoViaje.destino = $event.target.value.toUpperCase()"
     />
+    <app-sugerencia-campo
+      campo="lugar"
+      [texto]="nuevoViaje.destino ?? ''"
+      (aceptada)="nuevoViaje.destino = $event"
+    />
 
     <label for="carga">Carga</label>
     <input
@@ -278,6 +288,11 @@
       type="text"
       [(ngModel)]="nuevoViaje.carga"
       (input)="nuevoViaje.carga = $event.target.value.toUpperCase()"
+    />
+    <app-sugerencia-campo
+      campo="carga"
+      [texto]="nuevoViaje.carga ?? ''"
+      (aceptada)="nuevoViaje.carga = $event"
     />
 
     <label for="tarifa">Tarifa</label>

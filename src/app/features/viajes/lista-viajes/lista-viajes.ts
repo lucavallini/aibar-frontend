@@ -27,6 +27,7 @@ import { TramoViaje } from '../../../shared/components/tramo-viaje/tramo-viaje';
 import { PaginaHeader } from '../../../shared/components/pagina-header/pagina-header';
 import { EstadoCarga } from '../../../shared/components/estado-carga/estado-carga';
 import { Modal } from '../../../shared/components/modal/modal';
+import { SugerenciaCampoComponent } from '../../../shared/components/sugerencia-campo/sugerencia-campo';
 import { AuthService } from '../../../core/services/auth.service';
 import { obtenerNombrePorId } from '../../../core/utils/entidades';
 
@@ -49,6 +50,7 @@ type AccionModal = 'finalizar' | 'cancelar' | 'nuevo' | 'vuelta' | 'reanudar' | 
     PaginaHeader,
     EstadoCarga,
     Modal,
+    SugerenciaCampoComponent,
   ],
   templateUrl: './lista-viajes.html',
   styleUrl: './lista-viajes.css',
